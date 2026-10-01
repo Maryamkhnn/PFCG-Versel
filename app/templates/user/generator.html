@@ -1,0 +1,280 @@
+{% extends "user/base.html" %}
+
+{% block title %}Content Generator | PFCG AI{% endblock %}
+
+{% block page_title %}{% endblock %}
+
+{% block css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/user/generator.css') }}"
+>
+{% endblock %}
+
+{% block content %}
+
+<div class="workspace">
+
+    <div class="settings-card">
+
+        <h2>
+            <i class="fas fa-sliders" aria-hidden="true"></i>
+            Content Settings
+        </h2>
+
+        <p class="settings-description">
+            Choose your preferences and enter a topic to get started.
+        </p>
+
+        <div class="form-group">
+            <label for="role">Role</label>
+
+            <select id="role">
+                <option>Student</option>
+                <option>Teacher</option>
+                <option>Blogger</option>
+                <option>Developer</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="contentType">Content Type</label>
+
+            <select id="contentType">
+                <option>Blog</option>
+                <option>Essay</option>
+                <option>Article</option>
+                <option>Assignment</option>
+                <option>Report</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="wordCount">Word Count</label>
+            <input type="number" id="wordCount" value="500">
+        </div>
+
+        <div class="form-group">
+            <label for="prompt">Topic</label>
+
+            <textarea
+                id="prompt"
+                placeholder="What would you like to write about?"
+            ></textarea>
+        </div>
+
+        <button type="button" id="generateBtn" class="generate-btn">
+            <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
+            Generate Content
+        </button>
+
+    </div>
+
+    <div class="workspace-right">
+
+        <div class="editor-grid">
+
+            <div class="editor-card generated-editor">
+
+                <div class="editor-top">
+                    <div class="editor-title">
+                        <i class="fas fa-robot" aria-hidden="true"></i>
+                        <h3>Generated Content</h3>
+                    </div>
+
+                    <span id="generatedWords">0 Words</span>
+                </div>
+
+                <textarea
+                    id="generatedContent"
+                    aria-label="Generated content"
+                    placeholder="Your generated content will appear here..."
+                ></textarea>
+
+                <div class="editor-footer">
+                    <button type="button" id="regenerateBtn">
+                        <i class="fas fa-rotate" aria-hidden="true"></i>
+                        Regenerate
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="editor-card humanized-editor">
+
+                <div class="editor-top">
+                    <div class="editor-title">
+                        <i class="fas fa-user-pen" aria-hidden="true"></i>
+                        <h3>Humanized Content</h3>
+                    </div>
+
+                    <span id="humanWords">0 Words</span>
+                </div>
+
+                <textarea
+                    id="humanizedContent"
+                    aria-label="Humanized content"
+                    placeholder="Your humanized content will appear here..."
+                ></textarea>
+
+                <div class="editor-footer">
+                    <button type="button" id="humanizeBtn">
+                        <i class="fas fa-user-check" aria-hidden="true"></i>
+                        Humanize
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="action-bar">
+
+    <div class="action-source">
+
+        <label for="generatorPdfSource">
+            Content
+        </label>
+
+        <select id="generatorPdfSource">
+
+            <option value="generatedContent">
+                AI Content
+            </option>
+
+            <option value="humanizedContent">
+                Humanized Content
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <button type="button" id="copyBtn">
+        <i class="fas fa-copy" aria-hidden="true"></i>
+        Copy
+    </button>
+
+
+    <button type="button" id="saveBtn">
+        <i class="fas fa-bookmark" aria-hidden="true"></i>
+        Save
+    </button>
+
+
+    <button type="button" id="downloadBtn">
+        <i class="fas fa-file-lines" aria-hidden="true"></i>
+        Export TXT
+    </button>
+
+
+    <button type="button" id="generatorPdfBtn">
+        <i class="fas fa-file-pdf" aria-hidden="true"></i>
+        Download PDF
+    </button>
+
+</div>
+
+        <div class="plagiarism-card">
+
+            <div class="plagiarism-header">
+                <h2>
+                    <i class="fas fa-shield-halved" aria-hidden="true"></i>
+                    Plagiarism Report
+                </h2>
+
+                <p>
+                    Check similarity for generated and humanized content.
+                </p>
+            </div>
+
+            <div class="plagiarism-buttons">
+
+                <button type="button" id="plagiarismBtn">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    AI Check
+                </button>
+
+                <button type="button" id="humanizedPlagiarismBtn">
+                    <i class="fas fa-user-shield" aria-hidden="true"></i>
+                    Humanized Check
+                </button>
+
+            </div>
+
+            <div class="plagiarism-grid">
+
+                <div class="result-card">
+                    <div class="result-head">
+                        <i class="fas fa-robot" aria-hidden="true"></i>
+                        AI Similarity
+                    </div>
+
+                    <div class="progress" aria-hidden="true">
+                        <div id="aiProgress" class="progress-fill"></div>
+                    </div>
+
+                    <h2 id="aiPercentage">0%</h2>
+
+                    <p id="aiPlagiarismResult" aria-live="polite">
+                        Waiting for analysis...
+                    </p>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-head">
+                        <i class="fas fa-user-check" aria-hidden="true"></i>
+                        Humanized Similarity
+                    </div>
+
+                    <div class="progress" aria-hidden="true">
+                        <div id="humanProgress" class="progress-fill"></div>
+                    </div>
+
+                    <h2 id="humanPercentage">0%</h2>
+
+                    <p id="humanizedPlagiarismResult" aria-live="polite">
+                        Waiting for analysis...
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="sources-grid">
+
+                <div class="sources-card">
+                    <h3>AI Matched Sources</h3>
+
+                    <div id="aiMatchedSources">
+                        <p>No matched sources.</p>
+                    </div>
+                </div>
+
+                <div class="sources-card">
+                    <h3>Humanized Matched Sources</h3>
+
+                    <div id="humanizedMatchedSources">
+                        <p>No matched sources.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@3.0.3/dist/jspdf.umd.min.js"></script>
+
+<script src="{{ url_for('static', filename='js/user/generator.js', v='8') }}"></script>
+
+<script src="{{ url_for('static', filename='js/user/plagiarism.js') }}"></script>
+
+{% endblock %}

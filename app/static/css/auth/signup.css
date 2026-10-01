@@ -1,0 +1,469 @@
+:root {
+    --navy: #120a32;
+    --dark-purple: #28165e;
+    --purple: #6944ed;
+    --purple-light: #f4f0ff;
+    --text: #251b47;
+    --muted: #77718b;
+    --border: #dfdbeb;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    color: var(--text);
+    background: #f7f6fc;
+    font-family: "Poppins", sans-serif;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* MAIN LAYOUT */
+
+.signup-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+/* LEFT IMAGE */
+.visual-panel {
+    min-height: 100vh;
+    background-color: #ffffff;
+    background-image: url("../../images/signup.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: auto min(560px, calc(100vh - 64px));
+}
+
+/* @media (max-width: 850px) {
+    .visual-panel {
+        min-height: 220px;
+        background-size: auto 190px;
+    }
+}
+
+@media (max-width: 560px) {
+    .visual-panel {
+        min-height: 170px;
+        background-size: auto 145px;
+    }
+} */
+/* RIGHT FORM */
+
+.form-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    padding: 28px 30px;
+}
+
+.signup-card {
+    width: 100%;
+    max-width: 590px;
+    padding: 30px;
+    background: #fff;
+    border: 1px solid #ebe7f5;
+    border-radius: 20px;
+    box-shadow: 0 16px 45px rgba(35, 20, 80, .07);
+}
+
+/* HEADER */
+
+.card-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 24px;
+}
+
+.heading-icon {
+    display: grid;
+    flex: 0 0 44px;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    color: #fff;
+    background: linear-gradient(
+        135deg,
+        var(--dark-purple),
+        var(--purple)
+    );
+    border-radius: 12px;
+    font-size: 17px;
+}
+
+.card-heading h1 {
+    margin: 0;
+    color: var(--dark-purple);
+    font-size: 24px;
+    line-height: 1.25;
+}
+
+.card-heading p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.server-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    color: #b42323;
+    background: #fff1f1;
+    border: 1px solid #ffd6d6;
+    border-radius: 9px;
+    font-size: 11px;
+}
+
+/* FORM FIELDS */
+
+.fields-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 16px;
+    row-gap: 17px;
+}
+
+.form-group {
+    min-width: 0;
+}
+
+.form-group > label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--dark-purple);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.input-box {
+    display: flex;
+    align-items: center;
+    height: 46px;
+    padding: 0 10px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.input-box:hover {
+    border-color: #b9a8f1;
+}
+
+.input-box:focus-within {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(105, 68, 237, .11);
+}
+
+.field-icon {
+    flex: 0 0 20px;
+    color: #8a83a0;
+    text-align: center;
+    font-size: 12px;
+}
+
+.input-box:focus-within .field-icon {
+    color: var(--purple);
+}
+
+.input-box input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0 7px;
+    color: var(--text);
+    background: transparent;
+    border: 0;
+    outline: 0;
+    font-size: 11px;
+}
+
+.input-box input::placeholder {
+    color: #aaa5b7;
+}
+
+.toggle-password {
+    display: grid;
+    flex: 0 0 29px;
+    place-items: center;
+    width: 29px;
+    height: 29px;
+    padding: 0;
+    color: #827b94;
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.toggle-password:hover,
+.toggle-password:focus-visible {
+    color: var(--purple);
+    background: var(--purple-light);
+}
+
+.error-message {
+    display: none;
+    margin-top: 4px;
+    color: #c62828;
+    font-size: 10px;
+    line-height: 1.35;
+}
+
+.error-message:not(:empty) {
+    display: block;
+}
+
+/* PASSWORD STRENGTH */
+
+.password-strength {
+    height: 4px;
+    margin-top: 8px;
+    background: #eceaf0;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+#strengthBar {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    transition: width .25s;
+}
+
+#strengthText {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 9px;
+}
+
+/* PASSWORD RULES */
+
+.password-rules,
+.password-rules.show {
+    display: none !important;
+    margin-top: 9px;
+    padding: 10px 11px;
+    color: #716b81;
+    background: #f8f6ff;
+    border: 1px solid #ebe5ff;
+    border-radius: 9px;
+    font-size: 10px;
+}
+
+/* Sirf password INPUT focus hone par show */
+.password-group:has(#password:focus) .password-rules {
+    display: block !important;
+}
+
+.password-rules strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #4a3880;
+    font-weight: 600;
+}
+
+.rule {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 3px;
+}
+
+.rule i {
+    width: 11px;
+    color: #aaa5b1;
+    text-align: center;
+    font-size: 7px;
+}
+
+.rule.valid,
+.rule.valid i {
+    color: #258b4a;
+}
+
+/* TERMS */
+
+.checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 22px 0 12px;
+    color: #6c6679;
+    font-size: 10px;
+    line-height: 1.55;
+}
+
+.checkbox-row input {
+    flex: 0 0 15px;
+    width: 15px;
+    height: 15px;
+    margin: 1px 0 0;
+    accent-color: var(--purple);
+    cursor: pointer;
+}
+
+.checkbox-row label {
+    cursor: pointer;
+}
+
+.checkbox-row a,
+.login-text a {
+    color: var(--purple);
+    font-weight: 600;
+}
+
+.checkbox-row a:hover,
+.login-text a:hover {
+    text-decoration: underline;
+}
+
+/* BUTTON */
+
+.signup-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 46px;
+    margin-top: 12px;
+    color: #fff;
+    background: linear-gradient(
+        100deg,
+        var(--dark-purple),
+        var(--purple)
+    );
+    border: 0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: transform .2s, box-shadow .2s;
+}
+
+.signup-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 20px rgba(105, 68, 237, .24);
+}
+
+.login-text {
+    margin: 16px 0 0;
+    color: var(--muted);
+    text-align: center;
+    font-size: 11px;
+}
+
+
+
+
+
+
+/* Password rules: default hidden */
+#passwordRules,
+#passwordRules.show {
+    display: none !important;
+}
+
+/* Sirf password field focus par show */
+.password-group:has(> .input-box #password:focus) #passwordRules {
+    display: block !important;
+}
+/* Medium laptop */
+@media (max-width: 1100px) {
+    .form-panel {
+        padding: 24px;
+    }
+
+    .signup-card {
+        padding: 26px;
+    }
+
+    .visual-panel {
+        background-size: auto min(520px, calc(100vh - 48px));
+    }
+}
+
+/* Tablet: image above form */
+@media (max-width: 850px) {
+    .signup-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .visual-panel {
+        min-height: 300px;
+        background-color: #fff;
+        background-position: center;
+        background-size: auto 270px;
+    }
+
+    .form-panel {
+        padding: 0 24px 40px;
+    }
+
+    .signup-card {
+        max-width: 650px;
+    }
+}
+@media (max-width: 600px) {
+    .visual-panel {
+        display: none;
+    }
+
+    .form-panel {
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: 20px 15px;
+    }
+
+    .signup-card {
+        padding: 23px 19px;
+        border-radius: 16px;
+    }
+
+    .fields-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .card-heading {
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .card-heading h1 {
+        font-size: 21px;
+    }
+
+    .card-heading p {
+        font-size: 10px;
+    }
+
+    .checkbox-row {
+        margin-top: 18px;
+    }
+}

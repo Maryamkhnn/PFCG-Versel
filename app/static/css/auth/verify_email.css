@@ -1,0 +1,529 @@
+/* =========================================
+   BASIC RESET
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #5b35b5;
+    --primary-dark: #2d1b6b;
+    --primary-light: #ede9fe;
+    --secondary: #7c55d5;
+    --success: #169b72;
+    --error: #c62828;
+    --text-dark: #241b3f;
+    --text-medium: #686276;
+    --border: #ddd8ea;
+    --white: #ffffff;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text-dark);
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(124, 85, 213, 0.14),
+            transparent 32%
+        ),
+        linear-gradient(
+            135deg,
+            #f5f1ff 0%,
+            #fbfaff 50%,
+            #f0ebff 100%
+        );
+}
+
+
+/* =========================================
+   MAIN PAGE
+========================================= */
+
+.verify-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.verify-wrapper {
+    width: 100%;
+    max-width: 1080px;
+    min-height: 650px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--white);
+    border: 1px solid rgba(91, 53, 181, 0.08);
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow:
+        0 25px 70px rgba(45, 27, 107, 0.16);
+}
+
+
+/* =========================================
+   LEFT ILLUSTRATION PANEL
+========================================= */
+
+.illustration-panel {
+    position: relative;
+    overflow: hidden;
+    padding: 38px 48px;
+    color: var(--white);
+    background:
+        linear-gradient(
+            145deg,
+            #2d1b6b 0%,
+            #5430a5 52%,
+            #784fd0 100%
+        );
+}
+
+.brand,
+.mobile-brand {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.brand-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.illustration-content {
+    position: relative;
+    z-index: 2;
+    max-width: 410px;
+    margin: 55px auto 0;
+    text-align: center;
+}
+
+.email-illustration {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 12px;
+}
+
+.email-illustration svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.illustration-content h2 {
+    margin-bottom: 13px;
+    font-size: 31px;
+    line-height: 1.2;
+}
+
+.illustration-content > p {
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.security-note {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 24px auto 0;
+    padding: 11px 16px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.11);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 40px;
+}
+
+.security-note i {
+    color: #75e2bd;
+}
+
+.decorative-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.circle-one {
+    width: 220px;
+    height: 220px;
+    top: -85px;
+    right: -75px;
+}
+
+.circle-two {
+    width: 280px;
+    height: 280px;
+    bottom: -155px;
+    left: -105px;
+}
+
+
+/* =========================================
+   RIGHT FORM PANEL
+========================================= */
+
+.form-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 58px;
+    background: var(--white);
+}
+
+.form-content {
+    width: 100%;
+    max-width: 405px;
+}
+
+.mobile-brand {
+    display: none;
+}
+
+.form-icon {
+    width: 68px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 22px;
+    color: var(--primary);
+    background: var(--primary-light);
+    border-radius: 20px;
+    font-size: 29px;
+}
+
+.eyebrow {
+    margin-bottom: 8px;
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.form-content h1 {
+    margin-bottom: 12px;
+    color: var(--primary-dark);
+    font-size: 34px;
+    line-height: 1.2;
+}
+
+.main-text {
+    color: var(--text-medium);
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+
+/* =========================================
+   EMAIL AND MESSAGE BOXES
+========================================= */
+
+.email-box {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin: 18px 0 22px;
+    padding: 13px 15px;
+    color: var(--primary-dark);
+    background: #f6f3ff;
+    border: 1px solid #e2daf7;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.email-box i {
+    color: var(--primary);
+}
+
+.message-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-bottom: 17px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.error-box {
+    color: var(--error);
+    background: #fff1f1;
+    border: 1px solid #ffcaca;
+}
+
+.success-box {
+    color: #087453;
+    background: #edfff8;
+    border: 1px solid #bcebd9;
+}
+
+
+/* =========================================
+   VERIFICATION FORM
+========================================= */
+
+.verification-form label {
+    display: block;
+    margin-bottom: 8px;
+    color: #393145;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper > i {
+    position: absolute;
+    top: 50%;
+    left: 17px;
+    color: #8c83a3;
+    transform: translateY(-50%);
+}
+
+.input-wrapper input {
+    width: 100%;
+    height: 55px;
+    padding: 0 18px 0 48px;
+    color: var(--text-dark);
+    background: #fdfcff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    outline: none;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.input-wrapper input::placeholder {
+    color: #aaa4b8;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0;
+}
+
+.input-wrapper input:focus {
+    background: var(--white);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(91, 53, 181, 0.11);
+}
+
+.input-help {
+    margin-top: 7px;
+    color: #8b8496;
+    font-size: 12px;
+}
+
+.verify-button {
+    width: 100%;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+    color: var(--white);
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary-dark),
+            var(--secondary)
+        );
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 10px 22px rgba(91, 53, 181, 0.23);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.verify-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(91, 53, 181, 0.3);
+}
+
+.verify-button:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================
+   RESEND AND LOGIN
+========================================= */
+
+.resend-section {
+    margin-top: 22px;
+    padding: 16px;
+    text-align: center;
+    background: #faf9fd;
+    border: 1px solid #ece8f3;
+    border-radius: 12px;
+}
+
+.resend-section p {
+    margin-bottom: 8px;
+    color: var(--text-medium);
+    font-size: 13px;
+}
+
+.resend-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.resend-link:hover {
+    color: var(--primary-dark);
+}
+
+.divider {
+    position: relative;
+    margin: 22px 0 18px;
+    text-align: center;
+}
+
+.divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: #ebe7f1;
+}
+
+.divider span {
+    position: relative;
+    z-index: 1;
+    padding: 0 11px;
+    color: #9b95a5;
+    background: var(--white);
+    font-size: 12px;
+}
+
+.login-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--text-medium);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.login-link:hover {
+    color: var(--primary);
+}
+
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 900px) {
+
+    .verify-wrapper {
+        max-width: 560px;
+        grid-template-columns: 1fr;
+    }
+
+    .illustration-panel {
+        display: none;
+    }
+
+    .form-panel {
+        display: block;
+        padding: 35px 45px 45px;
+    }
+
+    .mobile-brand {
+        display: flex;
+        margin-bottom: 38px;
+        color: var(--primary-dark);
+    }
+
+    .form-content {
+        max-width: none;
+    }
+}
+
+@media (max-width: 520px) {
+
+    .verify-page {
+        display: block;
+        padding: 0;
+    }
+
+    .verify-wrapper {
+        min-height: 100vh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .form-panel {
+        min-height: 100vh;
+        padding: 27px 22px 38px;
+    }
+
+    .mobile-brand {
+        margin-bottom: 38px;
+    }
+
+    .form-icon {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 18px;
+        border-radius: 17px;
+        font-size: 25px;
+    }
+
+    .form-content h1 {
+        font-size: 29px;
+    }
+
+    .main-text {
+        font-size: 14px;
+    }
+
+    .input-wrapper input {
+        height: 53px;
+    }
+}

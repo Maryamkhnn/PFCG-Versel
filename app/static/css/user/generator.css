@@ -1,0 +1,988 @@
+/* =========================================
+   WORKSPACE
+========================================= */
+
+.workspace {
+    --purple: #6d28d9;
+    --ink: #1f1648;
+    --border: #e5def1;
+
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    align-items: start;
+    gap: 24px;
+
+    width: 100%;
+    color: var(--ink);
+}
+
+.workspace,
+.workspace * {
+    box-sizing: border-box;
+}
+
+.workspace h2,
+.workspace h3,
+.workspace p {
+    margin-top: 0;
+}
+
+.workspace button,
+.workspace input,
+.workspace select,
+.workspace textarea {
+    font-family: inherit;
+}
+
+.workspace button {
+    cursor: pointer;
+}
+
+.workspace :is(button, input, select, textarea):focus-visible {
+    outline: 3px solid #c4b5fd;
+    outline-offset: 3px;
+}
+
+.workspace button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+.workspace-right {
+    display: grid;
+    gap: 20px;
+    min-width: 0;
+}
+
+.workspace .settings-card,
+.workspace .editor-card,
+.workspace .plagiarism-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(31, 22, 72, 0.045);
+}
+
+/* =========================================
+   SETTINGS
+========================================= */
+
+.workspace .settings-card {
+    padding: 24px;
+    border-top: 4px solid var(--purple);
+}
+
+.workspace .settings-card h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 12px;
+    font-size: 19px;
+    color: var(--ink);
+}
+
+.workspace .settings-card h2 i {
+    color: var(--purple);
+}
+
+.workspace .settings-description {
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: #7c728b;
+    line-height: 1.65;
+}
+
+.workspace .form-group {
+    margin-bottom: 18px;
+}
+
+.workspace .form-group label {
+    display: block;
+    margin-bottom: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+    color: #554666;
+}
+
+.workspace .form-group :is(input, select, textarea) {
+    width: 100%;
+    padding: 11px 12px;
+
+    border: 1px solid #ded6eb;
+    border-radius: 10px;
+
+    background: #fcfbff;
+    color: #393044;
+    font-size: 14px;
+}
+
+.workspace .form-group :is(input, select) {
+    min-height: 44px;
+}
+
+.workspace #prompt {
+    min-height: 142px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.workspace :is(#generateBtn, #regenerateBtn, #humanizeBtn),
+.workspace .action-bar button,
+.workspace .plagiarism-buttons button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    min-height: 44px;
+    padding: 11px 16px;
+
+    border: 1px solid transparent;
+    border-radius: 10px;
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+
+    transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.workspace button i {
+    margin: 0;
+    font-size: 14px;
+}
+
+.workspace #generateBtn {
+    width: 100%;
+    background: var(--purple);
+    color: white;
+    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.15);
+}
+
+.workspace #generateBtn:hover:not(:disabled) {
+    background: #5b21b6;
+}
+
+.workspace #regenerateBtn {
+    background: #efe7ff;
+    border-color: #e0d1fc;
+    color: #6d28d9;
+}
+
+.workspace #regenerateBtn:hover:not(:disabled) {
+    background: #e3d5ff;
+}
+
+.workspace #humanizeBtn {
+    background: #4f46e5;
+    color: #fff;
+    box-shadow: 0 3px 9px rgba(79, 70, 229, 0.13);
+}
+
+.workspace #humanizeBtn:hover:not(:disabled) {
+    background: #4338ca;
+}
+
+/* =========================================
+   OUTPUT CARDS
+========================================= */
+
+.workspace .editor-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.workspace .editor-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.workspace .generated-editor {
+    border-top: 3px solid #7c3aed;
+}
+
+.workspace .humanized-editor {
+    border-top: 3px solid #4f46e5;
+}
+
+.workspace .editor-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    padding: 18px;
+    background: #fcfaff;
+    border-bottom: 1px solid #eee8f5;
+}
+
+.workspace .humanized-editor .editor-top {
+    background: #fafaff;
+}
+
+.workspace .editor-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.workspace .editor-title > i {
+    display: grid;
+    place-items: center;
+
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+
+    border-radius: 11px;
+    background: #eee5ff;
+    color: #6d28d9;
+    font-size: 17px;
+}
+
+.workspace .humanized-editor .editor-title > i {
+    background: #e9e8ff;
+    color: #4f46e5;
+}
+
+.workspace .editor-title h3 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.workspace :is(#generatedWords, #humanWords) {
+    padding: 5px 8px;
+
+    border-radius: 7px;
+    border: 1px solid #e8e0f3;
+
+    background: #fff;
+    color: #7b6a90;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.workspace .editor-card textarea {
+    display: block;
+    width: 100%;
+    flex: 1;
+    min-height: 350px;
+
+    padding: 22px;
+    margin: 0;
+
+    border: 0;
+    border-radius: 0;
+
+    background: #fff;
+    color: #3c3348;
+
+    font-size: 15px;
+    line-height: 1.85;
+    resize: vertical;
+}
+
+.workspace .editor-card textarea::placeholder {
+    color: #9a90a5;
+}
+
+.workspace .editor-card textarea:focus-visible {
+    outline-offset: -3px;
+}
+
+.workspace .editor-footer {
+    display: flex;
+    justify-content: flex-end;
+
+    padding: 14px 18px;
+
+    background: #fcfbff;
+    border-top: 1px solid #eee8f5;
+}
+
+/* =========================================
+   ACTION BAR
+========================================= */
+
+.workspace .action-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+
+    margin: 0;
+    padding: 14px;
+
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+}
+
+.workspace .content-action-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.workspace .action-group-label {
+    margin: 0 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #837390;
+}
+
+.workspace #copyBtn {
+    background: #edf5ff;
+    border-color: #d9e9ff;
+    color: #2563eb;
+}
+
+.workspace #copyBtn:hover:not(:disabled) {
+    background: #dfeeff;
+}
+
+.workspace #saveBtn {
+    background: #eaf8f0;
+    border-color: #cfeadb;
+    color: #17774a;
+}
+
+.workspace #saveBtn:hover:not(:disabled) {
+    background: #daf1e4;
+}
+
+.workspace #downloadBtn {
+    background: #fff5e6;
+    border-color: #f1dfba;
+    color: #8b5c00;
+}
+
+.workspace #downloadBtn:hover:not(:disabled) {
+    background: #ffedca;
+}
+
+/* =========================================
+   PDF CONTROLS
+========================================= */
+
+.workspace .generator-pdf-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    padding: 8px;
+    margin: 0;
+
+    border: 1px solid #e7def6;
+    border-radius: 11px;
+    background: #f8f5ff;
+}
+
+.workspace .generator-pdf-controls label {
+    margin: 0 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #79628e;
+}
+
+.workspace #generatorPdfSource {
+    height: 42px;
+    min-width: 135px;
+    max-width: 100%;
+    width: auto;
+
+    padding: 0 10px;
+    margin: 0;
+
+    border: 1px solid #ded3ed;
+    border-radius: 8px;
+
+    background: #fff;
+    color: #514060;
+    font-size: 12px;
+}
+
+.workspace #generatorPdfBtn {
+    min-height: 42px;
+    background: #382178;
+    border-color: #382178;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.workspace #generatorPdfBtn:hover:not(:disabled) {
+    background: #291659;
+}
+
+/* =========================================
+   PLAGIARISM
+========================================= */
+
+.workspace .plagiarism-card {
+    padding: 24px;
+}
+
+.workspace .plagiarism-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    font-size: 19px;
+    margin-bottom: 8px;
+    color: var(--ink);
+}
+
+.workspace .plagiarism-header h2 i {
+    color: var(--purple);
+}
+
+.workspace .plagiarism-header p {
+    margin-bottom: 18px;
+    color: #81758e;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.workspace .plagiarism-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.workspace #plagiarismBtn {
+    background: #efe7ff;
+    border-color: #e0d1fc;
+    color: #6d28d9;
+}
+
+.workspace #humanizedPlagiarismBtn {
+    background: #eeedff;
+    border-color: #dcd9ff;
+    color: #4f46e5;
+}
+
+.workspace .plagiarism-buttons button:hover:not(:disabled) {
+    box-shadow: inset 0 0 0 1px currentColor;
+}
+
+.workspace .plagiarism-grid,
+.workspace .sources-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.workspace .result-card,
+.workspace .sources-card {
+    min-width: 0;
+    padding: 20px;
+
+    border: 1px solid #e9e2f2;
+    border-radius: 12px;
+
+    background: #fcfbff;
+    overflow-wrap: anywhere;
+}
+
+.workspace .result-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    font-size: 13px;
+    color: #615073;
+    font-weight: 600;
+}
+
+.workspace .result-head i {
+    color: #7c3aed;
+}
+
+.workspace .progress {
+    height: 7px;
+    overflow: hidden;
+    margin: 18px 0 12px;
+
+    background: #e9e3f2;
+    border-radius: 8px;
+}
+
+.workspace .progress-fill {
+    width: 0;
+    height: 100%;
+
+    background: #7c3aed;
+    border-radius: inherit;
+    transition: width 0.3s ease;
+}
+
+.workspace .result-card h2 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    color: var(--ink);
+}
+
+.workspace .result-card p,
+.workspace .sources-card p {
+    margin: 0;
+    color: #83778e;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.workspace .sources-grid {
+    margin-top: 16px;
+}
+
+.workspace .sources-card h3 {
+    margin-bottom: 12px;
+    color: #544262;
+    font-size: 13px;
+}
+
+.workspace .sources-card a {
+    color: #6d28d9;
+    overflow-wrap: anywhere;
+}
+
+.workspace .sources-card :is(.source-item, .matched-source) {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee7f6;
+}
+
+/* =========================================
+   NOTIFICATIONS
+========================================= */
+
+#generatorPdfToast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 100000;
+
+    box-sizing: border-box;
+    width: min(360px, calc(100vw - 32px));
+    padding: 16px 20px;
+
+    border: 1px solid #e6dfef;
+    border-left: 4px solid #6d28d9;
+    border-radius: 12px;
+
+    background: #fff;
+    color: #40354f;
+    font-size: 14px;
+    line-height: 1.5;
+
+    box-shadow: 0 10px 35px rgba(31, 22, 72, 0.14);
+}
+
+#generatorPdfToast[hidden] {
+    display: none;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1200px) {
+
+    .workspace {
+        grid-template-columns: 245px minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    .workspace .settings-card {
+        padding: 20px;
+    }
+
+    .workspace .editor-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .workspace .editor-card textarea {
+        min-height: 280px;
+    }
+}
+
+@media (max-width: 900px) {
+
+    .workspace {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .workspace .settings-card {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .workspace .content-action-group,
+    .workspace .generator-pdf-controls {
+        width: 100%;
+    }
+
+    .workspace .action-group-label {
+        width: 100%;
+    }
+
+    .workspace .content-action-group button {
+        flex: 1;
+        padding: 10px;
+    }
+
+    .workspace .generator-pdf-controls label {
+        width: 100%;
+    }
+
+    .workspace #generatorPdfSource {
+        flex: 1 1 130px;
+        min-width: 0;
+    }
+
+    .workspace #generatorPdfBtn {
+        flex: 1 1 130px;
+    }
+
+    .workspace .plagiarism-grid,
+    .workspace .sources-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .workspace .plagiarism-card,
+    .workspace .editor-card textarea {
+        padding: 18px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .workspace * {
+        transition: none !important;
+    }
+}
+/* Generator notifications — top right */
+
+#generatorNotice {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 100000;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    box-sizing: border-box;
+    width: min(380px, calc(100vw - 32px));
+    padding: 16px;
+
+    background: #ffffff;
+    border: 1px solid #e9e2f3;
+    border-left: 4px solid var(--notice-color, #6d28d9);
+    border-radius: 12px;
+
+    color: #40354f;
+    box-shadow: 0 10px 35px rgba(31, 22, 72, 0.14);
+}
+
+#generatorNotice[hidden] {
+    display: none !important;
+}
+
+#generatorNotice .notice-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+
+    background: var(--notice-background, #f0e9ff);
+    color: var(--notice-color, #6d28d9);
+    font-size: 17px;
+}
+
+#generatorNotice .notice-message {
+    flex: 1;
+    min-width: 0;
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+#generatorNotice .notice-close {
+    display: grid;
+    place-items: center;
+
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    padding: 0;
+
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #91859d;
+
+    font-size: 22px;
+    cursor: pointer;
+}
+
+#generatorNotice .notice-close:hover {
+    background: #f5f1fa;
+    color: #4c3d60;
+}
+
+#generatorNotice .notice-close:focus-visible {
+    outline: 2px solid #6d28d9;
+    outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+    #generatorNotice {
+        top: 16px;
+        right: 16px;
+    }
+}
+/* =========================================================
+   GENERATOR ACTION TOOLBAR
+========================================================= */
+
+.action-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+
+    margin-top: 20px;
+    padding: 14px;
+
+    background: #ffffff;
+    border: 1px solid #e7ddf8;
+    border-radius: 14px;
+
+    box-shadow: 0 5px 18px rgba(82, 46, 145, 0.07);
+}
+
+
+/* =========================================================
+   SOURCE SELECTION
+========================================================= */
+
+.action-source {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-right: auto;
+}
+
+.action-source label {
+    color: #3c2368;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.action-source select {
+    min-width: 165px;
+    min-height: 40px;
+
+    padding: 8px 10px;
+
+    color: #392456;
+    background: #ffffff;
+    border: 1px solid #dfd0f5;
+    border-radius: 9px;
+}
+
+
+/* =========================================================
+   TOOLBAR BUTTONS
+========================================================= */
+
+.action-bar button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    min-height: 40px;
+    padding: 9px 14px;
+
+    color: #5425a7;
+    background: #f7f2ff;
+    border: 1px solid #dfd0f5;
+    border-radius: 9px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.action-bar button:hover {
+    color: #ffffff;
+    background: #7435cf;
+    border-color: #7435cf;
+    transform: translateY(-1px);
+}
+
+#saveBtn {
+    color: #ffffff;
+    background: #7435cf;
+    border-color: #7435cf;
+}
+
+#saveBtn:hover {
+    background: #5f25b6;
+    border-color: #5f25b6;
+}
+
+#generatorPdfBtn {
+    color: #ffffff;
+    background: #dc3545;
+    border-color: #dc3545;
+}
+
+#generatorPdfBtn:hover {
+    background: #bd2938;
+    border-color: #bd2938;
+}
+
+.action-bar button:disabled {
+    color: #aaa1b8;
+    background: #f4f1f7;
+    border-color: #e5dfeb;
+
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .action-bar {
+        flex-wrap: wrap;
+    }
+
+    .action-source {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .action-source select {
+        flex: 1;
+    }
+
+    .action-bar button {
+        flex: 1;
+    }
+}
+
+
+@media (max-width: 520px) {
+
+    .action-source {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .action-bar button {
+        width: 100%;
+        flex-basis: 100%;
+    }
+}
+/* =====================================================
+   PROMPT SUGGESTIONS
+===================================================== */
+
+.prompt-suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-top: 12px;
+    padding: 14px;
+    border: 1px solid #ddd2fa;
+    border-radius: 11px;
+    background: #f8f5ff;
+}
+
+.prompt-suggestions[hidden] {
+    display: none;
+}
+
+.prompt-suggestions > strong {
+    color: #352454;
+    font-size: 13px;
+}
+
+.prompt-suggestions > p {
+    margin: 0 0 3px;
+    color: #786d8a;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.prompt-suggestion-button {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e4dcf4;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #513780;
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1.6;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.prompt-suggestion-button:hover {
+    border-color: #6944ed;
+    background: #f0eaff;
+}
+
+.prompt-suggestion-button:focus-visible {
+    outline: 2px solid #6944ed;
+    outline-offset: 2px;
+}

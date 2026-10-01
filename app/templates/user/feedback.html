@@ -1,0 +1,261 @@
+{% extends "user/base.html" %}
+
+{% block title %}Feedback | PFCG AI{% endblock %}
+{% block page_title %}{% endblock %}
+
+{% block css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/user/feedback.css', v='4') }}"
+>
+{% endblock %}
+
+{% block content %}
+
+<div
+    class="feedback-page"
+    id="feedbackPage"
+    data-submit-url="{{ url_for('user.api_submit_feedback') }}"
+    data-history-url="{{ url_for('user.api_get_feedback') }}"
+>
+
+    {% if csrf_token is defined %}
+    <input
+        type="hidden"
+        id="feedbackCsrf"
+        value="{{ csrf_token() }}"
+    >
+    {% endif %}
+
+    <header class="feedback-heading">
+
+        <div class="feedback-heading-icon">
+            <i class="fas fa-comments"></i>
+        </div>
+
+        <div>
+            <h1>Feedback</h1>
+            <p>
+                Share your experience and help us improve PFCG AI.
+            </p>
+        </div>
+
+    </header>
+
+    <!-- FEEDBACK FORM -->
+
+    <section class="feedback-card">
+
+        <div class="feedback-section-heading">
+            <h2>Share your thoughts</h2>
+            <p>
+                Report an issue, suggest an idea or share your experience.
+            </p>
+        </div>
+
+        <form id="feedbackForm">
+
+            <div class="feedback-form-row">
+
+                <div class="feedback-field">
+
+                    <label for="feedbackType">
+                        Feedback type
+                    </label>
+
+                    <select id="feedbackType" required>
+                        <option value="">Select feedback type</option>
+                        <option value="Suggestion">Suggestion</option>
+                        <option value="Bug Report">Bug Report</option>
+                        <option value="Complaint">Complaint</option>
+                        <option value="Feature Request">
+                            Feature Request
+                        </option>
+                        <option value="General Feedback">
+                            General Feedback
+                        </option>
+                    </select>
+
+                </div>
+
+                <div class="feedback-field">
+
+                    <label for="feedbackRating">
+                        Your rating
+                    </label>
+
+                    <select id="feedbackRating" required>
+                        <option value="">Select a rating</option>
+                        <option value="5">5 — Excellent</option>
+                        <option value="4">4 — Good</option>
+                        <option value="3">3 — Average</option>
+                        <option value="2">2 — Poor</option>
+                        <option value="1">1 — Very Poor</option>
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="feedback-field">
+
+                <label for="feedbackSubject">
+                    Subject
+                </label>
+
+                <input
+                    type="text"
+                    id="feedbackSubject"
+                    maxlength="255"
+                    placeholder="Enter a short subject"
+                    required
+                >
+
+            </div>
+
+            <div class="feedback-field">
+
+                <label for="feedbackMessage">
+                    Your feedback
+                </label>
+
+                <textarea
+                    id="feedbackMessage"
+                    rows="6"
+                    maxlength="2000"
+                    placeholder="Write your feedback here..."
+                    required
+                ></textarea>
+
+                <div class="feedback-input-help">
+
+                    <span>
+                        Maximum 2000 characters
+                    </span>
+
+                    <span id="feedbackCharacters">
+                        0 / 2000
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="feedback-submit-row">
+
+                <button
+                    type="submit"
+                    id="submitFeedbackBtn"
+                    class="fb-button fb-primary"
+                >
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Submit Feedback</span>
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+    <!-- FEEDBACK HISTORY -->
+
+    <section class="feedback-card feedback-history">
+
+        <div class="feedback-history-heading">
+
+            <div class="feedback-section-heading">
+                <h2>Your Feedback History</h2>
+                <p>
+                    View your submissions, status and admin replies.
+                </p>
+            </div>
+
+            <div class="feedback-search">
+
+                <i class="fas fa-search"></i>
+
+                <input
+                    type="search"
+                    id="searchFeedback"
+                    placeholder="Search feedback..."
+                >
+
+            </div>
+
+        </div>
+
+        <p
+            id="feedbackHistoryCount"
+            class="feedback-history-count"
+            aria-live="polite"
+        >
+            Loading feedback...
+        </p>
+
+        <div
+            id="feedbackHistoryList"
+            aria-busy="true"
+        ></div>
+
+        <nav
+            id="feedbackPagination"
+            class="feedback-pagination"
+            hidden
+        >
+
+            <button
+                type="button"
+                id="feedbackPrev"
+                class="fb-button"
+            >
+                Previous
+            </button>
+
+            <span id="feedbackPageNumber"></span>
+
+            <button
+                type="button"
+                id="feedbackNext"
+                class="fb-button"
+            >
+                Next
+            </button>
+
+        </nav>
+
+    </section>
+
+</div>
+
+<!-- SUCCESS / ERROR NOTIFICATION -->
+
+<div
+    id="feedbackToast"
+    class="feedback-toast"
+    hidden
+>
+
+    <span
+        id="feedbackToastText"
+        role="status"
+        aria-live="polite"
+    ></span>
+
+    <button
+        type="button"
+        id="closeFeedbackToast"
+        aria-label="Close notification"
+    >
+        &times;
+    </button>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script
+    src="{{ url_for('static', filename='js/user/feedback.js', v='4') }}"
+></script>
+{% endblock %}

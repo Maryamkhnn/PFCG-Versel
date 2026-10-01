@@ -1,0 +1,365 @@
+.blocked-page {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 4px 0 28px;
+    color: #251b47;
+}
+
+.blocked-page * {
+    box-sizing: border-box;
+}
+
+.blocked-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 25px 28px;
+    margin-bottom: 22px;
+    background: linear-gradient(110deg, #120a32, #28165e 65%, #6944ed);
+    border-radius: 18px;
+    color: #fff;
+}
+
+.blocked-eyebrow {
+    display: inline-block;
+    margin-bottom: 9px;
+    color: #d9ceff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.blocked-header h1 {
+    margin: 0 0 7px;
+    color: #fff;
+    font-size: clamp(23px, 3vw, 30px);
+}
+
+.blocked-header p {
+    margin: 0;
+    color: #e4dcff;
+    font-size: 13px;
+}
+
+.blocked-header-icon {
+    display: grid;
+    flex: 0 0 62px;
+    place-items: center;
+    width: 62px;
+    height: 62px;
+    background: rgba(255, 255, 255, .14);
+    border: 1px solid rgba(255, 255, 255, .2);
+    border-radius: 16px;
+    font-size: 25px;
+}
+
+.blocked-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.blocked-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #e9e4f4;
+    border-radius: 16px;
+    box-shadow: 0 5px 18px rgba(35, 20, 80, .04);
+}
+
+.blocked-stat-icon {
+    display: grid;
+    flex: 0 0 46px;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    font-size: 18px;
+}
+
+.blocked-stat-icon.purple {
+    color: #6944ed;
+    background: #f0ebff;
+}
+
+.blocked-stat-icon.pink {
+    color: #be4380;
+    background: #fff0f7;
+}
+
+.blocked-stat-icon.blue {
+    color: #3476b8;
+    background: #eaf4ff;
+}
+
+.blocked-stat-card span {
+    display: block;
+    margin-bottom: 5px;
+    color: #77718b;
+    font-size: 12px;
+}
+
+.blocked-stat-card strong {
+    display: block;
+    color: #28165e;
+    font-size: 25px;
+}
+
+.blocked-table-card {
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e9e4f4;
+    border-radius: 18px;
+    box-shadow: 0 7px 24px rgba(35, 20, 80, .05);
+}
+
+.blocked-table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 22px 24px;
+}
+
+.blocked-table-header h2 {
+    margin: 0 0 5px;
+    color: #28165e;
+    font-size: 18px;
+}
+
+.blocked-table-header p {
+    margin: 0;
+    color: #77718b;
+    font-size: 12px;
+}
+
+.blocked-search {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: min(100%, 290px);
+    min-height: 42px;
+    padding: 0 13px;
+    color: #8b83a1;
+    border: 1px solid #dfdbeb;
+    border-radius: 10px;
+}
+
+.blocked-search:focus-within {
+    border-color: #6944ed;
+    box-shadow: 0 0 0 3px rgba(105, 68, 237, .1);
+}
+
+.blocked-search input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #251b47;
+    font: inherit;
+    font-size: 12px;
+}
+
+.blocked-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.blocked-table {
+    width: 100%;
+    min-width: 620px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.blocked-table th {
+    padding: 14px 24px;
+    color: #6b617e;
+    background: #f8f6fc;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.blocked-table td {
+    padding: 15px 24px;
+    border-top: 1px solid #f0edf6;
+    font-size: 13px;
+}
+
+.blocked-table tbody tr:hover {
+    background: #fbfaff;
+}
+
+.blocked-table tbody tr[hidden] {
+    display: none;
+}
+
+.blocked-user {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 180px;
+}
+
+.blocked-avatar {
+    display: grid;
+    flex: 0 0 37px;
+    place-items: center;
+    width: 37px;
+    height: 37px;
+    color: #6944ed;
+    background: #f0ebff;
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+.blocked-user strong,
+.blocked-user small {
+    display: block;
+}
+
+.blocked-user strong {
+    margin-bottom: 3px;
+    color: #28165e;
+    font-size: 12px;
+}
+
+.blocked-user small {
+    color: #77718b;
+    font-size: 11px;
+}
+
+.blocked-id {
+    color: #726b85;
+}
+
+.blocked-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    color: #6944ed;
+    background: #f2eeff;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.blocked-count {
+    display: inline-grid;
+    min-width: 32px;
+    height: 28px;
+    padding: 0 7px;
+    place-items: center;
+    color: #ae3151;
+    background: #fff0f3;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.blocked-empty {
+    padding: 42px 20px;
+    text-align: center;
+    color: #77718b;
+    font-size: 13px;
+}
+
+.blocked-empty[hidden] {
+    display: none;
+}
+
+.blocked-empty > i {
+    display: block;
+    margin-bottom: 12px;
+    color: #6944ed;
+    font-size: 32px;
+}
+
+.blocked-empty h3 {
+    margin: 0 0 6px;
+    color: #28165e;
+}
+
+.blocked-empty p {
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    .blocked-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .blocked-header {
+        padding: 21px;
+    }
+
+    .blocked-header-icon {
+        display: none;
+    }
+
+    .blocked-stats {
+        grid-template-columns: 1fr;
+        gap: 11px;
+    }
+
+    .blocked-table-header {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 19px;
+    }
+
+    .blocked-search {
+        width: 100%;
+    }
+}
+.selected-user-note {
+    margin: 10px 0 0;
+    color: #e9e1ff;
+    font-size: 12px;
+}
+
+.selected-user-note strong {
+    color: #fff;
+}
+
+.selected-user-note a {
+    margin-left: 10px;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: underline;
+}
+.blocked-search button,
+.blocked-pagination a {
+    padding: 9px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: #6944ed;
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.blocked-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 20px;
+}
+
+.blocked-pagination span {
+    color: #77718b;
+}

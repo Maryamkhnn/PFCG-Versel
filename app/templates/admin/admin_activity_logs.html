@@ -1,0 +1,273 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Activity Logs | Admin{% endblock %}
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/admin/admin_activity_logs.css') }}"
+>
+
+<style>
+    .logs-table tbody tr[hidden],
+    .logs-pagination[hidden] {
+        display: none !important;
+    }
+
+    .logs-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 20px 16px;
+    }
+
+    .logs-pagination button {
+        padding: 9px 15px;
+        border: 1px solid #ddd6fe;
+        border-radius: 8px;
+        background: #fff;
+        color: #6d28d9;
+        font: inherit;
+        cursor: pointer;
+    }
+
+    .logs-pagination button:hover:not(:disabled) {
+        background: #f5f3ff;
+    }
+
+    .logs-pagination button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .logs-pagination span {
+        color: #4b5563;
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
+
+
+{% block page_header %}
+<div class="logs-top-header">
+
+    <div class="logs-title-row">
+        <h1>Activity Logs</h1>
+        <i class="fas fa-clock-rotate-left"></i>
+    </div>
+
+    <p>Monitor important actions performed by administrators.</p>
+
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="logs-page">
+
+    <!-- SUMMARY -->
+    <div class="logs-summary">
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                <i class="fas fa-list-check"></i>
+            </div>
+
+            <div>
+                <span>Total Activities</span>
+                <h2>{{ logs|length }}</h2>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- LOGS CARD -->
+    <div class="logs-card">
+
+        <div class="logs-card-header">
+            <div>
+                <h2>Admin Activity</h2>
+                <p>Recent administrative actions</p>
+            </div>
+
+            <div class="card-icon">
+                <i class="fas fa-shield-halved"></i>
+            </div>
+        </div>
+
+        {% if logs %}
+
+            <div class="table-container">
+                <table class="logs-table">
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Administrator</th>
+                            <th>Action</th>
+                            <th>Target</th>
+                            <th>Details</th>
+                            <th>Date &amp; Time</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="activityLogsBody">
+                        {% for log in logs %}
+                            <tr class="activity-log-row">
+
+                                <td class="row-number">
+                                    {{ loop.index }}
+                                </td>
+
+                                <td>
+                                    <div class="admin-cell">
+                                        <div class="admin-avatar">
+                                            <i class="fas fa-user-shield"></i>
+                                        </div>
+
+                                        <span>
+                                            {{ log.admin_email or "Administrator" }}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="action-badge">
+                                        {{ log.action }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="target-badge">
+                                        {{ log.target_type or "System" }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div
+                                        class="details-cell"
+                                        title="{{ log.target_details or '' }}"
+                                    >
+                                        {{ log.target_details or "—" }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="log-date">
+                                        {% if log.created_at %}
+                                            {{
+                                                log.created_at.strftime(
+                                                    "%d %b %Y, %I:%M %p"
+                                                )
+                                            }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </span>
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+            <!-- PAGINATION: TABLE KE BAAD, LOGS CARD KE ANDAR -->
+            <nav
+                class="logs-pagination"
+                id="logsPagination"
+                aria-label="Activity logs pages"
+                hidden
+            >
+                <button
+                    type="button"
+                    id="logsPrevious"
+                >
+                    <i class="fas fa-chevron-left"></i>
+                    Previous
+                </button>
+
+                <span id="logsPageInfo"></span>
+
+                <button
+                    type="button"
+                    id="logsNext"
+                >
+                    Next
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </nav>
+
+        {% else %}
+
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-clock-rotate-left"></i>
+                </div>
+
+                <h3>No Activity Yet</h3>
+                <p>Administrator activities will appear here.</p>
+            </div>
+
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const rows = Array.from(
+        document.querySelectorAll("#activityLogsBody .activity-log-row")
+    );
+
+    const pagination = document.getElementById("logsPagination");
+    const previous = document.getElementById("logsPrevious");
+    const next = document.getElementById("logsNext");
+    const pageInfo = document.getElementById("logsPageInfo");
+
+    if (!rows.length || !pagination || !previous || !next || !pageInfo) {
+        return;
+    }
+
+    const perPage = 5;
+    const totalPages = Math.ceil(rows.length / perPage);
+    let currentPage = 1;
+
+    function renderPage() {
+        const start = (currentPage - 1) * perPage;
+        const end = start + perPage;
+
+        rows.forEach(function (row, index) {
+            row.hidden = index < start || index >= end;
+        });
+
+        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+        previous.disabled = currentPage === 1;
+        next.disabled = currentPage === totalPages;
+
+        pagination.hidden = totalPages <= 1;
+    }
+
+    previous.addEventListener("click", function () {
+        if (currentPage > 1) {
+            currentPage--;
+            renderPage();
+        }
+    });
+
+    next.addEventListener("click", function () {
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderPage();
+        }
+    });
+
+    renderPage();
+});
+</script>
+{% endblock %}

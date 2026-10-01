@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}PFCG AI{% endblock %}</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/user/common.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/user/layout.css') }}">
+
+    <style>
+        .user-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .user-notification-area {
+            position: relative;
+            flex: 0 0 auto;
+            z-index: 5000;
+        }
+
+        .notification-bell {
+            position: relative;
+            width: 43px;
+            height: 43px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e7e0f4;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #7251d2;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 5px 18px rgba(70, 50, 110, 0.08);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .notification-bell:hover {
+            background: #f6f2ff;
+            transform: translateY(-1px);
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            min-width: 19px;
+            height: 19px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            border: 2px solid #ffffff;
+            border-radius: 20px;
+            background: #dc4f5d;
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 700;
+            box-sizing: border-box;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 52px;
+            right: 0;
+            width: min(390px, calc(100vw - 35px));
+            max-height: 520px;
+            overflow: hidden;
+            border: 1px solid #e9e3f2;
+            border-radius: 15px;
+            background: #ffffff;
+            box-shadow: 0 18px 50px rgba(45, 31, 70, 0.18);
+        }
+
+        .notification-dropdown[hidden] {
+            display: none;
+        }
+
+        .notification-dropdown-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 16px 17px;
+            border-bottom: 1px solid #eee9f5;
+            background: #fbf9ff;
+        }
+
+        .notification-dropdown-header h3 {
+            margin: 0 0 3px;
+            color: #302641;
+            font-size: 15px;
+        }
+
+        .notification-dropdown-header p {
+            margin: 0;
+            color: #92899e;
+            font-size: 10px;
+        }
+
+        #markAllNotificationsRead {
+            padding: 7px 10px;
+            border: 1px solid #dfd5f3;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #7251d2;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        #markAllNotificationsRead:hover {
+            background: #f3edff;
+        }
+
+        #markAllNotificationsRead:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .notification-list {
+            max-height: 435px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0ecf5;
+            background: #ffffff;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background: #faf8ff;
+        }
+
+        .notification-item.unread {
+            background: #f7f3ff;
+        }
+
+        .notification-item-icon {
+            width: 36px;
+            min-width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: #eee8ff;
+            color: #7251d2;
+            font-size: 13px;
+        }
+
+        .notification-item.warning .notification-item-icon {
+            background: #fff4dd;
+            color: #b87517;
+        }
+
+        .notification-item.suspended .notification-item-icon {
+            background: #ffe8eb;
+            color: #cc4d5c;
+        }
+
+        .notification-item.reactivated .notification-item-icon {
+            background: #e7f8ed;
+            color: #2c9155;
+        }
+
+        .notification-item-content {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .notification-item-content strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #342b43;
+            font-size: 12px;
+        }
+
+        .notification-item-content p {
+            margin: 0 0 6px;
+            color: #746c7e;
+            font-size: 10px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .notification-item-content time {
+            color: #a098aa;
+            font-size: 9px;
+        }
+
+        .notification-unread-dot {
+            width: 8px;
+            min-width: 8px;
+            height: 8px;
+            margin-top: 5px;
+            border-radius: 50%;
+            background: #7251d2;
+        }
+
+        .notification-loading,
+        .notification-empty,
+        .notification-error {
+            padding: 40px 20px;
+            text-align: center;
+            color: #8f869a;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .notification-empty i,
+        .notification-error i {
+            display: block;
+            margin-bottom: 10px;
+            color: #b4a8c8;
+            font-size: 25px;
+        }
+
+        .notification-error {
+            color: #c74e5a;
+        }
+
+        @media (max-width: 700px) {
+            .user-header-actions {
+                gap: 8px;
+            }
+
+            .notification-bell {
+                width: 39px;
+                height: 39px;
+            }
+
+            .notification-dropdown {
+                position: fixed;
+                top: 62px;
+                right: 12px;
+                left: 12px;
+                width: auto;
+            }
+        }
+    </style>
+
+    {% block css %}{% endblock %}
+</head>
+
+{% set pages_without_header = [
+    'user.generator',
+    'user.seo_analysis',
+    'user.my_content',
+    'user.edit_content',
+    'user.saved_documents',
+    'user.reports',
+    'user.feedback'
+] %}
+
+{% set hide_page_header = request.endpoint in pages_without_header %}
+
+<body class="user-layout {% if hide_page_header %}user-layout-no-header{% endif %}">
+<div class="wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+        
+            <span>PFCG AI</span>
+        </div>
+
+        <nav aria-label="Main navigation">
+            {% set navigation = [
+                ('user.dashboard', 'fa-house', 'Dashboard'),
+                ('user.generator', 'fa-wand-magic-sparkles', 'Generator'),
+                ('user.seo_analysis', 'fa-chart-line', 'SEO Analysis'),
+                ('user.my_content', 'fa-folder-open', 'My Content'),
+                ('user.edit_content', 'fa-pen', 'Edit Content'),
+                ('user.saved_documents', 'fa-bookmark', 'Saved Documents'),
+                ('user.reports', 'fa-file-lines', 'Reports'),
+                ('user.feedback', 'fa-comments', 'Feedback')
+            ] %}
+
+            {% for endpoint, icon, label in navigation %}
+                <a href="{{ url_for(endpoint) }}"
+                   class="{% if request.endpoint == endpoint %}active{% endif %}"
+                   aria-label="{{ label }}"
+                   title="{{ label }}"
+                   {% if request.endpoint == endpoint %}aria-current="page"{% endif %}>
+                    <i class="fas {{ icon }}" aria-hidden="true"></i>
+                    <span>{{ label }}</span>
+                </a>
+            {% endfor %}
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('user.profile') }}"
+               class="{% if request.endpoint in ['user.profile', 'user.settings'] %}active{% endif %}"
+               title="My Account"
+               {% if request.endpoint in ['user.profile', 'user.settings'] %}
+                   aria-current="page"
+               {% endif %}>
+                <i class="fas fa-user-gear" aria-hidden="true"></i>
+                <span>My Account</span>
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="logout"
+               title="Logout">
+                <i class="fas fa-right-from-bracket" aria-hidden="true"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+        {% if not hide_page_header %}
+            <header class="user-page-header">
+                <div class="user-header-heading">
+                    {% if request.endpoint == 'user.dashboard' %}
+                        <h1>
+                            Welcome Back,
+                            <span>{{ session.get('user_name') or 'User' }}</span>
+                        </h1>
+                        <p>Generate, humanize and analyze your content in one workspace.</p>
+                    {% else %}
+                        <h1>{% block page_title %}{% endblock %}</h1>
+                    {% endif %}
+                </div>
+
+                <!-- BELL AND PROFILE TOGETHER -->
+                <div class="user-header-actions">
+                    <div class="user-notification-area">
+                        <button type="button"
+                                id="notificationBell"
+                                class="notification-bell"
+                                aria-label="Open notifications"
+                                aria-expanded="false">
+                            <i class="fas fa-bell" aria-hidden="true"></i>
+                            <span id="notificationCount"
+                                  class="notification-count"
+                                  hidden>0</span>
+                        </button>
+
+                        <div id="notificationDropdown"
+                             class="notification-dropdown"
+                             hidden>
+                            <div class="notification-dropdown-header">
+                                <div>
+                                    <h3>Notifications</h3>
+                                    <p>Account updates and messages</p>
+                                </div>
+
+                                <button type="button"
+                                        id="markAllNotificationsRead">
+                                    Mark all read
+                                </button>
+                            </div>
+
+                            <div id="notificationList"
+                                 class="notification-list"
+                                 aria-live="polite"
+                                 aria-busy="true">
+                                <div class="notification-loading">
+                                    Loading notifications...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{{ url_for('user.profile') }}"
+                       class="user-header-profile"
+                       aria-label="Open My Profile"
+                       title="My Profile">
+                        <span class="user-header-avatar">
+                            {% if account_header_photo|default('') %}
+                                <img src="{{ account_header_photo }}"
+                                     alt="Your profile photo"
+                                     class="user-header-photo">
+                            {% else %}
+                                <i class="fas fa-user" aria-hidden="true"></i>
+                            {% endif %}
+                        </span>
+
+                        <span class="user-header-details">
+                            <small>{{ (session.get('role') or 'User')|title }}</small>
+                            <strong>{{ session.get('user_name') or 'User' }}</strong>
+                        </span>
+
+                        <i class="fas fa-chevron-right profile-arrow"
+                           aria-hidden="true"></i>
+                    </a>
+                </div>
+            </header>
+        {% endif %}
+
+        <section class="content-wrapper">
+            {% block content %}{% endblock %}
+        </section>
+    </main>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="{{ url_for('static', filename='js/user/ui.js') }}"></script>
+<script src="{{ url_for('static', filename='js/user/notifications.js') }}"></script>
+
+{% block js %}{% endblock %}
+</body>
+</html>

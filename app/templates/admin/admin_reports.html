@@ -1,0 +1,1407 @@
+{% extends "admin/admin_base.html" %}
+
+
+{% block title %}
+Reports | Admin
+{% endblock %}
+
+
+{% block extra_css %}
+
+<link rel="stylesheet"
+      href="{{ url_for(
+          'static',
+          filename='css/admin/admin_reports.css'
+      ) }}">
+
+{% endblock %}
+
+
+{% block page_header %}
+
+<div class="reports-top-header">
+
+    <div class="reports-title-row">
+
+        <h1>Reports & Analytics</h1>
+
+        <i class="fas fa-chart-line"></i>
+
+    </div>
+
+    <p>
+        Monitor SEO, AI content plagiarism,
+        humanized content plagiarism and user feedback.
+    </p>
+
+</div>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="reports-page">
+
+
+    <!-- =====================================================
+         SUMMARY CARDS
+    ====================================================== -->
+
+    <div class="report-summary">
+
+
+        <!-- SEO -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon seo-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+
+            <div class="summary-info">
+
+                <span>SEO Reports</span>
+
+                <strong>
+                    {{ total_seo }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- AI CONTENT PLAGIARISM -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon ai-icon">
+                <i class="fas fa-robot"></i>
+            </div>
+
+            <div class="summary-info">
+
+                <span>
+                    AI Content Plagiarism
+                </span>
+
+                <strong>
+                    {{ total_ai_plagiarism }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- HUMANIZED CONTENT PLAGIARISM -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon humanized-icon">
+                <i class="fas fa-wand-magic-sparkles"></i>
+            </div>
+
+            <div class="summary-info">
+
+                <span>
+                    Humanized Plagiarism
+                </span>
+
+                <strong>
+                    {{ total_humanized_plagiarism }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- FEEDBACK -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon feedback-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+
+            <div class="summary-info">
+
+                <span>
+                    Feedback Reports
+                </span>
+
+                <strong>
+                    {{ total_feedback }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         PERFORMANCE
+    ====================================================== -->
+
+    <div class="performance-row">
+
+
+        <div class="performance-card">
+
+            <div class="performance-icon">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+
+            <div>
+
+                <span>
+                    Average SEO Score
+                </span>
+
+                <strong>
+                    {{ average_seo }}%
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="performance-card">
+
+            <div class="performance-icon">
+                <i class="fas fa-star"></i>
+            </div>
+
+            <div>
+
+                <span>
+                    Average Feedback Rating
+                </span>
+
+                <strong>
+                    {{ average_rating }}/5
+                </strong>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         REPORTS BOX
+    ====================================================== -->
+
+    <div class="reports-box">
+
+
+        <!-- =================================================
+             TABS
+        ================================================== -->
+
+        <div class="report-tabs">
+
+
+            <button
+                type="button"
+                class="report-tab active"
+                onclick="showReport('seo', this)">
+
+                <i class="fas fa-chart-line"></i>
+
+                SEO Reports
+
+            </button>
+
+
+            <button
+                type="button"
+                class="report-tab"
+                onclick="showReport(
+                    'ai-plagiarism',
+                    this
+                )">
+
+                <i class="fas fa-robot"></i>
+
+                AI Content Plagiarism
+
+            </button>
+
+
+            <button
+                type="button"
+                class="report-tab"
+                onclick="showReport(
+                    'humanized-plagiarism',
+                    this
+                )">
+
+                <i class="fas fa-wand-magic-sparkles"></i>
+
+                Humanized Plagiarism
+
+            </button>
+
+
+            <button
+                type="button"
+                class="report-tab"
+                onclick="showReport(
+                    'feedback',
+                    this
+                )">
+
+                <i class="fas fa-comments"></i>
+
+                Feedback
+
+            </button>
+
+
+        </div>
+
+
+        <!-- =================================================
+             SEO REPORTS
+        ================================================== -->
+
+        <div
+            class="report-panel active"
+            id="seo-panel">
+
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        SEO Reports
+                    </h2>
+
+                    <p>
+                        SEO analysis and optimization history.
+                    </p>
+
+                </div>
+
+                <div class="panel-header-icon">
+
+                    <i class="fas fa-chart-line"></i>
+
+                </div>
+
+            </div>
+
+
+            {% if recent_seo %}
+
+
+            <div class="table-wrapper">
+
+
+                <table class="reports-table">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>#</th>
+
+                            <th>User</th>
+
+                            <th>Topic</th>
+
+                            <th>Words</th>
+
+                            <th>SEO Score</th>
+
+                            <th>Readability</th>
+
+                            <th>Status</th>
+
+                            <th>Date</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                    {% for report in recent_seo %}
+
+
+                        <tr>
+
+
+                            <td>
+                                {{ loop.index }}
+                            </td>
+
+
+                            <td>
+
+                                <div class="user-cell">
+
+                                    <div class="user-avatar">
+
+                                        {{
+                                            (report.user_email or 'U')[0]
+                                            | upper
+                                        }}
+
+                                    </div>
+
+                                    <span>
+
+                                        {{
+                                            report.user_email
+                                            or "Unknown User"
+                                        }}
+
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="topic-cell">
+
+                                    {{
+                                        report.content_topic
+                                        or "No Topic"
+                                    }}
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                {{ report.word_count or 0 }}
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="score-badge seo-score">
+
+                                    {{ report.seo_score or 0 }}%
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                {{
+                                    report.readability_score
+                                    or 0
+                                }}%
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="status-badge">
+
+                                    {{
+                                        report.seo_status
+                                        or "Completed"
+                                    }}
+
+                                </span>
+
+                            </td>
+
+
+                            <td class="date-cell">
+
+                                {% if report.created_at %}
+
+                                    {{
+                                        report.created_at.strftime(
+                                            '%d %b %Y'
+                                        )
+                                    }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+
+                        </tr>
+
+
+                    {% endfor %}
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+            {% else %}
+
+
+            <div class="empty-state">
+
+                <i class="fas fa-chart-line"></i>
+
+                <h3>
+                    No SEO Reports
+                </h3>
+
+                <p>
+                    No SEO analysis has been performed yet.
+                </p>
+
+            </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+        <!-- =================================================
+             AI CONTENT PLAGIARISM
+        ================================================== -->
+
+        <div
+            class="report-panel"
+            id="ai-plagiarism-panel">
+
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        AI Content Plagiarism Checks
+                    </h2>
+
+                    <p>
+                        Plagiarism checks performed on
+                        AI-generated content.
+                    </p>
+
+                </div>
+
+                <div class="panel-header-icon">
+
+                    <i class="fas fa-robot"></i>
+
+                </div>
+
+            </div>
+
+
+            {% if recent_ai_plagiarism %}
+
+
+            <div class="table-wrapper">
+
+
+                <table class="reports-table">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>#</th>
+
+                            <th>User</th>
+
+                            <th>Topic</th>
+
+                            <th>Plagiarism Score</th>
+
+                            <th>Type</th>
+
+                            <th>Date</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                    {% for report in recent_ai_plagiarism %}
+
+
+                        <tr>
+
+
+                            <td>
+                                {{ loop.index }}
+                            </td>
+
+
+                            <td>
+
+                                <div class="user-cell">
+
+                                    <div class="user-avatar">
+
+                                        {{
+                                            (report.user_email or 'U')[0]
+                                            | upper
+                                        }}
+
+                                    </div>
+
+                                    <span>
+
+                                        {{
+                                            report.user_email
+                                            or "Unknown User"
+                                        }}
+
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="topic-cell">
+
+                                    {{
+                                        report.topic
+                                        or "No Topic"
+                                    }}
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="score-badge ai-score">
+
+                                    {{ report.score or 0 }}%
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="type-badge ai-type">
+
+                                    AI Content
+
+                                </span>
+
+                            </td>
+
+
+                            <td class="date-cell">
+
+                                {% if report.created_at %}
+
+                                    {{
+                                        report.created_at.strftime(
+                                            '%d %b %Y'
+                                        )
+                                    }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+
+                        </tr>
+
+
+                    {% endfor %}
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+            {% else %}
+
+
+            <div class="empty-state">
+
+                <i class="fas fa-robot"></i>
+
+                <h3>
+                    No AI Content Plagiarism Checks
+                </h3>
+
+                <p>
+                    No plagiarism checks for AI-generated
+                    content have been recorded yet.
+                </p>
+
+            </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+        <!-- =================================================
+             HUMANIZED CONTENT PLAGIARISM
+        ================================================== -->
+
+        <div
+            class="report-panel"
+            id="humanized-plagiarism-panel">
+
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        Humanized Content Plagiarism Checks
+                    </h2>
+
+                    <p>
+                        Plagiarism checks performed after
+                        content was humanized.
+                    </p>
+
+                </div>
+
+                <div class="panel-header-icon">
+
+                    <i class="fas fa-wand-magic-sparkles"></i>
+
+                </div>
+
+            </div>
+
+
+            {% if recent_humanized_plagiarism %}
+
+
+            <div class="table-wrapper">
+
+
+                <table class="reports-table">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>#</th>
+
+                            <th>User</th>
+
+                            <th>Topic</th>
+
+                            <th>Plagiarism Score</th>
+
+                            <th>Type</th>
+
+                            <th>Date</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                    {% for report in recent_humanized_plagiarism %}
+
+
+                        <tr>
+
+
+                            <td>
+                                {{ loop.index }}
+                            </td>
+
+
+                            <td>
+
+                                <div class="user-cell">
+
+                                    <div class="user-avatar">
+
+                                        {{
+                                            (report.user_email or 'U')[0]
+                                            | upper
+                                        }}
+
+                                    </div>
+
+                                    <span>
+
+                                        {{
+                                            report.user_email
+                                            or "Unknown User"
+                                        }}
+
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="topic-cell">
+
+                                    {{
+                                        report.topic
+                                        or "No Topic"
+                                    }}
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="score-badge humanized-score">
+
+                                    {{ report.score or 0 }}%
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="type-badge humanized-type">
+
+                                    Humanized Content
+
+                                </span>
+
+                            </td>
+
+
+                            <td class="date-cell">
+
+                                {% if report.created_at %}
+
+                                    {{
+                                        report.created_at.strftime(
+                                            '%d %b %Y'
+                                        )
+                                    }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+
+                        </tr>
+
+
+                    {% endfor %}
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+            {% else %}
+
+
+            <div class="empty-state">
+
+                <i class="fas fa-wand-magic-sparkles"></i>
+
+                <h3>
+                    No Humanized Content Plagiarism Checks
+                </h3>
+
+                <p>
+                    No plagiarism checks for humanized
+                    content have been recorded yet.
+                </p>
+
+            </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+        <!-- =================================================
+             FEEDBACK
+        ================================================== -->
+
+        <div
+            class="report-panel"
+            id="feedback-panel">
+
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        Feedback Reports
+                    </h2>
+
+                    <p>
+                        User feedback and rating history.
+                    </p>
+
+                </div>
+
+                <div class="panel-header-icon">
+
+                    <i class="fas fa-comments"></i>
+
+                </div>
+
+            </div>
+
+
+            {% if recent_feedback %}
+
+
+            <div class="table-wrapper">
+
+
+                <table class="reports-table">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>#</th>
+
+                            <th>User</th>
+
+                            <th>Subject</th>
+
+                            <th>Type</th>
+
+                            <th>Rating</th>
+
+                            <th>Status</th>
+
+                            <th>Date</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                    {% for report in recent_feedback %}
+
+
+                        <tr>
+
+
+                            <td>
+                                {{ loop.index }}
+                            </td>
+
+
+                            <td>
+
+                                <div class="user-cell">
+
+                                    <div class="user-avatar">
+
+                                        {{
+                                            (report.user_email or 'U')[0]
+                                            | upper
+                                        }}
+
+                                    </div>
+
+                                    <span>
+
+                                        {{
+                                            report.user_email
+                                            or "Unknown User"
+                                        }}
+
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="topic-cell">
+
+                                    {{
+                                        report.subject
+                                        or "No Subject"
+                                    }}
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="type-badge">
+
+                                    {{
+                                        report.feedback_type
+                                        or "General"
+                                    }}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="rating-badge">
+
+                                    <i class="fas fa-star"></i>
+
+                                    {{ report.rating or 0 }}/5
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="status-badge">
+
+                                    {{
+                                        report.status
+                                        or "Pending"
+                                    }}
+
+                                </span>
+
+                            </td>
+
+
+                            <td class="date-cell">
+
+                                {% if report.created_at %}
+
+                                    {{
+                                        report.created_at.strftime(
+                                            '%d %b %Y'
+                                        )
+                                    }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+
+                        </tr>
+
+
+                    {% endfor %}
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+            {% else %}
+
+
+            <div class="empty-state">
+
+                <i class="fas fa-comments"></i>
+
+                <h3>
+                    No Feedback Reports
+                </h3>
+
+                <p>
+                    No feedback has been submitted yet.
+                </p>
+
+            </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   REPORT TABS
+========================================================= */
+
+function showReport(type, button) {
+
+    document
+        .querySelectorAll(".report-panel")
+        .forEach(function(panel) {
+            panel.classList.remove("active");
+        });
+
+    document
+        .querySelectorAll(".report-tab")
+        .forEach(function(tab) {
+            tab.classList.remove("active");
+        });
+
+    const selectedPanel =
+        document.getElementById(type + "-panel");
+
+    if (selectedPanel) {
+        selectedPanel.classList.add("active");
+    }
+
+    if (button) {
+        button.classList.add("active");
+    }
+}
+
+
+/* =========================================================
+   REPORT PAGINATION
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const rowsPerPage = 5;
+
+    const panels = document.querySelectorAll(".report-panel");
+
+    panels.forEach(function (panel) {
+
+        const table = panel.querySelector(".reports-table");
+
+        if (!table) {
+            return;
+        }
+
+        const tbody = table.querySelector("tbody");
+
+        if (!tbody) {
+            return;
+        }
+
+        const rows = Array.from(
+            tbody.querySelectorAll("tr")
+        );
+
+        if (rows.length === 0) {
+            return;
+        }
+
+
+        let currentPage = 1;
+
+        const totalPages = Math.ceil(
+            rows.length / rowsPerPage
+        );
+
+
+        /* =============================================
+           PAGINATION CONTAINER
+        ============================================= */
+
+        const pagination =
+            document.createElement("div");
+
+        pagination.className = "reports-pagination";
+
+
+        const previousButton =
+            document.createElement("button");
+
+        previousButton.type = "button";
+        previousButton.className = "pagination-btn";
+        previousButton.innerHTML =
+            '<i class="fas fa-chevron-left"></i> Previous';
+
+
+        const pageNumbers =
+            document.createElement("div");
+
+        pageNumbers.className = "pagination-pages";
+
+
+        const nextButton =
+            document.createElement("button");
+
+        nextButton.type = "button";
+        nextButton.className = "pagination-btn";
+        nextButton.innerHTML =
+            'Next <i class="fas fa-chevron-right"></i>';
+
+
+        pagination.appendChild(previousButton);
+        pagination.appendChild(pageNumbers);
+        pagination.appendChild(nextButton);
+
+
+        /* =============================================
+           INSERT PAGINATION AFTER TABLE
+        ============================================= */
+
+        const tableWrapper =
+            table.closest(".table-wrapper");
+
+        if (tableWrapper) {
+            tableWrapper.insertAdjacentElement(
+                "afterend",
+                pagination
+            );
+        }
+
+
+        /* =============================================
+           SHOW PAGE
+        ============================================= */
+
+        function showPage(page) {
+
+            currentPage = page;
+
+            const start =
+                (currentPage - 1) * rowsPerPage;
+
+            const end =
+                start + rowsPerPage;
+
+
+            rows.forEach(function (row, index) {
+
+                if (index >= start && index < end) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+
+            });
+
+
+            /* =========================================
+               UPDATE SERIAL NUMBER
+            ========================================= */
+
+            rows.forEach(function (row, index) {
+
+                const numberCell =
+                    row.querySelector("td:first-child");
+
+                if (numberCell) {
+                    numberCell.textContent =
+                        index + 1;
+                }
+
+            });
+
+
+            renderPageNumbers();
+
+
+            previousButton.disabled =
+                currentPage === 1;
+
+            nextButton.disabled =
+                currentPage === totalPages;
+        }
+
+
+        /* =============================================
+           PAGE NUMBER BUTTONS
+        ============================================= */
+
+        function renderPageNumbers() {
+
+            pageNumbers.innerHTML = "";
+
+            for (
+                let page = 1;
+                page <= totalPages;
+                page++
+            ) {
+
+                const button =
+                    document.createElement("button");
+
+                button.type = "button";
+
+                button.className =
+                    "pagination-number";
+
+                button.textContent = page;
+
+
+                if (page === currentPage) {
+                    button.classList.add("active");
+                }
+
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        showPage(page);
+
+                    }
+                );
+
+
+                pageNumbers.appendChild(button);
+            }
+        }
+
+
+        /* =============================================
+           PREVIOUS
+        ============================================= */
+
+        previousButton.addEventListener(
+            "click",
+            function () {
+
+                if (currentPage > 1) {
+
+                    showPage(
+                        currentPage - 1
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =============================================
+           NEXT
+        ============================================= */
+
+        nextButton.addEventListener(
+            "click",
+            function () {
+
+                if (currentPage < totalPages) {
+
+                    showPage(
+                        currentPage + 1
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =============================================
+           HIDE PAGINATION IF ONLY ONE PAGE
+        ============================================= */
+
+        if (totalPages <= 1) {
+
+            pagination.style.display = "none";
+
+        }
+
+
+        /* =============================================
+           INITIAL PAGE
+        ============================================= */
+
+        showPage(1);
+
+    });
+
+});
+
+</script>
+{% endblock %}

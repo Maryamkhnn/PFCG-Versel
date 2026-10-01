@@ -1,0 +1,16 @@
+Flask
+Flask-SQLAlchemy
+PyMySQL
+Werkzeug
+Flask-Mail
+python-dotenv
+groq
+ddgs
+requests
+beautifulsoup4
+rapidfuzz
+python-docx
+reportlab
+Pillow
+bcrypt
+gunicorn

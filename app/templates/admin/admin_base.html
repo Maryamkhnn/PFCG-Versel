@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+            Admin | PFCG AI
+        {% endblock %}
+    </title>
+
+
+    <!-- FONT AWESOME -->
+<script>
+    try {
+        document.documentElement.dataset.adminTheme =
+            localStorage.getItem("adminTheme") === "dark"
+                ? "dark"
+                : "light";
+    } catch (error) {
+        document.documentElement.dataset.adminTheme = "light";
+    }
+</script>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    >
+
+
+    <!-- ADMIN COMMON CSS -->
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/admin/common.css'
+        ) }}"
+    >
+
+
+    <!-- PAGE-SPECIFIC CSS -->
+
+    {% block extra_css %}
+    {% endblock %}
+
+</head>
+
+
+<body>
+
+
+<div class="admin-layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="admin-sidebar">
+
+
+        <div class="sidebar-top">
+
+
+            <!-- =============================================
+                 LOGO
+            ============================================== -->
+
+            <div class="admin-logo">
+
+        
+
+                <span>PFCG AI</span>
+
+            </div>
+
+
+            <!-- =============================================
+                 NAVIGATION
+            ============================================== -->
+
+            <nav class="admin-nav">
+
+
+                <!-- DASHBOARD -->
+
+                <a
+                    href="{{ url_for('admin.dashboard') }}"
+                    class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}"
+                >
+
+                    <i class="fas fa-home"></i>
+
+                    <span>Dashboard</span>
+
+                </a>
+
+
+                <!-- MANAGE USERS -->
+
+                <a
+                    href="{{ url_for('admin.users') }}"
+                    class="{% if request.endpoint == 'admin.users' %}active{% endif %}"
+                >
+
+                    <i class="fas fa-users"></i>
+
+                    <span>Manage Users</span>
+
+                </a>
+
+
+                <!-- GENERATED CONTENT -->
+
+                <a
+                    href="{{ url_for('admin.content') }}"
+                    class="{% if request.endpoint == 'admin.content' %}active{% endif %}"
+                >
+
+                    <i class="fas fa-file-alt"></i>
+
+                    <span>Generated Content</span>
+
+                </a>
+
+
+                <!-- REPORTS -->
+
+                <a
+                    href="{{ url_for('admin.reports') }}"
+                    class="{% if request.endpoint == 'admin.reports' %}active{% endif %}"
+                >
+
+                    <i class="fas fa-chart-pie"></i>
+
+                    <span>Reports</span>
+
+                </a>
+
+
+                <!-- FEEDBACK -->
+
+                <a
+                    href="{{ url_for('admin.feedback') }}"
+                    class="{% if request.endpoint == 'admin.feedback' %}active{% endif %}"
+                >
+
+                    <i class="fas fa-comments"></i>
+
+                    <span>Feedback</span>
+
+                </a>
+
+
+                <!-- ACTIVITY LOGS -->
+
+                <a
+                    href="{{ url_for('admin.activity_logs') }}"
+                    class="{% if request.endpoint == 'admin.activity_logs' %}active{% endif %}"
+                >
+
+                    <i class="fas fa-clock-rotate-left"></i>
+
+                    <span>Activity Logs</span>
+
+                </a>
+
+<a href="{{ url_for('admin.blocked_attempts') }}"
+   class="admin-blocked-link {% if request.endpoint == 'admin.blocked_attempts' %}active{% endif %}">
+    <i class="fa-solid fa-shield-halved"></i>
+    <span>Blocked Attempts</span>
+</a>
+
+            </nav>
+
+        </div>
+
+        <!-- =================================================
+             SIDEBAR BOTTOM
+        ================================================== -->
+
+        <div class="admin-bottom">
+<a
+    href="{{ url_for('admin.account') }}"
+    class="admin-account-link {% if request.endpoint == 'admin.account' %}active{% endif %}"
+>
+    <span class="admin-account-avatar">
+        <i class="fas fa-user-shield"></i>
+    </span>
+
+    <span class="admin-account-details">
+        <strong>{{ session.get("user_name") or "Administrator" }}</strong>
+        <small>My Account</small>
+    </span>
+
+    <i class="fas fa-chevron-right admin-account-arrow"></i>
+</a>
+            <!-- LOGOUT -->
+
+            <a
+                href="{{ url_for('auth.logout') }}"
+                class="logout"
+            >
+
+                <i class="fas fa-sign-out-alt"></i>
+
+                <span>Logout</span>
+
+            </a>
+
+
+        </div>
+
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN AREA
+    ====================================================== -->
+
+    <main class="admin-main">
+
+
+        <!-- =================================================
+             TOP HEADER
+        ================================================== -->
+
+        <header class="admin-header">
+
+
+            <!-- PAGE TITLE -->
+
+            <div class="header-left">
+
+                {% block page_header %}
+
+                    <h1>Admin Panel</h1>
+
+                    <p>
+                        Manage your PFCG AI platform
+                    </p>
+
+                {% endblock %}
+
+            </div>
+
+
+
+        </header>
+
+
+        <!-- =================================================
+             PAGE CONTENT
+        ================================================== -->
+
+        {% block content %}
+        {% endblock %}
+
+
+    </main>
+
+
+</div>
+
+
+<!-- PAGE-SPECIFIC JAVASCRIPT -->
+
+{% block extra_js %}
+{% endblock %}
+
+
+</body>
+
+</html>

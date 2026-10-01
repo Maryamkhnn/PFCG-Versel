@@ -1,0 +1,610 @@
+{% extends "user/base.html" %}
+
+{% block title %}Content Editor | PFCG AI{% endblock %}
+{% block page_title %}{% endblock %}
+
+{% block css %}
+{% if csrf_token is defined %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+{% endif %}
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/user/edit_content.css', v='2') }}">
+      <style>
+    .topbar {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="editor-page"
+     id="editorPage"
+     data-back="{{ url_for('user.my_content') }}">
+
+   <header class="editor-header">
+
+    <div class="editor-heading">
+        <h1>Content Editor</h1>
+        <p>Edit, format and export your documents.</p>
+    </div>
+
+    <div class="editor-header-tools">
+        <button
+            id="focusBtn"
+            type="button"
+            aria-pressed="false"
+        >
+            Focus Mode
+        </button>
+
+        <button id="backToContentBtn" type="button">
+            My Content
+        </button>
+    </div>
+
+</header>
+    <div class="document-picker">
+        <label for="documentSelector">Document</label>
+
+        <select id="documentSelector">
+            <option value="">Loading documents...</option>
+        </select>
+
+        <button id="loadDocumentBtn" type="button">
+            Open Document
+        </button>
+
+        <label class="auto-label">
+            <input id="autoSave" type="checkbox" checked>
+            Auto-save
+        </label>
+    </div>
+
+    <div class="content-info-card">
+        <div>
+            <h2 id="contentTitle">Select a document</h2>
+            <p>
+                <span id="contentType">Content</span>
+                <span id="contentDate"></span>
+            </p>
+        </div>
+
+        <span id="saveStatusBadge">No document selected</span>
+    </div>
+
+    <div class="studio-grid">
+
+    <!-- =====================================================
+         MAIN EDITOR
+    ====================================================== -->
+
+    <div class="writing-column">
+
+        <fieldset id="editingControls" disabled>
+
+            <div class="editor-card">
+
+                <!-- FORMATTING TOOLBAR -->
+
+                <div id="editorToolbar">
+
+                    <span class="ql-formats">
+
+                        <select
+                            class="ql-header"
+                            aria-label="Heading"
+                        >
+                            <option selected>Normal</option>
+                            <option value="1">Heading 1</option>
+                            <option value="2">Heading 2</option>
+                            <option value="3">Heading 3</option>
+                        </select>
+
+                        <select
+                            class="ql-font"
+                            aria-label="Font"
+                        >
+                            <option selected>Sans Serif</option>
+                            <option value="serif">Serif</option>
+                            <option value="monospace">
+                                Monospace
+                            </option>
+                        </select>
+
+                        <select
+                            class="ql-size"
+                            aria-label="Text size"
+                        >
+                            <option value="small">Small</option>
+                            <option selected>Normal</option>
+                            <option value="large">Large</option>
+                            <option value="huge">Huge</option>
+                        </select>
+
+                    </span>
+
+                    <span class="ql-formats">
+
+                        <button
+                            type="button"
+                            class="ql-bold"
+                            aria-label="Bold"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="ql-italic"
+                            aria-label="Italic"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="ql-underline"
+                            aria-label="Underline"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="ql-strike"
+                            aria-label="Strike"
+                        ></button>
+
+                    </span>
+
+                    <span class="ql-formats">
+
+                        <select
+                            class="ql-color"
+                            aria-label="Text color"
+                        ></select>
+
+                        <select
+                            class="ql-background"
+                            aria-label="Highlight color"
+                        ></select>
+
+                    </span>
+
+                    <span class="ql-formats">
+
+                        <select
+                            class="ql-align"
+                            aria-label="Text alignment"
+                        ></select>
+
+                        <button
+                            type="button"
+                            class="ql-list"
+                            value="ordered"
+                            aria-label="Numbered list"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="ql-list"
+                            value="bullet"
+                            aria-label="Bullet list"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="ql-indent"
+                            value="-1"
+                            aria-label="Decrease indentation"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="ql-indent"
+                            value="+1"
+                            aria-label="Increase indentation"
+                        ></button>
+
+                        <button
+                            type="button"
+                            class="ql-clean"
+                            aria-label="Clear formatting"
+                        ></button>
+
+                    </span>
+
+                </div>
+
+                <!-- SECONDARY TOOLBAR -->
+
+                <div class="extra-toolbar">
+
+                    <button type="button" id="undoBtn">
+                        <i class="fas fa-rotate-left"></i>
+                        Undo
+                    </button>
+
+                    <button type="button" id="redoBtn">
+                        <i class="fas fa-rotate-right"></i>
+                        Redo
+                    </button>
+
+                    <label for="lineSpacing">
+                        Line spacing
+                    </label>
+
+                    <select id="lineSpacing">
+                        <option value="1">1.0</option>
+                        <option value="1.5" selected>1.5</option>
+                        <option value="2">2.0</option>
+                        <option value="2.5">2.5</option>
+                    </select>
+
+                </div>
+
+                <!-- EDITOR -->
+
+                <div class="paper-surround">
+                    <div id="editorContent"></div>
+                </div>
+
+                <div class="editor-footer">
+
+                    <span id="lastSaved">
+                        No document selected
+                    </span>
+
+                    <span>
+                        <i class="fas fa-keyboard"></i>
+                        Ctrl + S to save
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- FIND AND REPLACE -->
+
+            <details class="find-panel">
+
+                <summary>
+                    <i class="fas fa-magnifying-glass"></i>
+                    Find &amp; Replace
+                </summary>
+
+                <div class="find-controls">
+
+                    <input
+                        id="findText"
+                        placeholder="Find text"
+                        aria-label="Find text"
+                    >
+
+                    <input
+                        id="replaceText"
+                        placeholder="Replace with"
+                        aria-label="Replacement text"
+                    >
+
+                    <button type="button" id="findNextBtn">
+                        Find Next
+                    </button>
+
+                    <button type="button" id="replaceAllBtn">
+                        Replace All
+                    </button>
+
+                </div>
+
+                <small>
+                    Search is case-sensitive. Changes can be undone.
+                </small>
+
+            </details>
+
+            <!-- DOCUMENT ACTIONS -->
+
+            <div class="editor-actions">
+
+                <div class="button-row">
+
+                    <button type="button" id="resetBtn">
+                        <i class="fas fa-rotate-left"></i>
+                        Reset
+                    </button>
+
+                    <button type="button" id="copyBtn">
+                        <i class="fas fa-copy"></i>
+                        Copy
+                    </button>
+
+                    <button type="button" id="previewBtn">
+                        <i class="fas fa-eye"></i>
+                        Preview
+                    </button>
+
+                </div>
+
+                <div class="button-row">
+
+                    <button type="button" id="downloadBtn">
+                        <i class="fas fa-file-lines"></i>
+                        TXT
+                    </button>
+
+                    <button type="button" id="exportWordBtn">
+                        <i class="fas fa-file-word"></i>
+                        Word
+                    </button>
+
+                    <button type="button" id="exportPdfBtn">
+                        <i class="fas fa-file-pdf"></i>
+                        PDF
+                    </button>
+
+                    <button
+                        type="button"
+                        id="saveBtn"
+                        class="primary"
+                    >
+                        <i class="fas fa-floppy-disk"></i>
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </div>
+
+        </fieldset>
+
+    </div>
+
+
+    <!-- =====================================================
+         RIGHT INFORMATION PANEL
+    ====================================================== -->
+
+    <aside class="editor-aside editor-info-aside">
+
+        <!-- WRITING STATISTICS -->
+
+        <section class="side-panel">
+
+            <div class="panel-title">
+
+                <span class="panel-icon">
+                    <i class="fas fa-chart-simple"></i>
+                </span>
+
+                <div>
+                    <h3>Writing Statistics</h3>
+                    <p>Live document information</p>
+                </div>
+
+            </div>
+
+            <dl class="statistics">
+
+                <div class="stat-box">
+                    <dt>Words</dt>
+                    <dd id="wordCount">0</dd>
+                </div>
+
+                <div class="stat-box">
+                    <dt>Characters</dt>
+                    <dd id="characterCount">0</dd>
+                </div>
+
+                <div class="stat-box">
+                    <dt>Paragraphs</dt>
+                    <dd id="paragraphCount">0</dd>
+                </div>
+
+                <div class="stat-box">
+                    <dt>Reading Time</dt>
+                    <dd id="readingTime">0 min</dd>
+                </div>
+
+            </dl>
+
+        </section>
+
+
+
+    </aside>
+
+</div>
+
+
+<!-- =========================================================
+     FULL-WIDTH AI WRITING ASSISTANT
+========================================================== -->
+
+<section class="assistant-panel">
+
+    <div class="assistant-header">
+
+        <div class="assistant-heading">
+
+            <span class="assistant-icon">
+                <i class="fas fa-wand-magic-sparkles"></i>
+            </span>
+
+            <div>
+                <h2>AI Writing Assistant</h2>
+
+                <p>
+                    Select a sentence or paragraph from the editor,
+                    choose an action and review the suggestion before
+                    applying it.
+                </p>
+            </div>
+
+        </div>
+
+        <span class="assistant-note">
+            <i class="fas fa-shield-halved"></i>
+            Your changes are not saved until you accept and save them.
+        </span>
+
+    </div>
+
+    <div class="assistant-controls">
+
+        <div class="assistant-field">
+
+            <label for="assistAction">
+                Writing action
+            </label>
+
+            <select id="assistAction">
+
+                <option value="improve">
+                    Improve clarity and flow
+                </option>
+
+               
+
+                <option value="shorten">
+                    Make the text shorter
+                </option>
+
+                <option value="expand">
+                    Expand the explanation
+                </option>
+
+                <option value="formal">
+                    Use a formal tone
+                </option>
+
+            </select>
+
+        </div>
+
+        <button
+            type="button"
+            id="assistBtn"
+            class="primary assistant-button"
+        >
+            <i class="fas fa-sparkles"></i>
+            Generate Suggestion
+        </button>
+
+    </div>
+
+    <p class="assistant-help">
+        If no text is selected, the assistant will use the full
+        document when it contains no more than 6,000 characters.
+    </p>
+
+    <!-- SUGGESTION COMPARISON -->
+
+    <div id="suggestionPanel" hidden>
+
+        <div class="suggestion-status">
+            <i class="fas fa-circle-check"></i>
+            Suggestion ready. Compare both versions before applying.
+        </div>
+
+        <div class="suggestion-comparison">
+
+            <div class="suggestion-column original-column">
+
+                <div class="suggestion-column-title">
+
+                    <span>
+                        <i class="fas fa-file-lines"></i>
+                        Original Text
+                    </span>
+
+                </div>
+
+                <div
+                    id="beforeText"
+                    class="comparison"
+                ></div>
+
+            </div>
+
+            <div class="suggestion-column suggested-column">
+
+                <div class="suggestion-column-title">
+
+                    <span>
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        AI Suggestion
+                    </span>
+
+                </div>
+
+                <div
+                    id="afterText"
+                    class="comparison suggested"
+                ></div>
+
+            </div>
+
+        </div>
+
+        <div class="suggestion-actions">
+
+            <button
+                type="button"
+                id="rejectSuggestionBtn"
+                class="reject-suggestion"
+            >
+                <i class="fas fa-xmark"></i>
+                Reject Suggestion
+            </button>
+
+            <button
+                type="button"
+                id="acceptSuggestionBtn"
+                class="primary accept-suggestion"
+            >
+                <i class="fas fa-check"></i>
+                Apply Suggestion
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+</div>
+
+<div id="editorNotice" role="status" aria-live="polite" hidden>
+    <span id="noticeText"></span>
+
+    <button id="closeNotice"
+            type="button"
+            aria-label="Dismiss notification">
+        ×
+    </button>
+</div>
+
+<dialog id="previewModal" class="editor-dialog">
+    <div class="dialog-heading">
+        <h2 id="previewTitle">Preview</h2>
+        <button type="button" id="closePreviewBtn">Close</button>
+    </div>
+
+    <div id="previewContent"></div>
+</dialog>
+
+<dialog id="confirmModal" class="editor-dialog confirm-dialog">
+    <h2>Unsaved changes</h2>
+    <p id="confirmMessage"></p>
+
+    <form method="dialog" class="button-row">
+        <button value="cancel" autofocus>Keep Editing</button>
+        <button value="discard">Discard Changes</button>
+    </form>
+</dialog>
+
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<script src="{{ url_for('static', filename='js/user/edit_content.js', v='3') }}"></script>
+{% endblock %}

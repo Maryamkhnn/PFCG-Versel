@@ -1,0 +1,320 @@
+{% extends "user/base.html" %}
+
+{% block title %}Reports | PFCG AI{% endblock %}
+
+{% block page_title %}{% endblock %}
+
+{% block css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/user/reports.css') }}"
+>
+{% endblock %}
+
+{% block content %}
+
+<div class="reports-page">
+
+    <!-- PAGE HEADING -->
+
+    <div class="reports-header">
+
+        <div class="reports-heading-icon">
+            <i class="fas fa-chart-line" aria-hidden="true"></i>
+        </div>
+
+        <div class="reports-heading-text">
+            <h1>Reports</h1>
+            <p>Review your plagiarism results and SEO performance.</p>
+        </div>
+
+    </div>
+
+    <!-- SEARCH AND PAGE SIZE -->
+
+    <div class="reports-tools">
+
+        <div class="reports-search">
+            <i class="fas fa-search" aria-hidden="true"></i>
+
+            <input
+                type="search"
+                id="searchReports"
+                placeholder="Search by topic or content type..."
+                aria-label="Search reports"
+                autocomplete="off"
+            >
+        </div>
+
+        <div class="reports-page-size">
+            <label for="reportsPerPage">Per page</label>
+
+            <select id="reportsPerPage">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+            </select>
+        </div>
+
+    </div>
+
+    <p
+        id="reportsResultCount"
+        class="reports-result-count"
+        role="status"
+        aria-live="polite"
+    ></p>
+
+    <!-- NO SEARCH RESULTS -->
+
+    <div id="reportsNoMatch" class="reports-no-match" hidden>
+        <i class="fas fa-search" aria-hidden="true"></i>
+        <h3>No matching reports</h3>
+        <p>Try another topic or content type.</p>
+
+        <button type="button" id="clearReportsSearch">
+            Clear Search
+        </button>
+    </div>
+
+    <!-- REPORT CARDS -->
+
+    <div class="reports-container">
+
+        {% if reports %}
+
+            {% for report in reports %}
+
+                {% set ai_score = report.ai_plagiarism_score | default(none) %}
+                {% set human_score = report.humanized_plagiarism_score | default(none) %}
+                {% set seo_score = report.seo_score | default(none) %}
+
+                <article
+                    class="report-card"
+                    data-topic="{{ report.topic or 'Untitled Content' }}"
+                    data-type="{{ report.content_type or 'Content' }}"
+                >
+
+                    <!-- CARD HEADER -->
+
+                    <div class="report-header">
+
+                        <div class="report-title">
+
+                            <div class="file-icon">
+                                <i
+                                    class="fas fa-file-lines"
+                                    aria-hidden="true"
+                                ></i>
+                            </div>
+
+                            <div>
+                                <h2>
+                                    {{ report.topic or "Untitled Content" }}
+                                </h2>
+
+                                <p>
+                                    {{ report.content_type or "Content" }}
+                                    <span>•</span>
+                                    {{ report.word_count or 0 }} words
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="report-date">
+                            <i class="far fa-clock" aria-hidden="true"></i>
+                            {{ report.created_at or "--" }}
+                        </div>
+
+                    </div>
+
+                    <!-- ANALYSIS -->
+
+                    <div class="analysis-grid">
+
+                        <!-- AI PLAGIARISM -->
+
+                        <div class="analysis-box">
+
+                            <div class="analysis-title">
+                                <i class="fas fa-robot" aria-hidden="true"></i>
+                                <span>AI Plagiarism</span>
+                            </div>
+
+                            {% if ai_score is not none %}
+
+                                <strong class="{% if ai_score <= 20 %}score-good{% elif ai_score <= 40 %}score-medium{% else %}score-high{% endif %}">
+                                    {{ ai_score }}%
+                                </strong>
+
+                                <small>
+                                    {{ report.ai_source_count or 0 }}
+                                    matched sources
+                                </small>
+
+                            {% else %}
+
+                                <strong class="not-checked">—</strong>
+                                <small>Not checked</small>
+
+                            {% endif %}
+
+                        </div>
+
+                        <!-- HUMANIZED PLAGIARISM -->
+
+                        <div class="analysis-box">
+
+                            <div class="analysis-title">
+                                <i
+                                    class="fas fa-user-check"
+                                    aria-hidden="true"
+                                ></i>
+                                <span>Humanized Plagiarism</span>
+                            </div>
+
+                            {% if human_score is not none %}
+
+                                <strong class="{% if human_score <= 20 %}score-good{% elif human_score <= 40 %}score-medium{% else %}score-high{% endif %}">
+                                    {{ human_score }}%
+                                </strong>
+
+                                <small>
+                                    {{ report.humanized_source_count or 0 }}
+                                    matched sources
+                                </small>
+
+                            {% else %}
+
+                                <strong class="not-checked">—</strong>
+                                <small>Not checked</small>
+
+                            {% endif %}
+
+                        </div>
+
+                        <!-- SEO -->
+
+                        <div class="analysis-box seo-box">
+
+                            <div class="analysis-title">
+                                <i
+                                    class="fas fa-chart-line"
+                                    aria-hidden="true"
+                                ></i>
+                                <span>SEO Score</span>
+                            </div>
+
+                            {% if seo_score is not none %}
+
+                                <strong class="{% if seo_score >= 80 %}score-good{% elif seo_score >= 50 %}score-medium{% else %}score-high{% endif %}">
+                                    {{ seo_score }}%
+                                </strong>
+
+                                <small>
+                                    {{ report.seo_status or "Analyzed" }}
+                                </small>
+
+                            {% else %}
+
+                                <strong class="not-checked">—</strong>
+                                <small>Not analyzed</small>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    <!-- CARD FOOTER -->
+
+                    <div class="report-footer">
+
+                        <div>
+                            <i class="fas fa-key" aria-hidden="true"></i>
+
+                            Keyword Count:
+
+                            <strong>
+                                {% if seo_score is not none %}
+                                    {{ report.keyword_count or 0 }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <i class="fas fa-percent" aria-hidden="true"></i>
+
+                            Keyword Density:
+
+                            <strong>
+                                {% if seo_score is not none %}
+                                    {{ report.keyword_density or 0 }}%
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        {% if report.humanized_id %}
+
+                            <div class="humanized-label">
+                                <i
+                                    class="fas fa-circle-check"
+                                    aria-hidden="true"
+                                ></i>
+                                Humanized
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <i class="fas fa-chart-line" aria-hidden="true"></i>
+
+                <h2>No Reports Yet</h2>
+
+                <p>
+                    Generate and analyze content to see your reports here.
+                </p>
+
+                <a href="{{ url_for('user.generator') }}">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                    Generate Content
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    <!-- PAGINATION -->
+
+    <nav
+        id="reportsPagination"
+        class="reports-pagination"
+        aria-label="Reports pagination"
+        hidden
+    ></nav>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script
+    src="{{ url_for('static', filename='js/user/reports.js') }}"
+></script>
+{% endblock %}

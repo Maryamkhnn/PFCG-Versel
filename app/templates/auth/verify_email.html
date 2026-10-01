@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Verify Email | PFCG AI</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/auth/verify_email.css'
+        ) }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+</head>
+
+<body>
+
+    <main class="verify-page">
+
+        <section class="verify-wrapper">
+
+            <!-- =====================================
+                 LEFT ILLUSTRATION AREA
+            ====================================== -->
+
+            <div class="illustration-panel">
+
+                <div class="brand">
+
+                    <div class="brand-icon">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+
+                    <span>PFCG AI</span>
+
+                </div>
+
+                <div class="illustration-content">
+
+                    <div class="email-illustration">
+
+                        <svg
+                            viewBox="0 0 500 400"
+                            xmlns="http://www.w3.org/2000/svg"
+                            role="img"
+                            aria-label="Email verification illustration"
+                        >
+
+                            <circle
+                                cx="250"
+                                cy="195"
+                                r="150"
+                                fill="#ffffff"
+                                opacity="0.12"
+                            />
+
+                            <circle
+                                cx="105"
+                                cy="88"
+                                r="17"
+                                fill="#a78bfa"
+                                opacity="0.7"
+                            />
+
+                            <circle
+                                cx="405"
+                                cy="294"
+                                r="24"
+                                fill="#c4b5fd"
+                                opacity="0.7"
+                            />
+
+                            <path
+                                d="M92 287 C148 247 185 321 241 280"
+                                fill="none"
+                                stroke="#c4b5fd"
+                                stroke-width="8"
+                                stroke-linecap="round"
+                                opacity="0.55"
+                            />
+
+                            <!-- Envelope shadow -->
+                            <rect
+                                x="109"
+                                y="143"
+                                width="290"
+                                height="188"
+                                rx="24"
+                                fill="#31206d"
+                                opacity="0.22"
+                                transform="translate(8 12)"
+                            />
+
+                            <!-- Envelope -->
+                            <rect
+                                x="109"
+                                y="143"
+                                width="290"
+                                height="188"
+                                rx="24"
+                                fill="#ffffff"
+                            />
+
+                            <path
+                                d="M119 162 L254 258 L389 162"
+                                fill="#ede9fe"
+                            />
+
+                            <path
+                                d="M119 312 L215 223"
+                                fill="none"
+                                stroke="#ddd6fe"
+                                stroke-width="12"
+                                stroke-linecap="round"
+                            />
+
+                            <path
+                                d="M389 312 L293 223"
+                                fill="none"
+                                stroke="#ddd6fe"
+                                stroke-width="12"
+                                stroke-linecap="round"
+                            />
+
+                            <path
+                                d="M122 158 L254 254 L386 158"
+                                fill="none"
+                                stroke="#6d44c5"
+                                stroke-width="10"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+
+                            <!-- Verification badge -->
+                            <circle
+                                cx="370"
+                                cy="124"
+                                r="57"
+                                fill="#28b487"
+                            />
+
+                            <circle
+                                cx="370"
+                                cy="124"
+                                r="45"
+                                fill="#ffffff"
+                            />
+
+                            <path
+                                d="M346 124 L363 141 L395 105"
+                                fill="none"
+                                stroke="#28b487"
+                                stroke-width="13"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+
+                            <!-- Small decorative stars -->
+                            <path
+                                d="M87 188 L91 200 L103 204 L91 208 L87 220 L83 208 L71 204 L83 200 Z"
+                                fill="#fbbf24"
+                            />
+
+                            <path
+                                d="M427 176 L430 185 L439 188 L430 191 L427 200 L424 191 L415 188 L424 185 Z"
+                                fill="#fbbf24"
+                            />
+
+                        </svg>
+
+                    </div>
+
+                    <h2>One Last Step!</h2>
+
+                    <p>
+                        Verify your email address to securely access
+                        content generation, plagiarism checking and
+                        other PFCG AI features.
+                    </p>
+
+                    <div class="security-note">
+
+                        <i class="fa-solid fa-shield-halved"></i>
+
+                        <span>
+                            Your account information is protected.
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="decorative-circle circle-one"></div>
+                <div class="decorative-circle circle-two"></div>
+
+            </div>
+
+            <!-- =====================================
+                 RIGHT VERIFICATION FORM
+            ====================================== -->
+
+            <div class="form-panel">
+
+                <div class="mobile-brand">
+
+                    <div class="brand-icon">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+
+                    <span>PFCG AI</span>
+
+                </div>
+
+                <div class="form-content">
+
+                    <div class="form-icon">
+
+                        <i class="fa-solid fa-envelope-circle-check"></i>
+
+                    </div>
+
+                    <p class="eyebrow">
+                        ACCOUNT VERIFICATION
+                    </p>
+
+                    <h1>Verify Your Email</h1>
+
+                    <p class="main-text">
+                        We sent a six-digit verification code to
+                        the following email address:
+                    </p>
+
+                    <div class="email-box">
+
+                        <i class="fa-solid fa-envelope"></i>
+
+                        <span>{{ email }}</span>
+
+                    </div>
+
+                    {% if error %}
+
+                        <div class="message-box error-box">
+
+                            <i class="fa-solid fa-circle-exclamation"></i>
+
+                            <span>{{ error }}</span>
+
+                        </div>
+
+                    {% endif %}
+
+                    {% with messages =
+                        get_flashed_messages(
+                            with_categories=true
+                        )
+                    %}
+
+                        {% if messages %}
+
+                            {% for category, message in messages %}
+
+                                <div class="
+                                    message-box
+                                    {% if category == 'success' %}
+                                        success-box
+                                    {% else %}
+                                        error-box
+                                    {% endif %}
+                                ">
+
+                                    <i class="
+                                        fa-solid
+                                        {% if category == 'success' %}
+                                            fa-circle-check
+                                        {% else %}
+                                            fa-circle-exclamation
+                                        {% endif %}
+                                    "></i>
+
+                                    <span>{{ message }}</span>
+
+                                </div>
+
+                            {% endfor %}
+
+                        {% endif %}
+
+                    {% endwith %}
+
+                    <form
+                        action="{{ url_for('auth.verify_email') }}"
+                        method="POST"
+                        class="verification-form"
+                    >
+
+                        <label for="verification_code">
+                            Verification Code
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="fa-solid fa-key"></i>
+
+                            <input
+                                type="text"
+                                id="verification_code"
+                                name="verification_code"
+                                placeholder="Enter 6-digit code"
+                                maxlength="6"
+                                minlength="6"
+                                inputmode="numeric"
+                                pattern="[0-9]{6}"
+                                autocomplete="one-time-code"
+                                aria-describedby="code-help"
+                                required
+                            >
+
+                        </div>
+
+                        <p id="code-help" class="input-help">
+                            Enter the code exactly as shown in your email.
+                        </p>
+
+                        <button type="submit" class="verify-button">
+
+                            <span>Verify Email</span>
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </button>
+
+                    </form>
+
+                    <div class="resend-section">
+
+                        <p>Didn't receive the verification code?</p>
+
+                        <a
+                            href="{{ url_for(
+                                'auth.resend_verification'
+                            ) }}"
+                            class="resend-link"
+                        >
+
+                            <i class="fa-solid fa-rotate-right"></i>
+
+                            Resend Code
+
+                        </a>
+
+                    </div>
+
+                    <div class="divider">
+
+                        <span>or</span>
+
+                    </div>
+
+                    <a
+                        href="{{ url_for('auth.login') }}"
+                        class="login-link"
+                    >
+
+                        <i class="fa-solid fa-arrow-left"></i>
+
+                        Back to Login
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

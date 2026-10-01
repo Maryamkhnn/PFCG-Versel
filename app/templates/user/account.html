@@ -1,0 +1,286 @@
+{% extends "user/base.html" %}
+
+{% block title %}My Account | PFCG AI{% endblock %}
+
+{% block page_title %}{% endblock %}
+
+{% block css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/user/account.css') }}"
+>
+{% endblock %}
+
+{% block content %}
+
+<div
+    class="account-page"
+    id="accountPage"
+    data-static-root="{{ url_for('static', filename='') }}"
+>
+    {% if csrf_token is defined %}
+    <input
+        type="hidden"
+        id="accountCsrf"
+        value="{{ csrf_token() }}"
+    >
+    {% endif %}
+
+    <header class="account-heading">
+        <span class="account-heading-icon">
+            <i class="fas fa-user-gear" aria-hidden="true"></i>
+        </span>
+
+        <div>
+            <h1>My Account</h1>
+            <p>Manage your profile, photo and account security.</p>
+        </div>
+    </header>
+
+    <div id="accountLoadError" class="account-load-error" hidden>
+        <p id="accountLoadMessage">Unable to load your account.</p>
+        <button type="button" id="retryAccountBtn">Try Again</button>
+    </div>
+
+    <div class="account-layout">
+
+        <!-- PROFILE SUMMARY -->
+
+        <aside class="account-summary">
+            <div class="account-cover"></div>
+
+            <div class="account-summary-body">
+                <div class="account-avatar">
+                    <img id="accountPhoto" alt="Your profile photo" hidden>
+                    <span id="accountInitials">U</span>
+                </div>
+
+                <h2 id="accountName">Loading account…</h2>
+                <p id="accountEmail">Your account information</p>
+                <span class="account-role" id="accountRole">Member</span>
+
+                <label class="account-upload">
+                    <i class="fas fa-camera" aria-hidden="true"></i>
+                    <span id="uploadLabel">Change Photo</span>
+
+                    <input
+                        type="file"
+                        id="profilePicture"
+                        accept="image/png,image/jpeg,image/webp"
+                        aria-label="Choose a profile photo"
+                        disabled
+                    >
+                </label>
+
+                <p class="account-photo-help">
+                    JPG, PNG or WEBP. Maximum 2 MB.
+                </p>
+
+                <div class="account-summary-note">
+                    <i class="fas fa-circle-info" aria-hidden="true"></i>
+                    <p>
+                        Your photo appears here and on your dashboard
+                        account card.
+                    </p>
+                </div>
+            </div>
+        </aside>
+
+        <div class="account-sections">
+
+            <!-- PERSONAL DETAILS -->
+
+            <section class="account-card">
+                <div class="account-card-heading">
+                    <span class="account-section-icon">
+                        <i class="fas fa-address-card" aria-hidden="true"></i>
+                    </span>
+
+                    <div>
+                        <h2>Personal Information</h2>
+                        <p>Keep your account details up to date.</p>
+                    </div>
+                </div>
+
+                <form id="accountProfileForm">
+                    <fieldset id="accountProfileFields" disabled>
+                        <div class="account-form-grid">
+
+                            <div class="account-field">
+                                <label for="accountFullName">Full name</label>
+                                <input
+                                    type="text"
+                                    id="accountFullName"
+                                    autocomplete="name"
+                                    placeholder="Enter your full name"
+                                    required
+                                >
+                            </div>
+
+                            <div class="account-field">
+                                <label for="accountUsername">Username</label>
+                                <input
+                                    type="text"
+                                    id="accountUsername"
+                                    autocomplete="username"
+                                    placeholder="Enter your username"
+                                    minlength="3"
+                                    required
+                                >
+                            </div>
+
+                            <div class="account-field account-field-wide">
+                                <label for="accountEmailInput">Email address</label>
+                                <input
+                                    type="email"
+                                    id="accountEmailInput"
+                                    autocomplete="email"
+                                    readonly
+                                >
+                                <small>
+                                    Your sign-in email cannot be changed here.
+                                </small>
+                            </div>
+
+                        </div>
+
+                        <div class="account-form-footer">
+                            <span>Changes apply to your account profile.</span>
+
+                            <button
+                                type="submit"
+                                id="saveAccountProfile"
+                                class="account-primary"
+                            >
+                                <i class="fas fa-floppy-disk" aria-hidden="true"></i>
+                                Save Changes
+                            </button>
+                        </div>
+                    </fieldset>
+                </form>
+            </section>
+
+            <!-- SECURITY -->
+
+            <section class="account-card">
+                <div class="account-card-heading">
+                    <span class="account-section-icon account-security-icon">
+                        <i class="fas fa-shield-halved" aria-hidden="true"></i>
+                    </span>
+
+                    <div>
+                        <h2>Password &amp; Security</h2>
+                        <p>Choose a strong password to protect your account.</p>
+                    </div>
+                </div>
+
+                <form id="accountPasswordForm">
+                    <fieldset id="accountPasswordFields" disabled>
+                        <div class="account-form-grid">
+
+                            <div class="account-field account-field-wide">
+                                <label for="currentPassword">Current password</label>
+
+                                <div class="account-password">
+                                    <input
+                                        type="password"
+                                        id="currentPassword"
+                                        autocomplete="current-password"
+                                        placeholder="Enter current password"
+                                        required
+                                    >
+                                    <button
+                                        type="button"
+                                        data-toggle-password="currentPassword"
+                                        aria-label="Show current password"
+                                        aria-pressed="false"
+                                    >Show</button>
+                                </div>
+                            </div>
+
+                            <div class="account-field">
+                                <label for="newPassword">New password</label>
+
+                                <div class="account-password">
+                                    <input
+                                        type="password"
+                                        id="newPassword"
+                                        autocomplete="new-password"
+                                        placeholder="At least 8 characters"
+                                        minlength="8"
+                                        required
+                                    >
+                                    <button
+                                        type="button"
+                                        data-toggle-password="newPassword"
+                                        aria-label="Show new password"
+                                        aria-pressed="false"
+                                    >Show</button>
+                                </div>
+                            </div>
+
+                            <div class="account-field">
+                                <label for="confirmPassword">Confirm new password</label>
+
+                                <div class="account-password">
+                                    <input
+                                        type="password"
+                                        id="confirmPassword"
+                                        autocomplete="new-password"
+                                        placeholder="Repeat new password"
+                                        minlength="8"
+                                        required
+                                    >
+                                    <button
+                                        type="button"
+                                        data-toggle-password="confirmPassword"
+                                        aria-label="Show confirmed password"
+                                        aria-pressed="false"
+                                    >Show</button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="account-password-tip">
+                            <i class="fas fa-lock" aria-hidden="true"></i>
+                            Use a unique password with letters, numbers and symbols.
+                        </div>
+
+                        <div class="account-form-footer">
+                            <span>Your current password is required.</span>
+
+                            <button
+                                type="submit"
+                                id="saveAccountPassword"
+                                class="account-primary"
+                            >
+                                <i class="fas fa-key" aria-hidden="true"></i>
+                                Update Password
+                            </button>
+                        </div>
+                    </fieldset>
+                </form>
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<div id="accountToast" class="account-toast" hidden>
+    <span class="account-toast-icon" aria-hidden="true"></span>
+
+    <p id="accountToastText" role="status" aria-live="polite"></p>
+
+    <button
+        type="button"
+        id="closeAccountToast"
+        aria-label="Dismiss notification"
+    >&times;</button>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/user/account.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,839 @@
+/* =========================================================
+   ADMIN DASHBOARD
+========================================================= */
+
+.dashboard-page {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding-bottom: 30px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.page-heading h1 {
+    margin: 0;
+    color: #302742;
+    font-size: 27px;
+    font-weight: 700;
+}
+
+.page-heading p {
+    margin: 6px 0 0;
+    color: #8f899b;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   STATISTICS GRID
+========================================================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+
+/* =========================================================
+   STAT CARD
+========================================================= */
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    background: #ffffff;
+    border: 1px solid #ebe7f5;
+    border-radius: 16px;
+
+    padding: 19px;
+
+    box-shadow: 0 7px 22px rgba(76, 56, 120, 0.06);
+
+    transition: all 0.25s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(76, 56, 120, 0.10);
+}
+
+
+/* =========================================================
+   STAT ICON
+========================================================= */
+
+.stat-icon {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   STAT ICON COLORS
+========================================================= */
+
+.users-icon {
+    background: #eee9ff;
+    color: #704ee4;
+}
+
+.content-stat-icon {
+    background: #eaf2ff;
+    color: #4b78e6;
+}
+
+.humanize-stat-icon {
+    background: #f4eaff;
+    color: #9652d8;
+}
+
+.plagiarism-stat-icon {
+    background: #fff0f0;
+    color: #d95d6a;
+}
+
+.seo-stat-icon {
+    background: #e9f8f1;
+    color: #39a477;
+}
+
+.feedback-stat-icon {
+    background: #fff5df;
+    color: #d79732;
+}
+
+
+/* =========================================================
+   STAT CONTENT
+========================================================= */
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat-content span {
+    color: #9891a3;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.stat-content strong {
+    color: #342a47;
+    font-size: 23px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   RECENT SECTION
+========================================================= */
+
+.recent-section {
+    width: 100%;
+}
+
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 17px;
+}
+
+.section-header h2 {
+    margin: 0;
+    color: #342a47;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.section-header p {
+    margin: 5px 0 0;
+    color: #9891a3;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   REPORT GRID
+========================================================= */
+
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+
+/* =========================================================
+   REPORT CARD
+========================================================= */
+
+.report-card {
+    min-width: 0;
+
+    background: #ffffff;
+    border: 1px solid #ebe7f5;
+    border-radius: 18px;
+
+    padding: 21px;
+
+    box-shadow: 0 7px 22px rgba(76, 56, 120, 0.06);
+
+    transition: all 0.25s ease;
+}
+
+.report-card:hover {
+    box-shadow: 0 12px 30px rgba(76, 56, 120, 0.09);
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   REPORT HEADER
+========================================================= */
+
+.report-header {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    padding-bottom: 17px;
+    border-bottom: 1px solid #f0edf6;
+}
+
+
+/* =========================================================
+   REPORT ICON
+========================================================= */
+
+.report-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    font-size: 17px;
+}
+
+
+/* =========================================================
+   REPORT ICON COLORS
+========================================================= */
+
+.content-icon {
+    background: #eaf2ff;
+    color: #4b78e6;
+}
+
+.humanize-icon {
+    background: #f4eaff;
+    color: #9652d8;
+}
+
+.seo-icon {
+    background: #e9f8f1;
+    color: #39a477;
+}
+
+.plagiarism-icon {
+    background: #fff0f0;
+    color: #d95d6a;
+}
+
+.feedback-icon {
+    background: #fff5df;
+    color: #d79732;
+}
+
+
+/* =========================================================
+   HEADER CONTENT
+========================================================= */
+
+.report-header-info {
+    flex: 1;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+}
+
+
+/* =========================================================
+   REPORT TITLE
+========================================================= */
+
+.report-title {
+    flex: 1;
+    min-width: 0;
+}
+
+.report-title h3 {
+    margin: 0 0 4px;
+
+    color: #342a47;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.report-title span {
+    display: block;
+
+    color: #9992a3;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   VIEW ALL BUTTON
+========================================================= */
+
+.view-all-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    padding: 7px 12px;
+
+    background: #f1edff;
+    color: #704ee4;
+
+    border: 1px solid #e5defa;
+    border-radius: 7px;
+
+    text-decoration: none;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    transition: all 0.2s ease;
+}
+
+.view-all-btn:hover {
+    background: #704ee4;
+    color: #ffffff;
+    border-color: #704ee4;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   REPORT LIST
+========================================================= */
+
+.report-list {
+    padding-top: 5px;
+}
+
+
+/* =========================================================
+   REPORT ROW
+========================================================= */
+
+.report-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 13px 0;
+
+    border-bottom: 1px solid #f3f0f7;
+}
+
+.report-row:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   REPORT USER
+========================================================= */
+
+.report-user {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+/* =========================================================
+   MINI AVATAR
+========================================================= */
+
+.mini-avatar {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f3f0fb;
+    color: #75628e;
+
+    border-radius: 50%;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   USER TEXT
+========================================================= */
+
+.report-user > div:last-child {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.report-user strong {
+    max-width: 250px;
+
+    color: #443b53;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.report-user small {
+    max-width: 250px;
+
+    color: #a09aa9;
+
+    font-size: 10px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   ACTIVITY VALUE
+========================================================= */
+
+.activity-value {
+    flex-shrink: 0;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.content-value {
+    color: #4b78e6;
+}
+
+
+/* =========================================================
+   WORDS BADGE
+========================================================= */
+
+.words-badge {
+    padding: 5px 9px;
+
+    background: #f4eaff;
+    color: #9652d8;
+
+    border-radius: 6px;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   SCORE
+========================================================= */
+
+.score {
+    flex-shrink: 0;
+
+    min-width: 45px;
+
+    padding: 5px 8px;
+
+    border-radius: 6px;
+
+    text-align: center;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.seo-score {
+    background: #e9f8f1;
+    color: #31936b;
+}
+
+.plagiarism-score {
+    background: #fff0f0;
+    color: #d05a66;
+}
+
+
+/* =========================================================
+   RATING
+========================================================= */
+
+.rating-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    padding: 5px 8px;
+
+    background: #fff5df;
+    color: #d79732;
+
+    border-radius: 6px;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.rating-badge i {
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.report-empty {
+    padding: 25px 10px;
+
+    text-align: center;
+
+    color: #a39dac;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   RESPONSIVE - 1200px
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - 900px
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .reports-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - 650px
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .dashboard-page {
+        padding-bottom: 20px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .stat-card {
+        padding: 16px;
+    }
+
+    .reports-grid {
+        gap: 15px;
+    }
+
+    .report-card {
+        padding: 17px;
+        border-radius: 15px;
+    }
+
+    .report-header-info {
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .view-all-btn {
+        padding: 6px 9px;
+        font-size: 10px;
+    }
+
+    .report-row {
+        align-items: flex-start;
+    }
+
+    .report-user strong,
+    .report-user small {
+        max-width: 150px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - 450px
+========================================================= */
+
+@media (max-width: 450px) {
+
+    .report-header {
+        align-items: flex-start;
+    }
+
+    .report-icon {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+    }
+
+    .report-title h3 {
+        font-size: 13px;
+    }
+
+    .report-title span {
+        font-size: 10px;
+    }
+
+    .view-all-btn {
+        padding: 5px 8px;
+        font-size: 9px;
+    }
+
+    .report-user strong {
+        max-width: 120px;
+    }
+
+    .report-user small {
+        max-width: 120px;
+    }
+
+}
+/* BLOCKED TOPIC ALERTS */
+
+.topic-alert-card {
+    margin-bottom: 24px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #eadff4;
+    border-left: 4px solid #6944ed;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(35, 20, 80, .05);
+}
+
+.topic-alert-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 19px 22px;
+    background: #faf8ff;
+}
+
+.topic-alert-icon {
+    display: grid;
+    flex: 0 0 42px;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    color: #6944ed;
+    background: #eee9ff;
+    border-radius: 11px;
+    font-size: 17px;
+}
+
+.topic-alert-heading > div {
+    flex: 1;
+    min-width: 0;
+}
+
+.topic-alert-heading h2 {
+    margin: 0 0 5px;
+    color: #28165e;
+    font-size: 17px;
+}
+
+.topic-alert-heading p {
+    margin: 0;
+    color: #77718b;
+    font-size: 12px;
+}
+
+.topic-alert-total {
+    display: grid;
+    flex: 0 0 30px;
+    place-items: center;
+    height: 30px;
+    color: #6944ed;
+    background: #eee9ff;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.topic-alert-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 17px 22px;
+    border-top: 1px solid #f0ecf6;
+}
+
+.topic-alert-user,
+.topic-alert-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.topic-alert-avatar {
+    display: grid;
+    flex: 0 0 38px;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    color: #6944ed;
+    background: #f1ecff;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.topic-alert-user strong,
+.topic-alert-user span:not(.topic-alert-avatar) {
+    display: block;
+}
+
+.topic-alert-user strong {
+    overflow-wrap: anywhere;
+    color: #28165e;
+    font-size: 13px;
+}
+
+.topic-alert-user span:not(.topic-alert-avatar) {
+    margin-top: 4px;
+    color: #77718b;
+    font-size: 11px;
+}
+
+.topic-attempt-count {
+    padding: 7px 10px;
+    color: #a12a50;
+    background: #fff0f5;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.topic-review-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    color: #fff;
+    background: #6944ed;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.topic-review-btn:hover {
+    background: #5433cc;
+    color: #fff;
+}
+
+@media (max-width: 700px) {
+    .topic-alert-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .topic-alert-actions {
+        flex-wrap: wrap;
+        padding-left: 50px;
+    }
+
+    .topic-alert-heading {
+        padding: 16px;
+    }
+
+    .topic-alert-row {
+        padding: 15px 16px;
+    }
+}

@@ -1,0 +1,233 @@
+{% extends "user/base.html" %}
+
+{% block title %}Saved Documents | PFCG AI{% endblock %}
+
+{% block page_title %}{% endblock %}
+
+{% block css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/user/saved_documents.css',
+        v='5'
+    ) }}"
+>
+<style>
+    .topbar {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="saved-page" id="savedPage">
+
+    {% if csrf_token is defined %}
+    <input
+        type="hidden"
+        id="savedCsrfToken"
+        value="{{ csrf_token() }}"
+    >
+    {% endif %}
+
+    <header class="saved-page-header">
+
+    <div class="saved-heading">
+
+        <div class="saved-heading-icon">
+            <i class="fas fa-bookmark" aria-hidden="true"></i>
+        </div>
+
+        <div>
+            <h1>Saved Documents</h1>
+            <p>Browse and manage your saved writing.</p>
+        </div>
+
+    </div>
+
+</header>
+
+    <section class="saved-library" aria-label="Saved document library">
+
+        <div class="saved-library-heading">
+            <div>
+                <h2>Your Library</h2>
+                <p id="savedTotal">Loading documents…</p>
+            </div>
+
+            <button type="button" id="refreshSaved" class="sd-button">
+                <i class="fas fa-rotate" aria-hidden="true"></i>
+                Refresh
+            </button>
+        </div>
+
+        <div class="saved-tools">
+
+            <div class="saved-field saved-search-field">
+                <label for="searchSaved">Search documents</label>
+
+                <div class="saved-search">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+
+                    <input
+                        type="search"
+                        id="searchSaved"
+                        placeholder="Search title or content…"
+                        autocomplete="off"
+                    >
+                </div>
+            </div>
+
+            <div class="saved-field">
+                <label for="savedFilter">Content type</label>
+
+                <select id="savedFilter">
+                    <option value="">All types</option>
+                    <option value="Blog">Blog</option>
+                    <option value="Essay">Essay</option>
+                    <option value="Article">Article</option>
+                    <option value="Assignment">Assignment</option>
+                    <option value="Report">Report</option>
+                </select>
+            </div>
+
+            <div class="saved-field">
+                <label for="savedFrom">Saved from</label>
+                <input type="date" id="savedFrom">
+            </div>
+
+            <div class="saved-field">
+                <label for="savedTo">Saved until</label>
+                <input type="date" id="savedTo">
+            </div>
+
+            <div class="saved-field">
+                <label for="savedSort">Sort by</label>
+
+                <select id="savedSort">
+                    <option value="newest">Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                    <option value="title">Title A–Z</option>
+                </select>
+            </div>
+
+            <button type="button" id="clearSavedFilters" class="sd-button">
+                Clear
+            </button>
+
+        </div>
+
+        <p id="savedFilterError" class="saved-filter-error" role="status" hidden>
+            The start date must be on or before the end date.
+        </p>
+
+    </section>
+
+    <div class="saved-results-heading">
+        <p id="savedResults" role="status" aria-live="polite"></p>
+
+        <div class="saved-page-size">
+            <label for="savedPageSize">Per page</label>
+
+            <select id="savedPageSize">
+                <option value="6">6</option>
+                <option value="12">12</option>
+                <option value="24">24</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="saved-list" id="savedList" aria-busy="true"></div>
+
+    <nav
+        id="savedPagination"
+        class="saved-pagination"
+        aria-label="Saved documents pagination"
+        hidden
+    ></nav>
+
+</div>
+
+<dialog
+    id="savedViewModal"
+    class="sd-dialog sd-preview"
+    aria-labelledby="savedModalTitle"
+>
+    <div class="sd-dialog-header">
+        <div>
+            <h2 id="savedModalTitle">Saved Document</h2>
+            <p id="savedModalMeta"></p>
+        </div>
+
+        <button
+            type="button"
+            id="closeSavedPreview"
+            class="sd-icon-button"
+            aria-label="Close preview"
+            autofocus
+        >&times;</button>
+    </div>
+
+    <div id="savedModalContent" class="sd-document-content"></div>
+
+    <div class="sd-dialog-footer">
+        <button type="button" id="closeSavedPreviewBottom" class="sd-button">
+            Close Preview
+        </button>
+    </div>
+</dialog>
+
+<dialog
+    id="savedConfirmModal"
+    class="sd-dialog sd-confirm"
+    aria-labelledby="savedConfirmTitle"
+    aria-describedby="savedConfirmText"
+>
+    <div class="sd-remove-icon">
+        <i class="fas fa-trash-can" aria-hidden="true"></i>
+    </div>
+
+    <h2 id="savedConfirmTitle">Remove saved document?</h2>
+    <p id="savedConfirmText"></p>
+
+    <p class="sd-muted">This action cannot be undone.</p>
+
+    <div class="sd-confirm-actions">
+        <button
+            type="button"
+            id="cancelSavedRemove"
+            class="sd-button"
+            autofocus
+        >Keep Document</button>
+
+        <button
+            type="button"
+            id="confirmSavedRemove"
+            class="sd-button sd-danger"
+        >Remove Document</button>
+    </div>
+</dialog>
+
+<div id="savedToast" class="sd-toast" hidden>
+    <span id="savedToastMessage" role="status" aria-live="polite"></span>
+
+    <button
+        type="button"
+        id="closeSavedToast"
+        aria-label="Dismiss notification"
+    >&times;</button>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/user/saved_documents.js',
+        v='5'
+    ) }}"
+></script>
+{% endblock %}

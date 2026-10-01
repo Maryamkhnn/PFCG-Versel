@@ -1,0 +1,950 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Admin Dashboard | PFCG AI{% endblock %}
+
+
+{% block page_header %}
+
+<h1>Admin Dashboard</h1>
+
+<p>
+    Monitor and manage your PFCG AI platform activity.
+</p>
+
+{% endblock %}
+{% block content %}
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin/admin_dashboard.css') }}">
+
+<div class="dashboard-page">
+
+    {% if blocked_alerts %}
+    <section class="topic-alert-card">
+        <div class="topic-alert-heading">
+            <span class="topic-alert-icon">
+                <i class="fas fa-triangle-exclamation"></i>
+            </span>
+
+            <div>
+                <h2>Topics needing review</h2>
+                <p>Users with at least 3 blocked topic attempts in the last 24 hours.</p>
+            </div>
+
+            <span class="topic-alert-total">
+                {{ blocked_alerts | length }}
+            </span>
+        </div>
+
+        <div class="topic-alert-list">
+            {% for alert in blocked_alerts %}
+            <div class="topic-alert-row">
+                <div class="topic-alert-user">
+                    <span class="topic-alert-avatar">
+                        {{ alert.email[:1] | upper }}
+                    </span>
+
+                    <div>
+                        <strong>{{ alert.email }}</strong>
+                        <span>Restricted topic activity</span>
+                    </div>
+                </div>
+
+                <div class="topic-alert-actions">
+                    <span class="topic-attempt-count">
+                        {{ alert.attempts }} attempts
+                    </span>
+
+                    <a href="{{ url_for('admin.blocked_attempts', email=alert.email) }}"
+   class="topic-review-btn">
+    Review attempts
+    <i class="fas fa-arrow-right"></i>
+</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+<link rel="stylesheet"
+      href="{{ url_for(
+          'static',
+          filename='css/admin/admin_dashboard.css'
+      ) }}">
+
+
+<div class="dashboard-page">
+
+
+    <!-- =====================================================
+         STATISTICS
+    ====================================================== -->
+
+    <section class="stats-grid">
+
+
+        <!-- TOTAL USERS -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon users-icon">
+                <i class="fas fa-users"></i>
+            </div>
+
+            <div class="stat-content">
+
+                <span>Total Users</span>
+
+                <strong>
+                    {{ total_users }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- GENERATED CONTENT -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon content-stat-icon">
+                <i class="fas fa-file-lines"></i>
+            </div>
+
+            <div class="stat-content">
+
+                <span>Generated Content</span>
+
+                <strong>
+                    {{ total_content }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- HUMANIZED CONTENT -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon humanize-stat-icon">
+                <i class="fas fa-wand-magic-sparkles"></i>
+            </div>
+
+            <div class="stat-content">
+
+                <span>Humanized Content</span>
+
+                <strong>
+                    {{ total_humanized }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- PLAGIARISM -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon plagiarism-stat-icon">
+                <i class="fas fa-copy"></i>
+            </div>
+
+            <div class="stat-content">
+
+                <span>Plagiarism Checks</span>
+
+                <strong>
+                    {{ total_plagiarism }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- SEO -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon seo-stat-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+
+            <div class="stat-content">
+
+                <span>SEO Reports</span>
+
+                <strong>
+                    {{ total_seo }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- FEEDBACK -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon feedback-stat-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+
+            <div class="stat-content">
+
+                <span>Feedback</span>
+
+                <strong>
+                    {{ total_feedbacks }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         RECENT ACTIVITY
+    ====================================================== -->
+
+    <section class="recent-section">
+
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Recent Activity
+                </h2>
+
+                <p>
+                    Latest activity across your PFCG AI platform.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="reports-grid">
+
+
+            <!-- =================================================
+                 AI GENERATED CONTENT
+            ================================================== -->
+
+            <div class="report-card">
+
+
+                <div class="report-header">
+
+
+                    <div class="report-icon content-icon">
+
+                        <i class="fas fa-file-lines"></i>
+
+                    </div>
+
+
+                    <div class="report-header-info">
+
+
+                        <div class="report-title">
+
+                            <h3>
+                                AI Generated Content
+                            </h3>
+
+                            <span>
+                                {{ total_content }} total content
+                            </span>
+
+                        </div>
+
+
+                        <a
+                            href="{{ url_for('admin.content') }}"
+                            class="view-all-btn"
+                        >
+
+                            View All
+
+                        </a>
+
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="report-list">
+
+
+                    {% if recent_content %}
+
+
+                        {% for item in recent_content[:5] %}
+
+
+                        <div class="report-row">
+
+
+                            <div class="report-user">
+
+
+                                <div class="mini-avatar">
+
+                                    <i class="fas fa-user"></i>
+
+                                </div>
+
+
+                                <div class="report-info">
+
+
+                                    <strong>
+
+                                        {{ item.user_email }}
+
+                                    </strong>
+
+
+                                    <small>
+
+                                        {{ item.topic
+                                           or "Generated Content" }}
+
+                                    </small>
+
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <span class="activity-value content-value">
+
+                                {{ item.word_count or 0 }} words
+
+                            </span>
+
+
+                        </div>
+
+
+                        {% endfor %}
+
+
+                    {% else %}
+
+
+                        <div class="report-empty">
+
+                            No generated content yet.
+
+                        </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 HUMANIZED CONTENT
+            ================================================== -->
+
+            <div class="report-card">
+
+
+                <div class="report-header">
+
+
+                    <div class="report-icon humanize-icon">
+
+                        <i class="fas fa-wand-magic-sparkles"></i>
+
+                    </div>
+
+
+                    <div class="report-header-info">
+
+
+                        <div class="report-title">
+
+                            <h3>
+                                Humanized Content
+                            </h3>
+
+                            <span>
+                                {{ total_humanized }} total requests
+                            </span>
+
+                        </div>
+
+
+                        <a
+                            href="{{ url_for('admin.reports') }}"
+                            class="view-all-btn"
+                        >
+
+                            View All
+
+                        </a>
+
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="report-list">
+
+
+                    {% if recent_humanized %}
+
+
+                        {% for item in recent_humanized[:5] %}
+
+
+                        <div class="report-row">
+
+
+                            <div class="report-user">
+
+
+                                <div class="mini-avatar">
+
+                                    <i class="fas fa-user"></i>
+
+                                </div>
+
+
+                                <div class="report-info">
+
+
+                                    <strong>
+
+                                        {{ item.user_email }}
+
+                                    </strong>
+
+
+                                    <small>
+
+                                        {% if item.original_content %}
+
+                                            {{ item.original_content[:60] }}...
+
+                                        {% elif item.humanized_content %}
+
+                                            {{ item.humanized_content[:60] }}...
+
+                                        {% else %}
+
+                                            Humanized Content
+
+                                        {% endif %}
+
+                                    </small>
+
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <span class="activity-value words-badge">
+
+                                {{ item.word_count or 0 }} words
+
+                            </span>
+
+
+                        </div>
+
+
+                        {% endfor %}
+
+
+                    {% else %}
+
+
+                        <div class="report-empty">
+
+                            No humanized content yet.
+
+                        </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 SEO REPORTS
+            ================================================== -->
+
+            <div class="report-card">
+
+
+                <div class="report-header">
+
+
+                    <div class="report-icon seo-icon">
+
+                        <i class="fas fa-chart-line"></i>
+
+                    </div>
+
+
+                    <div class="report-header-info">
+
+
+                        <div class="report-title">
+
+                            <h3>
+                                SEO Reports
+                            </h3>
+
+                            <span>
+                                {{ total_seo }} total reports
+                            </span>
+
+                        </div>
+
+
+                        <a
+                            href="{{ url_for('admin.reports') }}"
+                            class="view-all-btn"
+                        >
+
+                            View All
+
+                        </a>
+
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="report-list">
+
+
+                    {% if recent_seo %}
+
+
+                        {% for item in recent_seo[:5] %}
+
+
+                        <div class="report-row">
+
+
+                            <div class="report-user">
+
+
+                                <div class="mini-avatar">
+
+                                    <i class="fas fa-user"></i>
+
+                                </div>
+
+
+                                <div class="report-info">
+
+
+                                    <strong>
+
+                                        {{ item.user_email }}
+
+                                    </strong>
+
+
+                                    <small>
+
+                                        {% if item.topic %}
+
+                                            {{ item.topic }}
+
+                                        {% elif item.content_topic %}
+
+                                            {{ item.content_topic }}
+
+                                        {% elif item.content %}
+
+                                            {{ item.content[:60] }}...
+
+                                        {% else %}
+
+                                            SEO Report
+
+                                        {% endif %}
+
+                                    </small>
+
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <span class="score seo-score">
+
+                                {{ item.score or item.seo_score or 0 }}%
+
+                            </span>
+
+
+                        </div>
+
+
+                        {% endfor %}
+
+
+                    {% else %}
+
+
+                        <div class="report-empty">
+
+                            No SEO reports yet.
+
+                        </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 PLAGIARISM CHECKS
+            ================================================== -->
+
+            <div class="report-card">
+
+
+                <div class="report-header">
+
+
+                    <div class="report-icon plagiarism-icon">
+
+                        <i class="fas fa-copy"></i>
+
+                    </div>
+
+
+                    <div class="report-header-info">
+
+
+                        <div class="report-title">
+
+                            <h3>
+                                Plagiarism Checks
+                            </h3>
+
+                            <span>
+                                {{ total_plagiarism }} total checks
+                            </span>
+
+                        </div>
+
+
+                        <a
+                            href="{{ url_for('admin.reports') }}"
+                            class="view-all-btn"
+                        >
+
+                            View All
+
+                        </a>
+
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="report-list">
+
+
+                    {% if recent_plagiarism %}
+
+
+                        {% for item in recent_plagiarism[:5] %}
+
+
+                        <div class="report-row">
+
+
+                            <div class="report-user">
+
+
+                                <div class="mini-avatar">
+
+                                    <i class="fas fa-user"></i>
+
+                                </div>
+
+
+                                <div class="report-info">
+
+
+                                    <strong>
+
+                                        {{ item.user_email }}
+
+                                    </strong>
+
+
+                                    <small>
+
+                                        {% if item.topic %}
+
+                                            {{ item.topic }}
+
+                                        {% elif item.content %}
+
+                                            {{ item.content[:60] }}...
+
+                                        {% else %}
+
+                                            Plagiarism Check
+
+                                        {% endif %}
+
+                                    </small>
+
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <span class="score plagiarism-score">
+
+                                {{ item.plagiarism_score
+                                   or item.score
+                                   or 0 }}%
+
+                            </span>
+
+
+                        </div>
+
+
+                        {% endfor %}
+
+
+                    {% else %}
+
+
+                        <div class="report-empty">
+
+                            No plagiarism checks yet.
+
+                        </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 FEEDBACK
+            ================================================== -->
+
+            <div class="report-card">
+
+
+                <div class="report-header">
+
+
+                    <div class="report-icon feedback-icon">
+
+                        <i class="fas fa-comments"></i>
+
+                    </div>
+
+
+                    <div class="report-header-info">
+
+
+                        <div class="report-title">
+
+                            <h3>
+                                Feedback
+                            </h3>
+
+                            <span>
+                                {{ total_feedbacks }} total feedback
+                            </span>
+
+                        </div>
+
+
+                        <a
+                            href="{{ url_for('admin.feedback') }}"
+                            class="view-all-btn"
+                        >
+
+                            View All
+
+                        </a>
+
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="report-list">
+
+
+                    {% if recent_feedback %}
+
+
+                        {% for item in recent_feedback[:5] %}
+
+
+                        <div class="report-row">
+
+
+                            <div class="report-user">
+
+
+                                <div class="mini-avatar">
+
+                                    <i class="fas fa-user"></i>
+
+                                </div>
+
+
+                                <div class="report-info">
+
+
+                                    <strong>
+
+                                        {{ item.user_email }}
+
+                                    </strong>
+
+
+                                    <small>
+
+                                        {% if item.subject %}
+
+                                            {{ item.subject }}
+
+                                        {% elif item.message %}
+
+                                            {{ item.message[:60] }}...
+
+                                        {% else %}
+
+                                            User Feedback
+
+                                        {% endif %}
+
+                                    </small>
+
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <span class="rating-badge">
+
+                                <i class="fas fa-star"></i>
+
+                                {{ item.rating or 0 }}
+
+                            </span>
+
+
+                        </div>
+
+
+                        {% endfor %}
+
+
+                    {% else %}
+
+
+                        <div class="report-empty">
+
+                            No feedback yet.
+
+                        </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+</div>
+
+
+{% endblock %}

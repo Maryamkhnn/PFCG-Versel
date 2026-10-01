@@ -1,0 +1,359 @@
+{% extends "user/base.html" %}
+
+{% block title %}SEO Analysis | PFCG AI{% endblock %}
+
+{% block page_title %}{% endblock %}
+
+{% block css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/user/seo-analysis.css') }}"
+>
+{% endblock %}
+
+{% block content %}
+
+<div class="seo-page">
+
+    {% if csrf_token is defined %}
+    <input
+        type="hidden"
+        name="csrf_token"
+        value="{{ csrf_token() }}"
+    >
+    {% endif %}
+
+    <!-- PAGE HEADER -->
+
+    <header class="seo-page-heading">
+        <div class="seo-heading-icon">
+            <i class="fas fa-chart-line" aria-hidden="true"></i>
+        </div>
+
+        <div>
+            <h1>SEO Analysis</h1>
+            <p>
+                Review keyword use, readability and content structure.
+            </p>
+        </div>
+    </header>
+
+    <div class="seo-layout">
+
+        <!-- SETTINGS -->
+
+        <aside class="seo-sidebar">
+            <section class="seo-card seo-settings">
+
+                <div class="seo-section-heading">
+                    <span class="seo-section-icon">
+                        <i class="fas fa-sliders" aria-hidden="true"></i>
+                    </span>
+
+                    <div>
+                        <h2>Analysis Settings</h2>
+                        <p>Choose a document to get started.</p>
+                    </div>
+                </div>
+
+                <div class="seo-field">
+                    <label for="seoSelector">Your documents</label>
+
+                    <select id="seoSelector">
+                        <option value="">Loading documents...</option>
+                    </select>
+
+                    <small>
+                        Select one of your generated documents.
+                    </small>
+                </div>
+
+                <button
+                    type="button"
+                    id="loadBtn"
+                    class="seo-btn seo-btn-secondary"
+                >
+                    <i class="fas fa-folder-open" aria-hidden="true"></i>
+                    Load Content
+                </button>
+
+                <div class="seo-settings-divider"></div>
+
+                <div class="seo-field">
+                    <label for="targetKeyword">Target keyword</label>
+
+                    <div class="seo-keyword-input">
+                        <i class="fas fa-key" aria-hidden="true"></i>
+
+                        <input
+                            type="text"
+                            id="targetKeyword"
+                            placeholder="e.g. online learning"
+                            autocomplete="off"
+                            aria-describedby="keywordHelp"
+                        >
+                    </div>
+
+                    <small id="keywordHelp">
+                        Enter a word or phrase that represents the
+                        main topic of your content.
+                    </small>
+                </div>
+
+                <button
+                    type="button"
+                    id="analyzeBtn"
+                    class="seo-btn seo-btn-primary"
+                >
+                    <i class="fas fa-chart-line" aria-hidden="true"></i>
+                    Analyze SEO
+                </button>
+
+                <p class="seo-save-note">
+                    <i class="fas fa-circle-check" aria-hidden="true"></i>
+                    Completed analyses are saved automatically.
+                </p>
+
+                <div class="seo-settings-tip">
+                    <i class="fas fa-lightbulb" aria-hidden="true"></i>
+
+                    <p>
+                        You can also paste text into the content area.
+                        Use a relevant keyword without forcing repetition.
+                    </p>
+                </div>
+
+            </section>
+        </aside>
+
+        <!-- CONTENT AND REPORT -->
+
+        <div class="seo-content">
+
+            <section class="seo-card seo-document-card">
+
+                <div class="seo-card-header">
+                    <div class="seo-section-heading">
+                        <span class="seo-section-icon">
+                            <i
+                                class="fas fa-file-lines"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
+
+                        <div>
+                            <h2>Your Content</h2>
+                            <p>Review or edit the text before analysis.</p>
+                        </div>
+                    </div>
+
+                    <span
+                        id="contentTypeBadge"
+                        class="seo-content-badge"
+                    >
+                        Content
+                    </span>
+                </div>
+
+                <label class="seo-sr-only" for="seoContent">
+                    Content for SEO analysis
+                </label>
+
+                <textarea
+                    id="seoContent"
+                    placeholder="Load a document or paste your content here..."
+                    spellcheck="true"
+                    aria-describedby="seoContentHelp"
+                ></textarea>
+
+                <div class="seo-content-footer">
+                    <div class="seo-document-topic">
+                        <span>Document</span>
+                        <strong id="contentTopic">No document loaded</strong>
+                    </div>
+
+                    <div class="seo-live-count">
+                        <strong id="liveWordCount">0</strong>
+                        <span>words</span>
+                    </div>
+                </div>
+
+                <p id="seoContentHelp" class="seo-editor-help">
+                    Changes here apply to this analysis and do not
+                    update your original document.
+                </p>
+
+            </section>
+
+            <section
+                class="seo-card seo-report-card"
+                aria-labelledby="seoReportHeading"
+            >
+
+                <div class="seo-card-header">
+                    <div class="seo-section-heading">
+                        <span class="seo-section-icon">
+                            <i
+                                class="fas fa-chart-simple"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
+
+                        <div>
+                            <h2 id="seoReportHeading">Analysis Overview</h2>
+                            <p>Results for the text and keyword analyzed.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="seo-stats">
+
+                    <div class="seo-stat seo-stat-words">
+                        <span class="seo-stat-icon">
+                            <i class="fas fa-file-word" aria-hidden="true"></i>
+                        </span>
+
+                        <span class="seo-stat-label">Word Count</span>
+                        <strong id="wordCount">—</strong>
+                    </div>
+
+                    <div class="seo-stat seo-stat-keywords">
+                        <span class="seo-stat-icon">
+                            <i class="fas fa-key" aria-hidden="true"></i>
+                        </span>
+
+                        <span class="seo-stat-label">Keyword Matches</span>
+                        <strong id="keywordCount">—</strong>
+                    </div>
+
+                    <div class="seo-stat seo-stat-density">
+                        <span class="seo-stat-icon">
+                            <i class="fas fa-percent" aria-hidden="true"></i>
+                        </span>
+
+                        <span class="seo-stat-label">Keyword Density</span>
+                        <strong id="keywordDensity">—</strong>
+                    </div>
+
+                    <div class="seo-stat seo-stat-score">
+                        <span class="seo-stat-icon">
+                            <i class="fas fa-star" aria-hidden="true"></i>
+                        </span>
+
+                        <span class="seo-stat-label">Content SEO Score</span>
+                        <strong id="seoScore">—</strong>
+                    </div>
+
+                </div>
+
+                <div class="seo-score-section">
+                    <div class="seo-score-header">
+                        <span>Overall assessment</span>
+                        <strong id="scoreLabel">Not Analyzed</strong>
+                    </div>
+
+                    <div class="seo-progress-track" aria-hidden="true">
+                        <div id="seoProgress" class="seo-progress-fill"></div>
+                    </div>
+
+                    <p>
+                        This score reflects PFCG's content checks,
+                        not a search-engine ranking.
+                    </p>
+                </div>
+
+                <div id="seoStatusBox" class="seo-status-box">
+                    <span class="seo-status-icon">
+                        <i class="fas fa-circle-info" aria-hidden="true"></i>
+                    </span>
+
+                    <div>
+                        <span>Analysis status</span>
+                        <strong id="seoStatus" aria-live="polite">
+                            Not Analyzed
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="seo-suggestions">
+                    <div class="seo-section-heading">
+                        <span class="seo-section-icon seo-tip-icon">
+                            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+                        </span>
+
+                        <div>
+                            <h3>Suggested Improvements</h3>
+                            <p>Review these points while keeping your writing natural.</p>
+                        </div>
+                    </div>
+
+                    <ul id="seoSuggestions">
+                        <li class="empty-suggestion">
+                            <i class="fas fa-circle-info" aria-hidden="true"></i>
+                            <span>
+                                Analyze your content to see suggestions.
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+            </section>
+
+        </div>
+    </div>
+
+    <!-- HISTORY -->
+
+    <section class="seo-card seo-history-card">
+        <div class="seo-card-header">
+            <div class="seo-section-heading">
+                <span class="seo-section-icon">
+                    <i
+                        class="fas fa-clock-rotate-left"
+                        aria-hidden="true"
+                    ></i>
+                </span>
+
+                <div>
+                    <h2>Analysis History</h2>
+                    <p>Your previously saved SEO reports.</p>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="seo-table-wrapper"
+            tabindex="0"
+            role="region"
+            aria-label="SEO analysis history"
+        >
+            <table class="seo-history-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Document</th>
+                        <th scope="col">Score</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Date</th>
+                    </tr>
+                </thead>
+
+                <tbody id="seoHistoryBody">
+                    <tr>
+                        <td colspan="4" class="empty-history">
+                            Loading analysis history...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script
+    src="{{ url_for('static', filename='js/user/seo_analysis.js') }}"
+></script>
+{% endblock %}

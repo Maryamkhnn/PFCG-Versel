@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Login | PFCG AI</title>
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/auth/login.css') }}">
+</head>
+
+<body>
+<main class="login-layout">
+
+    <section class="login-visual"
+             aria-label="PFCG AI illustration">
+    </section>
+
+    <section class="login-form-panel">
+        <div class="login-card">
+
+            <div class="login-heading">
+                <span class="heading-icon">
+                    <i class="fa-solid fa-right-to-bracket"
+                       aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <h1>Welcome Back</h1>
+                    <p>Log in to continue with PFCG AI.</p>
+                </div>
+            </div>
+
+            {% if error %}
+            <div class="error-box" role="alert">
+                <i class="fa-solid fa-circle-exclamation"
+                   aria-hidden="true"></i>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+
+            {% if lock_seconds %}
+            <div class="lockout-box"
+                 role="status"
+                 data-seconds="{{ lock_seconds }}">
+                <i class="fa-solid fa-clock"
+                   aria-hidden="true"></i>
+                <span>
+                    Try again in
+                    <strong id="lockCountdown">--:--</strong>
+                </span>
+            </div>
+            {% endif %}
+
+            <form action="/login"
+                  method="POST"
+                  id="loginForm">
+
+                <div class="form-group">
+                    <label for="loginEmail">
+                        Email Address
+                    </label>
+
+                    <div class="input-field">
+                        <i class="fa-solid fa-envelope"
+                           aria-hidden="true"></i>
+
+                        <input
+                            type="email"
+                            name="email"
+                            id="loginEmail"
+                            placeholder="Enter your email"
+                            value="{{ entered_email|default('', true) }}"
+                            autocomplete="email"
+                            required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">
+                        Password
+                    </label>
+
+                    <div class="input-field">
+                        <i class="fa-solid fa-lock"
+                           aria-hidden="true"></i>
+
+                        <input
+                            type="password"
+                            name="password"
+                            id="loginPassword"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required>
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="togglePassword"
+                            aria-label="Show password">
+                            <i class="fa-solid fa-eye"
+                               aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-options">
+                    <label class="remember-label">
+                        <input type="checkbox"
+                               name="remember">
+                        <span>Remember me</span>
+                    </label>
+
+                    <a href="{{ url_for('auth.forgot_password') }}">
+                        Forgot Password?
+                    </a>
+                </div>
+
+                <button
+                    type="submit"
+                    class="login-btn"
+                    id="loginBtn"
+                    {% if lock_seconds %}disabled{% endif %}>
+                    <i class="fa-solid fa-right-to-bracket"
+                       aria-hidden="true"></i>
+                    <span>Log In</span>
+                </button>
+
+            </form>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <p class="signup-text">
+                Don't have an account?
+                <a href="/signup">Create Account</a>
+            </p>
+        </div>
+    </section>
+</main>
+
+<script src="{{ url_for('static', filename='js/auth/auth.js') }}"></script>
+
+<script>
+    // Display only. The actual lock is checked by Python/database.
+    const lockBox = document.querySelector(".lockout-box");
+    const countdown = document.getElementById("lockCountdown");
+    const loginButton = document.getElementById("loginBtn");
+
+    if (lockBox && countdown) {
+        const initialSeconds = Number(
+            lockBox.dataset.seconds
+        );
+
+        const endTime = Date.now() +
+            initialSeconds * 1000;
+
+        function updateCountdown() {
+            const secondsLeft = Math.max(
+                0,
+                Math.ceil(
+                    (endTime - Date.now()) / 1000
+                )
+            );
+
+            const minutes = Math.floor(
+                secondsLeft / 60
+            );
+
+            const seconds = secondsLeft % 60;
+
+            countdown.textContent =
+                String(minutes).padStart(2, "0") +
+                ":" +
+                String(seconds).padStart(2, "0");
+
+            if (secondsLeft === 0) {
+                clearInterval(timer);
+                lockBox.hidden = true;
+
+                if (loginButton) {
+                    loginButton.disabled = false;
+                }
+            }
+        }
+
+        updateCountdown();
+
+        const timer = setInterval(
+            updateCountdown,
+            1000
+        );
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,809 @@
+/* =====================================================
+   ADMIN REPORTS PAGE
+===================================================== */
+
+.reports-page {
+    width: 100%;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   TOP HEADER
+===================================================== */
+
+.reports-top-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.reports-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.reports-title-row h1 {
+    margin: 0;
+    padding: 0;
+
+    color: #17124f;
+
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.reports-title-row i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #6c3fd1;
+
+    font-size: 18px;
+}
+
+.reports-top-header p {
+    margin: 6px 0 0;
+
+    color: #777;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   SUMMARY CARDS
+===================================================== */
+
+.report-summary {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    min-width: 0;
+
+    padding: 18px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    background: #ffffff;
+
+    border: 1px solid #eeeaf5;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 5px 18px
+        rgba(35, 24, 75, 0.05);
+}
+
+.summary-icon {
+    width: 46px;
+    height: 46px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    font-size: 17px;
+}
+
+
+/* SEO */
+
+.seo-icon {
+    background: #eaf8ef;
+    color: #2e9b61;
+}
+
+
+/* AI CONTENT */
+
+.ai-icon {
+    background: #f0ecff;
+    color: #6c3fd1;
+}
+
+
+/* HUMANIZED */
+
+.humanized-icon {
+    background: #eaf4ff;
+    color: #3f82c5;
+}
+
+
+/* FEEDBACK */
+
+.feedback-icon {
+    background: #fff3e6;
+    color: #d7832f;
+}
+
+
+.summary-info {
+    min-width: 0;
+}
+
+.summary-info span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #817a8e;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.summary-info strong {
+    display: block;
+
+    color: #29233a;
+
+    font-size: 23px;
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   PERFORMANCE CARDS
+===================================================== */
+
+.performance-row {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+
+    margin-bottom: 22px;
+}
+
+.performance-card {
+    padding: 17px 20px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    background: #ffffff;
+
+    border: 1px solid #eeeaf5;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 5px 18px
+        rgba(35, 24, 75, 0.04);
+}
+
+.performance-icon {
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background: #f1edff;
+
+    color: #6c3fd1;
+}
+
+.performance-card span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #817a8e;
+
+    font-size: 12px;
+}
+
+.performance-card strong {
+    color: #29233a;
+
+    font-size: 20px;
+}
+
+
+/* =====================================================
+   REPORTS BOX
+===================================================== */
+
+.reports-box {
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid #eeeaf5;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 6px 22px
+        rgba(35, 24, 75, 0.05);
+}
+
+
+/* =====================================================
+   TABS
+===================================================== */
+
+.report-tabs {
+    padding: 12px 16px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    overflow-x: auto;
+
+    background: #fbfaff;
+
+    border-bottom:
+        1px solid #eeeaf5;
+}
+
+.report-tab {
+    min-height: 39px;
+
+    padding: 0 15px;
+
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: transparent;
+
+    color: #70697e;
+
+    font-size: 12px;
+    font-weight: 650;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.report-tab:hover {
+    background: #f1edff;
+    color: #6842c2;
+}
+
+.report-tab.active {
+    background: #6c3fd1;
+    color: #ffffff;
+
+    box-shadow:
+        0 4px 10px
+        rgba(108, 63, 209, 0.18);
+}
+
+
+/* =====================================================
+   PANELS
+===================================================== */
+
+.report-panel {
+    display: none;
+}
+
+.report-panel.active {
+    display: block;
+}
+
+
+/* =====================================================
+   PANEL HEADER
+===================================================== */
+
+.panel-header {
+    min-height: 78px;
+
+    padding: 18px 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    border-bottom:
+        1px solid #f0edf4;
+}
+
+.panel-header h2 {
+    margin: 0;
+
+    color: #2d2740;
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.panel-header p {
+    margin: 5px 0 0;
+
+    color: #8b8595;
+
+    font-size: 12px;
+}
+
+.panel-header-icon {
+    width: 40px;
+    height: 40px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #f1edff;
+
+    color: #6c3fd1;
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.reports-table {
+    width: 100%;
+    min-width: 800px;
+
+    border-collapse: collapse;
+}
+
+.reports-table thead {
+    background: #faf9fd;
+}
+
+.reports-table th {
+    padding: 14px 16px;
+
+    text-align: left;
+
+    color: #6f6979;
+
+    border-bottom:
+        1px solid #eeeaf3;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    white-space: nowrap;
+}
+
+.reports-table td {
+    padding: 15px 16px;
+
+    color: #4e4859;
+
+    border-bottom:
+        1px solid #f1eff4;
+
+    font-size: 12px;
+
+    vertical-align: middle;
+}
+
+.reports-table tbody tr {
+    transition: 0.2s ease;
+}
+
+.reports-table tbody tr:hover {
+    background: #fcfbff;
+}
+
+.reports-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =====================================================
+   USER
+===================================================== */
+
+.user-cell {
+    min-width: 185px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+}
+
+.user-avatar {
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #eee9ff;
+
+    color: #6842c2;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.user-cell span {
+    max-width: 200px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   TOPIC
+===================================================== */
+
+.topic-cell {
+    max-width: 220px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   BADGES
+===================================================== */
+
+.score-badge,
+.status-badge,
+.type-badge,
+.rating-badge {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    padding: 6px 9px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+    font-weight: 650;
+
+    white-space: nowrap;
+}
+
+
+/* SEO */
+
+.seo-score {
+    background: #eaf8ef;
+    color: #278c56;
+}
+
+
+/* AI CONTENT PLAGIARISM */
+
+.ai-score,
+.ai-type {
+    background: #f0ecff;
+    color: #6842c2;
+}
+
+
+/* HUMANIZED PLAGIARISM */
+
+.humanized-score,
+.humanized-type {
+    background: #eaf4ff;
+    color: #3f82c5;
+}
+
+
+/* STATUS */
+
+.status-badge {
+    background: #eef4ff;
+    color: #4d6fa9;
+}
+
+
+/* DEFAULT TYPE */
+
+.type-badge {
+    background: #f2f0f5;
+    color: #686171;
+}
+
+
+/* Keep specific types after generic type */
+
+.type-badge.ai-type {
+    background: #f0ecff;
+    color: #6842c2;
+}
+
+.type-badge.humanized-type {
+    background: #eaf4ff;
+    color: #3f82c5;
+}
+
+
+/* FEEDBACK RATING */
+
+.rating-badge {
+    background: #fff6df;
+    color: #b57a15;
+}
+
+.rating-badge i {
+    color: #e3a92e;
+}
+
+
+/* =====================================================
+   DATE
+===================================================== */
+
+.date-cell {
+    color: #8c8695 !important;
+
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.empty-state {
+    padding: 60px 20px;
+
+    text-align: center;
+}
+
+.empty-state > i {
+    width: 60px;
+    height: 60px;
+
+    margin: 0 auto 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #f1edff;
+
+    color: #6c3fd1;
+
+    font-size: 22px;
+}
+
+.empty-state h3 {
+    margin: 0 0 7px;
+
+    color: #332d40;
+
+    font-size: 17px;
+}
+
+.empty-state p {
+    margin: 0;
+
+    color: #918b9b;
+
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1100px) {
+
+    .report-summary {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 850px) {
+
+    .reports-page {
+        padding: 20px;
+    }
+
+    .performance-row {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .reports-page {
+        padding: 15px;
+    }
+
+    .reports-title-row {
+        gap: 9px;
+    }
+
+    .reports-title-row h1 {
+        font-size: 21px;
+    }
+
+    .reports-title-row i {
+        font-size: 16px;
+    }
+
+    .reports-top-header p {
+        margin-top: 4px;
+        font-size: 12px;
+    }
+
+    .report-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-card {
+        padding: 15px;
+    }
+
+    .panel-header {
+        padding: 16px;
+    }
+
+    .report-tabs {
+        padding: 10px;
+    }
+
+}
+/* =========================================================
+   REPORT PAGINATION
+========================================================= */
+
+.reports-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    padding: 20px 15px 5px;
+}
+
+.pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pagination-btn,
+.pagination-number {
+    border: 1px solid #ddd6f7;
+    background: #ffffff;
+    color: #6d28d9;
+
+    min-width: 38px;
+    height: 38px;
+
+    padding: 0 12px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.pagination-number {
+    padding: 0;
+}
+
+.pagination-btn:hover:not(:disabled),
+.pagination-number:hover {
+    background: #f5f3ff;
+    border-color: #8b5cf6;
+}
+
+.pagination-number.active {
+    background: #6d28d9;
+    color: #ffffff;
+    border-color: #6d28d9;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.pagination-btn i {
+    font-size: 11px;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    .reports-pagination {
+        gap: 6px;
+    }
+
+    .pagination-btn {
+        padding: 0 9px;
+        font-size: 12px;
+    }
+
+    .pagination-number {
+        min-width: 34px;
+        height: 34px;
+    }
+}

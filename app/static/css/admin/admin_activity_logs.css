@@ -1,0 +1,415 @@
+/* =========================================================
+   ACTIVITY LOGS
+========================================================= */
+
+
+/* HEADER */
+
+.logs-top-header {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.logs-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logs-title-row h1 {
+    margin: 0;
+    font-size: 27px;
+    font-weight: 700;
+    color: #202431;
+}
+
+.logs-title-row i {
+    font-size: 20px;
+    color: #6d4aff;
+}
+
+.logs-top-header p {
+    margin: 0;
+    font-size: 14px;
+    color: #7a7f8c;
+}
+
+
+/* PAGE */
+
+.logs-page {
+    width: 100%;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+
+/* SUMMARY */
+
+.logs-summary {
+    margin-bottom: 22px;
+}
+
+.summary-card {
+    width: 100%;
+    max-width: 350px;
+
+    padding: 20px 22px;
+
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    background: #ffffff;
+
+    border: 1px solid #ececf2;
+    border-radius: 14px;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+}
+
+.summary-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 13px;
+
+    background: #eeeaff;
+    color: #6847e8;
+
+    font-size: 19px;
+}
+
+.summary-card span {
+    font-size: 13px;
+    color: #747986;
+}
+
+.summary-card h2 {
+    margin: 4px 0 0;
+
+    font-size: 26px;
+    font-weight: 700;
+
+    color: #242936;
+}
+
+
+/* MAIN CARD */
+
+.logs-card {
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #ececf2;
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.04);
+}
+
+
+/* CARD HEADER */
+
+.logs-card-header {
+    padding: 19px 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid #ededf2;
+}
+
+.logs-card-header h2 {
+    margin: 0 0 4px;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    color: #252a36;
+}
+
+.logs-card-header p {
+    margin: 0;
+
+    font-size: 13px;
+    color: #818691;
+}
+
+.card-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #eeeaff;
+    color: #6847e8;
+
+    font-size: 17px;
+}
+
+
+/* TABLE */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.logs-table {
+    width: 100%;
+    min-width: 950px;
+
+    border-collapse: collapse;
+
+    font-size: 13px;
+}
+
+.logs-table thead {
+    background: #f8f8fb;
+}
+
+.logs-table th {
+    padding: 14px 16px;
+
+    text-align: left;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    color: #606572;
+
+    text-transform: uppercase;
+    letter-spacing: 0.35px;
+
+    border-bottom: 1px solid #e8e8ed;
+
+    white-space: nowrap;
+}
+
+.logs-table td {
+    padding: 15px 16px;
+
+    vertical-align: middle;
+
+    color: #4e5460;
+
+    border-bottom: 1px solid #f0f0f3;
+}
+
+.logs-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.logs-table tbody tr:hover {
+    background: #faf9ff;
+}
+
+.logs-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* NUMBER */
+
+.row-number {
+    font-weight: 600;
+    color: #9297a1 !important;
+}
+
+
+/* ADMIN */
+
+.admin-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    white-space: nowrap;
+}
+
+.admin-avatar {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #eeeaff;
+    color: #6847e8;
+
+    font-size: 12px;
+}
+
+.admin-cell span {
+    font-weight: 500;
+    color: #383e49;
+}
+
+
+/* ACTION */
+
+.action-badge {
+    display: inline-flex;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    background: #eaf7ef;
+    color: #198754;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* TARGET */
+
+.target-badge {
+    display: inline-flex;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    background: #eeeaff;
+    color: #6447d7;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* DETAILS */
+
+.details-cell {
+    max-width: 230px;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: #626873;
+}
+
+
+/* DATE */
+
+.log-date {
+    font-size: 12px;
+    color: #7d828d;
+
+    white-space: nowrap;
+}
+
+
+/* EMPTY */
+
+.empty-state {
+    padding: 65px 20px;
+
+    text-align: center;
+}
+
+.empty-icon {
+    width: 65px;
+    height: 65px;
+
+    margin: 0 auto 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #eeeaff;
+    color: #6847e8;
+
+    font-size: 23px;
+}
+
+.empty-state h3 {
+    margin: 0 0 7px;
+
+    font-size: 18px;
+    color: #343944;
+}
+
+.empty-state p {
+    margin: 0;
+
+    font-size: 13px;
+    color: #858a94;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+
+    .logs-page {
+        padding: 16px;
+    }
+
+    .summary-card {
+        max-width: none;
+        box-sizing: border-box;
+    }
+
+    .logs-title-row h1 {
+        font-size: 24px;
+    }
+
+}
+    .logs-table tbody tr[hidden],
+    #logsPagination[hidden] {
+        display: none !important;
+    }
+
+    .logs-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 18px;
+    }
+
+    .logs-pagination button {
+        padding: 8px 14px;
+        border: 1px solid #ddd6fe;
+        border-radius: 8px;
+        background: white;
+        color: #6d28d9;
+        cursor: pointer;
+    }
+
+    .logs-pagination button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }

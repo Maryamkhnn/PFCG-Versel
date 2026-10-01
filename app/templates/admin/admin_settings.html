@@ -1,0 +1,497 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}My Account | PFCG AI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin_settings.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin_profile.css') }}">
+
+<style>
+    .account-sections {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .account-sections a {
+        padding: 10px 15px;
+        border: 1px solid #ded5f5;
+        border-radius: 10px;
+        background: #fff;
+        color: #28165e;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .account-sections a:hover {
+        background: #f4f0ff;
+        border-color: #6944ed;
+    }
+
+    .account-section {
+        scroll-margin-top: 20px;
+    }
+
+    #admin-profile-section {
+        margin-bottom: 26px;
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div class="settings-header">
+    <div class="settings-title">
+        <h1>My Account</h1>
+        <i class="fas fa-user-gear"></i>
+    </div>
+    <p>Manage your profile, security, and platform settings.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="account-sections">
+    <a href="#admin-profile-section">Profile &amp; Security</a>
+    <a href="#admin-system-settings">System Settings</a>
+</div>
+
+<section id="admin-profile-section" class="account-section">
+    <div class="profile-page">
+
+        <div class="profile-card">
+            <div class="profile-avatar">
+                <i class="fas fa-user-shield"></i>
+            </div>
+
+            <div class="profile-info">
+                <h2>{{ admin.name }}</h2>
+                <p>
+                    <i class="fas fa-shield-halved"></i>
+                    System Administrator
+                </p>
+                <span class="status-badge">
+                    <i class="fas fa-circle"></i>
+                    Active
+                </span>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <div class="section-heading">
+                <div>
+                    <h2>Account Information</h2>
+                    <p>Your administrator account details</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="edit-profile-btn"
+                    onclick="openProfileEdit()"
+                >
+                    <i class="fas fa-pen"></i>
+                    Edit Profile
+                </button>
+            </div>
+
+            <div class="profile-grid">
+                <div class="profile-field">
+                    <label for="profileName">Full Name</label>
+                    <div class="field-box">
+                        <i class="fas fa-user"></i>
+                        <input
+                            type="text"
+                            id="profileName"
+                            value="{{ admin.name }}"
+                            readonly
+                        >
+                    </div>
+                </div>
+
+                <div class="profile-field">
+                    <label for="profileEmail">Email Address</label>
+                    <div class="field-box">
+                        <i class="fas fa-envelope"></i>
+                        <input
+                            type="email"
+                            id="profileEmail"
+                            value="{{ admin.email }}"
+                            readonly
+                        >
+                    </div>
+                </div>
+
+                <div class="profile-field">
+                    <label>Role</label>
+                    <div class="field-box">
+                        <i class="fas fa-user-shield"></i>
+                        <input
+                            type="text"
+                            value="{{ admin.role|capitalize }}"
+                            readonly
+                        >
+                    </div>
+                </div>
+
+                <div class="profile-field">
+                    <label>Account Status</label>
+                    <div class="field-box">
+                        <i class="fas fa-circle-check"></i>
+                        <input type="text" value="Active" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="profile-actions"
+                id="profileActions"
+                style="display: none;"
+            >
+                <button
+                    type="button"
+                    class="cancel-profile-btn"
+                    onclick="cancelProfileEdit()"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    class="save-profile-btn"
+                    onclick="saveProfile()"
+                >
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                </button>
+            </div>
+
+            <div id="profileMessage" class="profile-message"></div>
+        </div>
+
+        <div class="profile-section">
+            <div class="section-heading">
+                <div>
+                    <h2>Security</h2>
+                    <p>Manage your administrator account security</p>
+                </div>
+                <i class="fas fa-lock"></i>
+            </div>
+
+            <div class="security-row">
+                <div class="security-icon">
+                    <i class="fas fa-key"></i>
+                </div>
+
+                <div class="security-text">
+                    <h3>Password</h3>
+                    <p>Your password is securely protected.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="security-btn"
+                    onclick="openPasswordModal()"
+                >
+                    Change Password
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="admin-system-settings" class="account-section">
+    <div class="settings-page">
+        <div id="settingsMessage" class="settings-message"></div>
+
+        <form id="settingsForm">
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-sliders"></i>
+                    </div>
+                    <div>
+                        <h2>General Settings</h2>
+                        <p>Basic platform information.</p>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="siteName">Site Name</label>
+                        <input
+                            type="text"
+                            id="siteName"
+                            value="{{ settings['site_name'] if settings else 'PFCG AI' }}"
+                            maxlength="100"
+                            required
+                        >
+                        <small>Name of the platform.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <h2>Plagiarism Settings</h2>
+                        <p>Configure the acceptable plagiarism threshold.</p>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="plagiarismThreshold">
+                            Plagiarism Threshold
+                        </label>
+                        <div class="input-suffix">
+                            <input
+                                type="number"
+                                id="plagiarismThreshold"
+                                value="{{ settings['plagiarism_threshold'] if settings else 20 }}"
+                                min="0"
+                                max="100"
+                                required
+                            >
+                            <span>%</span>
+                        </div>
+                        <small>Recommended maximum plagiarism percentage.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <h2>SEO Settings</h2>
+                        <p>Configure the recommended SEO target.</p>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="seoTargetScore">Target SEO Score</label>
+                        <div class="input-suffix">
+                            <input
+                                type="number"
+                                id="seoTargetScore"
+                                value="{{ settings['seo_target_score'] if settings else 70 }}"
+                                min="0"
+                                max="100"
+                                required
+                            >
+                            <span>/ 100</span>
+                        </div>
+                        <small>Recommended score for SEO optimized content.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-file-lines"></i>
+                    </div>
+                    <div>
+                        <h2>Content Settings</h2>
+                        <p>Configure the default generation preference.</p>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="defaultWordLimit">Default Word Limit</label>
+                        <div class="input-suffix word-limit">
+                            <input
+                                type="number"
+                                id="defaultWordLimit"
+                                value="{{ settings['default_word_limit'] if settings else 500 }}"
+                                min="100"
+                                max="5000"
+                                required
+                            >
+                            <span>words</span>
+                        </div>
+                        <small>
+                            Default preferred length for generated content.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-actions">
+                <span>
+                    <i class="fas fa-circle-info"></i>
+                    Save changes to update system settings.
+                </span>
+
+                <button type="submit" id="saveSettingsBtn">
+                    <i class="fas fa-floppy-disk"></i>
+                    Save Settings
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<div class="password-modal" id="passwordModal">
+    <div class="password-modal-content">
+        <div class="password-modal-header">
+            <div>
+                <h2>Change Password</h2>
+                <p>Update your administrator password</p>
+            </div>
+
+            <button
+                type="button"
+                class="modal-close"
+                onclick="closePasswordModal()"
+            >
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <form id="changePasswordForm">
+            <div class="password-field">
+                <label for="currentPassword">Current Password</label>
+                <div class="password-input">
+                    <i class="fas fa-lock"></i>
+                    <input
+                        type="password"
+                        name="current_password"
+                        id="currentPassword"
+                        placeholder="Enter current password"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="password-field">
+                <label for="newPassword">New Password</label>
+                <div class="password-input">
+                    <i class="fas fa-key"></i>
+                    <input
+                        type="password"
+                        name="new_password"
+                        id="newPassword"
+                        placeholder="Enter new password"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="password-field">
+                <label for="confirmPassword">Confirm New Password</label>
+                <div class="password-input">
+                    <i class="fas fa-check-circle"></i>
+                    <input
+                        type="password"
+                        name="confirm_password"
+                        id="confirmPassword"
+                        placeholder="Confirm new password"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div id="passwordMessage" class="password-message"></div>
+
+            <div class="modal-actions">
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="closePasswordModal()"
+                >
+                    Cancel
+                </button>
+
+                <button type="submit" class="save-password-btn">
+                    <i class="fas fa-save"></i>
+                    Change Password
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("settingsForm");
+    const button = document.getElementById("saveSettingsBtn");
+    const messageBox = document.getElementById("settingsMessage");
+
+    function showMessage(message, type) {
+        messageBox.textContent = message;
+        messageBox.className = "settings-message " + type;
+        messageBox.style.display = "block";
+
+        setTimeout(function () {
+            messageBox.style.display = "none";
+        }, 4000);
+    }
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const data = {
+            site_name: document.getElementById("siteName").value.trim(),
+            plagiarism_threshold: Number(
+                document.getElementById("plagiarismThreshold").value
+            ),
+            seo_target_score: Number(
+                document.getElementById("seoTargetScore").value
+            ),
+            default_word_limit: Number(
+                document.getElementById("defaultWordLimit").value
+            )
+        };
+
+        button.disabled = true;
+        button.innerHTML =
+            '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        try {
+            const response = await fetch(
+                "{{ url_for('admin.update_settings') }}",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                }
+            );
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                showMessage(result.message, "success");
+            } else {
+                showMessage(
+                    result.message || "Unable to save settings.",
+                    "error"
+                );
+            }
+        } catch (error) {
+            console.error("SETTINGS ERROR:", error);
+            showMessage("Unable to save settings.", "error");
+        } finally {
+            button.disabled = false;
+            button.innerHTML =
+                '<i class="fas fa-floppy-disk"></i> Save Settings';
+        }
+    });
+});
+</script>
+
+<script src="{{ url_for('static', filename='js/admin/admin_profile.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,1103 @@
+{% extends "admin/admin_base.html" %}
+
+
+{% block title %}
+    Feedback | Admin
+{% endblock %}
+
+
+{% block extra_css %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/admin/admin_feedback.css'
+    ) }}"
+>
+
+{% endblock %}
+
+
+<!-- =====================================================
+     PAGE HEADER
+====================================================== -->
+
+{% block page_header %}
+
+<div class="feedback-top-header">
+
+    <div class="feedback-title-row">
+
+        <h1>Feedback</h1>
+
+        <i class="fas fa-comments"></i>
+
+    </div>
+
+    <p>
+        View and monitor feedback submitted by users.
+    </p>
+
+</div>
+
+{% endblock %}
+
+
+<!-- =====================================================
+     PAGE CONTENT
+====================================================== -->
+
+{% block content %}
+
+<div class="feedback-page">
+
+
+    <!-- =================================================
+         SUMMARY CARDS
+    ================================================== -->
+
+    <div class="feedback-summary">
+
+
+        <!-- TOTAL FEEDBACK -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon feedback-icon">
+
+                <i class="fas fa-comments"></i>
+
+            </div>
+
+            <div class="summary-info">
+
+                <span class="summary-label">
+                    Total Feedback
+                </span>
+
+                <h2>
+                    {{ feedbacks|length }}
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <!-- AVERAGE RATING -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon rating-icon">
+
+                <i class="fas fa-star"></i>
+
+            </div>
+
+            <div class="summary-info">
+
+                <span class="summary-label">
+                    Average Rating
+                </span>
+
+                <h2>
+
+                    {% set rated_feedbacks =
+                        feedbacks
+                        |selectattr("rating")
+                        |list
+                    %}
+
+                    {% if rated_feedbacks %}
+
+                        {{
+                            "%.1f"|format(
+                                rated_feedbacks
+                                |map(attribute="rating")
+                                |sum
+                                /
+                                rated_feedbacks|length
+                            )
+                        }}
+
+                        <small>/ 5</small>
+
+                    {% else %}
+
+                        0.0
+                        <small>/ 5</small>
+
+                    {% endif %}
+
+                </h2>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =================================================
+         FEEDBACK TABLE CARD
+    ================================================== -->
+
+    <div class="feedback-card">
+
+
+        <!-- CARD HEADER -->
+
+        <div class="feedback-card-header">
+
+            <div>
+
+                <h2>User Feedback</h2>
+
+                <p>
+                    Recent feedback received from users
+                </p>
+
+            </div>
+
+            <div class="card-header-icon">
+
+                <i class="fas fa-comment-dots"></i>
+
+            </div>
+
+        </div>
+
+
+        {% if feedbacks %}
+
+
+            <!-- =========================================
+                 TABLE
+            ========================================== -->
+
+            <div class="table-container">
+
+                <table class="feedback-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>#</th>
+                            <th>User</th>
+                            <th>Type</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Rating</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="adminFeedbackTableBody">
+
+                        {% for feedback in feedbacks %}
+
+                            <tr class="feedback-row">
+
+
+                                <!-- NUMBER -->
+
+                                <td class="row-number">
+
+                                    {{ loop.index }}
+
+                                </td>
+
+
+                                <!-- USER -->
+
+                                <td>
+
+                                    <div class="user-cell">
+
+                                        <div class="user-avatar">
+
+                                            <i class="fas fa-user"></i>
+
+                                        </div>
+
+                                        <span>
+
+                                            {{
+                                                feedback.user_email
+                                                or
+                                                "Unknown User"
+                                            }}
+
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- TYPE -->
+
+                                <td>
+
+                                    <span class="type-badge">
+
+                                        {{
+                                            feedback.feedback_type
+                                            or
+                                            "General"
+                                        }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- SUBJECT -->
+
+                                <td>
+
+                                    <span class="subject-text">
+
+                                        {{
+                                            feedback.subject
+                                            or
+                                            "No Subject"
+                                        }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- SHORT MESSAGE -->
+
+                                <td>
+
+                                    <div
+                                        class="message-cell"
+                                        title="{{ feedback.message or '' }}"
+                                    >
+
+                                        {{
+                                            feedback.message
+                                            or
+                                            "No message"
+                                        }}
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- RATING -->
+
+                                <td>
+
+                                    <div class="rating-stars">
+
+                                        {% for star in range(1, 6) %}
+
+                                            {% if star <= (feedback.rating or 0) %}
+
+                                                <i class="fas fa-star"></i>
+
+                                            {% else %}
+
+                                                <i class="far fa-star"></i>
+
+                                            {% endif %}
+
+                                        {% endfor %}
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    {% set feedback_status =
+                                        feedback.status
+                                        or
+                                        "New"
+                                    %}
+
+                                    {% if feedback_status == "New" %}
+
+                                        <span class="status-badge new">
+                                            New
+                                        </span>
+
+                                    {% elif feedback_status == "Reviewed" %}
+
+                                        <span class="status-badge reviewed">
+                                            Reviewed
+                                        </span>
+
+                                    {% elif feedback_status == "Replied" %}
+
+                                        <span class="status-badge replied">
+                                            Replied
+                                        </span>
+
+                                    {% elif feedback_status == "Resolved" %}
+
+                                        <span class="status-badge resolved">
+                                            Resolved
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="status-badge pending">
+
+                                            {{ feedback_status }}
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- DATE -->
+
+                                <td>
+
+                                    <span class="feedback-date">
+
+                                        {% if feedback.created_at %}
+
+                                            {{
+                                                feedback.created_at.strftime(
+                                                    "%d %b %Y"
+                                                )
+                                            }}
+
+                                        {% else %}
+
+                                            —
+
+                                        {% endif %}
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- VIEW ACTION -->
+
+                                <td>
+
+                                    <button
+                                        type="button"
+                                        class="view-feedback-btn"
+                                        data-id="{{ feedback.id }}"
+                                        data-user="{{ feedback.user_email or 'Unknown User' }}"
+                                        data-type="{{ feedback.feedback_type or 'General' }}"
+                                        data-subject="{{ feedback.subject or 'No Subject' }}"
+                                        data-message="{{ feedback.message or 'No message' }}"
+                                        data-rating="{{ feedback.rating or 0 }}"
+                                        data-status="{{ feedback.status or 'New' }}"
+                                        data-date="{% if feedback.created_at %}{{ feedback.created_at.strftime('%d %b %Y, %I:%M %p') }}{% else %}—{% endif %}"
+                                    >
+
+                                        <i class="fas fa-eye"></i>
+
+                                        View
+
+                                    </button>
+
+                                </td>
+
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- =========================================
+                 PAGINATION
+            ========================================== -->
+
+            <div
+                class="feedback-pagination"
+                id="feedbackPagination"
+            >
+
+                <button
+                    type="button"
+                    id="feedbackPreviousPage"
+                    class="pagination-button"
+                >
+
+                    <i class="fas fa-chevron-left"></i>
+
+                    Previous
+
+                </button>
+
+                <span id="feedbackPageInformation">
+
+                    Page 1 of 1
+
+                </span>
+
+                <button
+                    type="button"
+                    id="feedbackNextPage"
+                    class="pagination-button"
+                >
+
+                    Next
+
+                    <i class="fas fa-chevron-right"></i>
+
+                </button>
+
+            </div>
+
+
+        {% else %}
+
+
+            <!-- =========================================
+                 EMPTY STATE
+            ========================================== -->
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+
+                    <i class="fas fa-comments"></i>
+
+                </div>
+
+                <h3>No Feedback Yet</h3>
+
+                <p>
+                    Users have not submitted any feedback yet.
+                </p>
+
+            </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     FEEDBACK DETAIL MODAL
+====================================================== -->
+
+<div
+    class="feedback-modal"
+    id="feedbackModal"
+    aria-hidden="true"
+>
+
+    <div class="feedback-modal-overlay"></div>
+
+
+    <div
+        class="feedback-modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="feedbackModalTitle"
+    >
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="feedback-modal-header">
+
+            <div>
+
+                <span class="modal-label">
+                    USER FEEDBACK
+                </span>
+
+                <h2 id="feedbackModalTitle">
+                    Feedback Details
+                </h2>
+
+            </div>
+
+            <button
+                type="button"
+                class="close-feedback-modal"
+                id="closeFeedbackModal"
+                aria-label="Close feedback details"
+            >
+
+                <i class="fas fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- MODAL BODY -->
+
+        <div class="feedback-modal-body">
+
+
+            <div class="feedback-detail-grid">
+
+
+                <div class="feedback-detail-item">
+
+                    <span>User Email</span>
+
+                    <strong id="modalFeedbackUser">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="feedback-detail-item">
+
+                    <span>Feedback Type</span>
+
+                    <strong id="modalFeedbackType">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="feedback-detail-item">
+
+                    <span>Rating</span>
+
+                    <strong id="modalFeedbackRating">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="feedback-detail-item">
+
+                    <span>Status</span>
+
+                    <strong id="modalFeedbackStatus">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="feedback-detail-item full-width">
+
+                    <span>Submitted On</span>
+
+                    <strong id="modalFeedbackDate">
+                        —
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- SUBJECT -->
+
+            <div class="feedback-subject-box">
+
+                <span>Subject</span>
+
+                <h3 id="modalFeedbackSubject">
+                    —
+                </h3>
+
+            </div>
+
+
+            <!-- COMPLETE MESSAGE -->
+
+            <div class="feedback-message-box">
+
+                <span>Complete Message</span>
+
+                <p id="modalFeedbackMessage">
+                    —
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- MODAL FOOTER -->
+
+        <div class="feedback-modal-footer">
+
+            <button
+                type="button"
+                class="modal-close-button"
+                id="modalCloseButton"
+            >
+
+                <i class="fas fa-check"></i>
+
+                Close
+
+            </button>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+<!-- =====================================================
+     ADMIN FEEDBACK JAVASCRIPT
+====================================================== -->
+
+{% block extra_js %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        "use strict";
+
+
+        // =============================================
+        // GET ELEMENTS
+        // =============================================
+
+        const rows = Array.from(
+            document.querySelectorAll(
+                ".feedback-row"
+            )
+        );
+
+        const viewButtons =
+            document.querySelectorAll(
+                ".view-feedback-btn"
+            );
+
+        const modal =
+            document.getElementById(
+                "feedbackModal"
+            );
+
+        const closeIcon =
+            document.getElementById(
+                "closeFeedbackModal"
+            );
+
+        const closeButton =
+            document.getElementById(
+                "modalCloseButton"
+            );
+
+        const overlay =
+            modal?.querySelector(
+                ".feedback-modal-overlay"
+            );
+
+
+        // =============================================
+        // PAGINATION
+        // =============================================
+
+        const perPage = 5;
+
+        let currentPage = 1;
+
+        const previousButton =
+            document.getElementById(
+                "feedbackPreviousPage"
+            );
+
+        const nextButton =
+            document.getElementById(
+                "feedbackNextPage"
+            );
+
+        const pageInformation =
+            document.getElementById(
+                "feedbackPageInformation"
+            );
+
+        const pagination =
+            document.getElementById(
+                "feedbackPagination"
+            );
+
+
+        function renderPagination() {
+
+            if (!rows.length) {
+
+                if (pagination) {
+                    pagination.hidden = true;
+                }
+
+                return;
+            }
+
+            const totalPages = Math.max(
+                1,
+                Math.ceil(
+                    rows.length / perPage
+                )
+            );
+
+            currentPage = Math.max(
+                1,
+                Math.min(
+                    currentPage,
+                    totalPages
+                )
+            );
+
+            const start =
+                (currentPage - 1)
+                * perPage;
+
+            const end =
+                start + perPage;
+
+            rows.forEach(
+                function (row, index) {
+
+                    row.hidden = !(
+                        index >= start
+                        && index < end
+                    );
+                }
+            );
+
+            pageInformation.textContent =
+                `Page ${currentPage} of ${totalPages}`;
+
+            previousButton.disabled =
+                currentPage === 1;
+
+            nextButton.disabled =
+                currentPage === totalPages;
+
+            pagination.hidden =
+                totalPages <= 1;
+        }
+
+
+        previousButton?.addEventListener(
+            "click",
+            function () {
+
+                if (currentPage > 1) {
+
+                    currentPage--;
+
+                    renderPagination();
+                }
+            }
+        );
+
+
+        nextButton?.addEventListener(
+            "click",
+            function () {
+
+                const totalPages =
+                    Math.ceil(
+                        rows.length
+                        / perPage
+                    );
+
+                if (
+                    currentPage
+                    < totalPages
+                ) {
+
+                    currentPage++;
+
+                    renderPagination();
+                }
+            }
+        );
+
+
+        // =============================================
+        // MODAL FUNCTIONS
+        // =============================================
+
+        function setText(
+            id,
+            value,
+            fallback = "—"
+        ) {
+
+            const element =
+                document.getElementById(id);
+
+            if (element) {
+
+                element.textContent =
+                    value || fallback;
+            }
+        }
+
+
+        function openModal(button) {
+
+            if (!modal) {
+                return;
+            }
+
+            setText(
+                "modalFeedbackUser",
+                button.dataset.user,
+                "Unknown User"
+            );
+
+            setText(
+                "modalFeedbackType",
+                button.dataset.type,
+                "General"
+            );
+
+            setText(
+                "modalFeedbackSubject",
+                button.dataset.subject,
+                "No Subject"
+            );
+
+            setText(
+                "modalFeedbackMessage",
+                button.dataset.message,
+                "No message"
+            );
+
+            setText(
+                "modalFeedbackRating",
+                `${button.dataset.rating || "0"} / 5`
+            );
+
+            setText(
+                "modalFeedbackStatus",
+                button.dataset.status,
+                "New"
+            );
+
+            setText(
+                "modalFeedbackDate",
+                button.dataset.date
+            );
+
+            modal.classList.add("show");
+
+            modal.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+            document.body.classList.add(
+                "modal-open"
+            );
+        }
+
+
+        function closeModal() {
+
+            if (!modal) {
+                return;
+            }
+
+            modal.classList.remove("show");
+
+            modal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            document.body.classList.remove(
+                "modal-open"
+            );
+        }
+
+
+        // =============================================
+        // UPDATE STATUS
+        // =============================================
+
+        async function markReviewed(button) {
+
+            const feedbackId =
+                button.dataset.id;
+
+            const currentStatus = (
+                button.dataset.status
+                || ""
+            ).trim().toLowerCase();
+
+            if (
+                !feedbackId
+                || currentStatus !== "new"
+            ) {
+                return;
+            }
+
+            try {
+
+                const response = await fetch(
+                    `/admin/feedback/${feedbackId}/review`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        },
+                        credentials:
+                            "same-origin"
+                    }
+                );
+
+                const result =
+                    await response.json();
+
+                if (
+                    !response.ok
+                    || result.success !== true
+                ) {
+
+                    throw new Error(
+                        result.message
+                        || "Unable to update status."
+                    );
+                }
+
+                button.dataset.status =
+                    "Reviewed";
+
+                setText(
+                    "modalFeedbackStatus",
+                    "Reviewed"
+                );
+
+                const row =
+                    button.closest("tr");
+
+                const badge =
+                    row?.querySelector(
+                        ".status-badge"
+                    );
+
+                if (badge) {
+
+                    badge.textContent =
+                        "Reviewed";
+
+                    badge.className =
+                        "status-badge reviewed";
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Feedback status error:",
+                    error
+                );
+            }
+        }
+
+
+        // =============================================
+        // VIEW BUTTONS
+        // =============================================
+
+        viewButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    async function () {
+
+                        openModal(button);
+
+                        await markReviewed(
+                            button
+                        );
+                    }
+                );
+            }
+        );
+
+
+        // =============================================
+        // CLOSE MODAL
+        // =============================================
+
+        closeIcon?.addEventListener(
+            "click",
+            closeModal
+        );
+
+        closeButton?.addEventListener(
+            "click",
+            closeModal
+        );
+
+        overlay?.addEventListener(
+            "click",
+            closeModal
+        );
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape"
+                    && modal?.classList.contains(
+                        "show"
+                    )
+                ) {
+
+                    closeModal();
+                }
+            }
+        );
+
+
+        // Initial page
+        renderPagination();
+    }
+);
+
+</script>
+
+{% endblock %}

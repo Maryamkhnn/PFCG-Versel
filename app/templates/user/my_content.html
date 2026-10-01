@@ -1,0 +1,182 @@
+{% extends "user/base.html" %}
+
+{% block title %}My Content | PFCG AI{% endblock %}
+{% block page_title %}My Content{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user/my_content.css', v='12') }}">
+{% endblock %}
+
+{% block content %}
+<div class="content-page">
+
+    <header class="content-top">
+        <div class="content-heading">
+            <span class="content-heading-icon">
+                <i class="fas fa-folder-open" aria-hidden="true"></i>
+            </span>
+
+            <div>
+                <h1>My Content</h1>
+                <p>Find, review and manage your generated content.</p>
+            </div>
+        </div>
+
+        <span class="content-total" id="contentTotal">Loading…</span>
+    </header>
+
+    <div class="content-filters">
+        <div class="filter-field search-field">
+            <label for="searchContent">Search</label>
+
+            <div class="search-wrapper">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input
+                    type="search"
+                    id="searchContent"
+                    placeholder="Search topic or content..."
+                >
+            </div>
+        </div>
+
+        <div class="filter-field">
+            <label for="filterType">Content Type</label>
+
+            <select id="filterType">
+                <option value="">All Types</option>
+                <option value="Blog">Blog</option>
+                <option value="Essay">Essay</option>
+                <option value="Article">Article</option>
+                <option value="Assignment">Assignment</option>
+                <option value="Report">Report</option>
+            </select>
+        </div>
+
+        <div class="filter-field">
+            <label for="dateFrom">From Date</label>
+            <input type="date" id="dateFrom">
+        </div>
+
+        <div class="filter-field">
+            <label for="dateTo">To Date</label>
+            <input type="date" id="dateTo">
+        </div>
+
+        <button type="button" id="resetFilters" class="reset-btn">
+            <i class="fas fa-rotate-left" aria-hidden="true"></i>
+            Reset
+        </button>
+    </div>
+
+    <p id="filterMessage" class="filter-message" role="status"></p>
+
+    <div class="list-summary">
+        <span id="resultsSummary" aria-live="polite">Loading content…</span>
+        <span>6 items per page</span>
+    </div>
+
+    <div
+        class="content-list"
+        id="contentList"
+        aria-busy="true"
+    ></div>
+
+    <nav
+        class="content-pagination"
+        id="contentPagination"
+        aria-label="Content pages"
+        hidden
+    >
+        <button type="button" id="previousPage">
+            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            Previous
+        </button>
+
+        <span id="pageInfo" aria-live="polite"></span>
+
+        <button type="button" id="nextPage">
+            Next
+            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+        </button>
+    </nav>
+</div>
+
+<!-- VIEW CONTENT MODAL -->
+<div
+    id="contentModal"
+    class="content-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+    aria-hidden="true"
+>
+    <div class="content-modal-box">
+        <div class="content-modal-header">
+            <div>
+                <h2 id="modalTitle">Content</h2>
+                <p id="modalMeta">Generated Content</p>
+            </div>
+
+            <button
+                type="button"
+                id="closeModalBtn"
+                class="modal-close"
+                aria-label="Close content"
+            >&times;</button>
+        </div>
+
+        <div
+            id="modalContent"
+            class="content-modal-body"
+            tabindex="0"
+        ></div>
+
+        <div class="content-modal-footer">
+            <button
+                type="button"
+                id="modalCloseBottomBtn"
+                class="modal-close-btn"
+            >Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div
+    id="deleteConfirmModal"
+    class="delete-confirm-overlay"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="deleteConfirmTitle"
+    aria-describedby="deleteConfirmDescription"
+    hidden
+>
+    <div class="delete-confirm-box">
+        <div class="delete-confirm-icon">
+            <i class="fas fa-trash" aria-hidden="true"></i>
+        </div>
+
+        <h2 id="deleteConfirmTitle">Delete content?</h2>
+
+        <p id="deleteConfirmDescription">
+            This content will be permanently deleted.
+            This action cannot be undone.
+        </p>
+
+        <div class="delete-confirm-actions">
+            <button type="button" id="cancelDeleteBtn">
+                Cancel
+            </button>
+
+            <button type="button" id="confirmDeleteBtn">
+                <i class="fas fa-trash" aria-hidden="true"></i>
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/user/my_content.js', v='13') }}"></script>
+{% endblock %}

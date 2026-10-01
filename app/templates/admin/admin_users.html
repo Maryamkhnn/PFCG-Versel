@@ -1,0 +1,949 @@
+{% extends "admin/admin_base.html" %}
+
+
+{% block title %}
+Manage Users | Admin
+{% endblock %}
+
+
+<!-- =====================================================
+     PAGE CSS
+====================================================== -->
+
+{% block extra_css %}
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin/admin_users.css') }}">
+
+{% endblock %}
+
+
+<!-- =====================================================
+     PAGE HEADER
+====================================================== -->
+
+{% block page_header %}
+
+<h1>Manage Users</h1>
+
+<p>
+    View, edit and manage registered users.
+</p>
+
+{% endblock %}
+
+
+<!-- =====================================================
+     PAGE CONTENT
+====================================================== -->
+
+{% block content %}
+
+<div class="admin-page">
+
+
+    <!-- =====================================================
+         SUMMARY
+    ====================================================== -->
+
+    <div class="content-summary">
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+
+                <i class="fas fa-users"></i>
+
+            </div>
+
+            <div>
+
+                <h3 id="registeredUsersCount">
+                    {{ pagination.total }}
+                </h3>
+
+                <p>Registered Users</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         USERS CARD
+    ====================================================== -->
+
+    <div class="content-card">
+
+
+        <!-- CARD HEADER -->
+
+        <div class="card-header">
+
+            <div>
+
+                <h2>All Users</h2>
+
+                <p>
+                    Manage registered user accounts and view their activity.
+                </p>
+
+            </div>
+
+            <i class="fas fa-users-gear"></i>
+
+        </div>
+
+
+        <!-- =================================================
+             USERS TABLE
+        ================================================== -->
+
+        {% if users %}
+
+        <div class="table-container">
+
+            <table class="content-table">
+
+                <thead>
+
+                <tr>
+
+                    <th>#</th>
+
+                    <th>User</th>
+
+                    <th>Email</th>
+
+                    <th>Status</th>
+
+                    <th>Activity</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                {% for user in users %}
+
+                {% set activity = user_activities.get(user.id, {}) %}
+
+
+                <tr id="user-row-{{ user.id }}"
+
+                    data-user-id="{{ user.id }}"
+
+                    data-name="{{ user.name or '' }}"
+
+                    data-username="{{ user.username or '' }}"
+
+                    data-email="{{ user.email or '' }}"
+
+                    data-generated="{{ activity.get('generated', 0) }}"
+
+                    data-humanized="{{ activity.get('humanized', 0) }}"
+
+                    data-plagiarism="{{ activity.get('plagiarism', 0) }}"
+
+                    data-seo="{{ activity.get('seo', 0) }}"
+
+                    data-feedback="{{ activity.get('feedback', 0) }}"
+
+                    data-total="{{ activity.get('total', 0) }}"
+
+                    data-status="{{ user.status or 'active' }}">
+
+
+                    <!-- SERIAL NUMBER -->
+
+                    <td class="id-cell">
+
+                        {{
+                            (pagination.page - 1)
+                            * pagination.per_page
+                            + loop.index
+                        }}
+
+                    </td>
+
+
+                    <!-- USER -->
+
+                    <td>
+
+                        <div class="user-cell">
+
+
+                            <div class="user-avatar">
+
+                                {% if user.profile_picture %}
+
+                                <img
+                                    src="{{ url_for(
+                                        'static',
+                                        filename='uploads/profile_pictures/' ~ user.profile_picture
+                                    ) }}"
+                                    alt="Profile">
+
+                                {% else %}
+
+                                <i class="fas fa-user"></i>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="user-info">
+
+                                <strong>
+
+                                    {{ user.name or "No Name" }}
+
+                                </strong>
+
+
+                                {% if user.username %}
+
+                                <small>
+
+                                    @{{ user.username }}
+
+                                </small>
+
+                                {% endif %}
+
+                            </div>
+
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- EMAIL -->
+
+                    <td class="email-cell">
+
+                        {{ user.email }}
+
+                    </td>
+
+                    <td>
+                        <span class="status-badge status-{{ user.status or 'active' }}">
+                            {{ (user.status or 'active')|replace('_', ' ') }}
+                        </span>
+                    </td>
+
+
+                    <!-- ACTIVITY -->
+
+                    <td>
+
+                        <span class="role-badge activity-badge">
+
+                            <i class="fas fa-chart-line"></i>
+
+                            {{ activity.get('total', 0) }}
+                            Activities
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- ACTIONS -->
+
+                    <td>
+
+                        <div class="action-buttons">
+
+
+                            <!-- VIEW -->
+
+                            <button
+                                type="button"
+                                class="action-btn view-btn"
+                                data-action="view"
+                                data-user-id="{{ user.id }}"
+                                title="View User">
+
+                                <i class="fas fa-eye"></i>
+
+                            </button>
+
+
+                            <!-- EDIT -->
+
+                            <button
+                                type="button"
+                                class="action-btn edit-btn"
+                                data-action="edit"
+                                data-user-id="{{ user.id }}"
+                                title="Edit User">
+
+                                <i class="fas fa-pen"></i>
+
+                            </button>
+
+
+                            <!-- MANAGE ACCOUNT -->
+
+                            <button
+                                type="button"
+                                class="action-btn manage-btn"
+                                data-action="manage"
+                                data-user-id="{{ user.id }}"
+                                title="Manage Account">
+
+                                <i class="fas fa-user-shield"></i>
+
+                            </button>
+
+
+                        </div>
+
+                    </td>
+
+
+                </tr>
+
+                {% endfor %}
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =================================================
+             PAGINATION
+        ================================================== -->
+
+        <div class="pagination">
+
+
+            <!-- PREVIOUS -->
+
+            {% if pagination.has_prev %}
+
+            <a
+                href="{{ url_for(
+                    'admin.users',
+                    page=pagination.prev_num
+                ) }}"
+                class="pagination-btn">
+
+                <i class="fas fa-chevron-left"></i>
+
+                Previous
+
+            </a>
+
+            {% else %}
+
+            <span class="pagination-btn disabled">
+
+                <i class="fas fa-chevron-left"></i>
+
+                Previous
+
+            </span>
+
+            {% endif %}
+
+
+            <!-- PAGE NUMBERS -->
+
+            <div class="page-numbers">
+
+                {% for page_num in pagination.iter_pages(
+                    left_edge=1,
+                    right_edge=1,
+                    left_current=2,
+                    right_current=2
+                ) %}
+
+
+                {% if page_num %}
+
+
+                {% if page_num == pagination.page %}
+
+                <span class="page-number active">
+
+                    {{ page_num }}
+
+                </span>
+
+
+                {% else %}
+
+                <a
+                    href="{{ url_for(
+                        'admin.users',
+                        page=page_num
+                    ) }}"
+                    class="page-number">
+
+                    {{ page_num }}
+
+                </a>
+
+                {% endif %}
+
+
+                {% else %}
+
+                <span class="page-dots">
+
+                    ...
+
+                </span>
+
+                {% endif %}
+
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- NEXT -->
+
+            {% if pagination.has_next %}
+
+            <a
+                href="{{ url_for(
+                    'admin.users',
+                    page=pagination.next_num
+                ) }}"
+                class="pagination-btn">
+
+                Next
+
+                <i class="fas fa-chevron-right"></i>
+
+            </a>
+
+            {% else %}
+
+            <span class="pagination-btn disabled">
+
+                Next
+
+                <i class="fas fa-chevron-right"></i>
+
+            </span>
+
+            {% endif %}
+
+
+        </div>
+
+
+        {% else %}
+
+
+        <!-- =================================================
+             EMPTY STATE
+        ================================================== -->
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+
+                <i class="fas fa-users-slash"></i>
+
+            </div>
+
+            <h3>No Users Found</h3>
+
+            <p>
+                No registered users are available.
+            </p>
+
+        </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     VIEW USER MODAL
+====================================================== -->
+
+<div class="user-modal"
+     id="viewUserModal">
+
+
+    <div class="modal-box user-view-modal">
+
+
+        <!-- CLOSE -->
+
+        <button
+            type="button"
+            class="modal-close"
+            id="closeViewBtn">
+
+            <i class="fas fa-times"></i>
+
+        </button>
+
+
+        <!-- ICON -->
+
+        <div class="modal-icon">
+
+            <i class="fas fa-user"></i>
+
+        </div>
+
+
+        <h2>User Details</h2>
+
+
+        <!-- BASIC INFORMATION -->
+
+        <div class="user-details">
+
+
+            <div>
+
+                <span>Name</span>
+
+                <strong id="viewName">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>Username</span>
+
+                <strong id="viewUsername">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>Email</span>
+
+                <strong id="viewEmail">
+                    -
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ACTIVITY TITLE -->
+
+        <div class="activity-section-title">
+
+            <h3>User Activity</h3>
+
+            <span id="viewTotalActivity">
+                0 Total
+            </span>
+
+        </div>
+
+
+        <!-- ACTIVITY COUNTS -->
+
+        <div class="activity-grid">
+
+
+            <div class="activity-item">
+
+                <i class="fas fa-file-alt"></i>
+
+                <div>
+
+                    <span>Generated</span>
+
+                    <strong id="viewGenerated">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="activity-item">
+
+                <i class="fas fa-wand-magic-sparkles"></i>
+
+                <div>
+
+                    <span>Humanized</span>
+
+                    <strong id="viewHumanized">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="activity-item">
+
+                <i class="fas fa-copy"></i>
+
+                <div>
+
+                    <span>Plagiarism</span>
+
+                    <strong id="viewPlagiarism">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="activity-item">
+
+                <i class="fas fa-chart-line"></i>
+
+                <div>
+
+                    <span>SEO Reports</span>
+
+                    <strong id="viewSeo">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="activity-item">
+
+                <i class="fas fa-comments"></i>
+
+                <div>
+
+                    <span>Feedback</span>
+
+                    <strong id="viewFeedback">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     EDIT USER MODAL
+====================================================== -->
+
+<div class="user-modal"
+     id="editUserModal">
+
+
+    <div class="modal-box edit-modal">
+
+
+        <!-- CLOSE -->
+
+        <button
+            type="button"
+            class="modal-close"
+            id="closeEditBtn">
+
+            <i class="fas fa-times"></i>
+
+        </button>
+
+
+        <div class="modal-icon">
+
+            <i class="fas fa-user-edit"></i>
+
+        </div>
+
+
+        <h2>Edit User</h2>
+
+
+        <form id="editUserForm">
+
+
+            <input
+                type="hidden"
+                id="editUserId">
+
+
+            <!-- NAME -->
+
+            <div class="form-group">
+
+                <label for="editName">
+
+                    Name
+
+                </label>
+
+                <input
+                    type="text"
+                    id="editName"
+                    required>
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label for="editEmail">
+
+                    Email
+
+                </label>
+
+                <input
+                    type="email"
+                    id="editEmail"
+                    required
+                    readonly>
+
+                <small class="privacy-note">
+                    Verified email cannot be changed directly by an administrator.
+                </small>
+
+            </div>
+
+
+            <!-- USERNAME -->
+
+            <div class="form-group">
+
+                <label for="editUsername">
+
+                    Username
+
+                </label>
+
+                <input
+                    type="text"
+                    id="editUsername">
+
+            </div>
+
+
+            <!-- SAVE -->
+
+            <button
+                type="submit"
+                class="save-btn">
+
+                <i class="fas fa-save"></i>
+
+                Save Changes
+
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     USER MODERATION MODAL
+====================================================== -->
+
+<div class="user-modal" id="moderationModal">
+    <div class="modal-box moderation-modal">
+        <button type="button" class="modal-close" id="closeModerationBtn">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="modal-icon">
+            <i class="fas fa-user-shield"></i>
+        </div>
+
+        <h2>Manage User Account</h2>
+        <p class="moderation-user" id="moderationUserName">User</p>
+
+        <form id="moderationForm">
+            <input type="hidden" id="moderationUserId">
+
+            <div class="form-group">
+                <label for="moderationAction">Action</label>
+                <select id="moderationAction" required>
+                    <option value="">Choose action</option>
+                    <option value="warn">Issue warning</option>
+                    <option value="suspend">Suspend account</option>
+                    <option value="reactivate">Reactivate account</option>
+                    <option value="schedule_delete">Schedule deletion (7 days)</option>
+                    <option value="cancel_delete">Cancel scheduled deletion</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="moderationReason">Reason</label>
+                <textarea
+                    id="moderationReason"
+                    rows="4"
+                    minlength="10"
+                    placeholder="Explain why this action is necessary..."
+                    required
+                ></textarea>
+
+                <small class="privacy-note">
+                    This reason is saved in the audit log and shown to the user.
+                </small>
+            </div>
+
+            <button type="submit" class="save-btn" id="submitModerationBtn">
+                <i class="fas fa-shield-halved"></i>
+                Apply Action
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- =====================================================
+     DELETE USER CONFIRMATION MODAL
+====================================================== -->
+
+<div class="confirm-modal" id="deleteModal">
+
+    <div class="confirm-box">
+
+        <div class="confirm-icon">
+            <i class="fas fa-trash"></i>
+        </div>
+
+        <h2>Delete User?</h2>
+
+        <p class="confirm-main-text">
+            Are you sure you want to delete
+            <strong id="deleteUserName">this user</strong>?
+        </p>
+
+        <p class="confirm-sub-text">
+            This action cannot be undone. The user and all related
+            generated content, humanized content, plagiarism history,
+            SEO reports and feedback will be permanently deleted.
+        </p>
+
+        <div class="confirm-actions">
+
+            <button type="button"
+                    class="cancel-btn"
+                    id="cancelDeleteBtn">
+                Cancel
+            </button>
+
+            <button type="button"
+                    class="confirm-delete-btn"
+                    id="confirmDeleteBtn">
+
+                <i class="fas fa-trash"></i>
+                Delete User
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- =====================================================
+     NOTIFICATION
+====================================================== -->
+
+<div class="admin-notification"
+     id="adminNotification">
+
+
+    <div class="notification-icon">
+
+        <i class="fas fa-check"></i>
+
+    </div>
+
+
+    <div class="notification-content">
+
+        <strong id="notificationTitle">
+
+            Success
+
+        </strong>
+
+        <span id="notificationMessage">
+
+            Done successfully.
+
+        </span>
+
+    </div>
+
+
+    <button
+        type="button"
+        id="closeNotification">
+
+        <i class="fas fa-times"></i>
+
+    </button>
+
+
+</div>
+
+
+{% endblock %}
+
+
+<!-- =====================================================
+     PAGE JAVASCRIPT
+====================================================== -->
+
+{% block extra_js %}
+
+<script src="{{ url_for('static', filename='js/admin/users.js') }}"></script>
+
+{% endblock %}

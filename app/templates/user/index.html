@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create and improve content with PFCG AI.">
+
+    <title>PFCG AI | Create Better Content</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/user/landing.css') }}">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <header class="site-header">
+        <nav class="navbar container" aria-label="Main navigation">
+
+            <a class="brand" href="/" aria-label="PFCG AI home">
+               
+                <span>PFCG <strong>AI</strong></span>
+            </a>
+
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#faq">FAQ</a>
+            </div>
+
+            <div class="nav-actions">
+                <a class="login-link" href="/login">Log In</a>
+                <a class="btn btn-primary btn-small" href="/signup">
+                    Create Account
+                </a>
+            </div>
+
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- HERO -->
+        <section class="hero">
+            <div class="container hero-grid">
+
+                <div class="hero-content">
+
+                    <span class="hero-label">
+                        <span class="label-dot"></span>
+                        YOUR AI WRITING WORKSPACE
+                    </span>
+
+                    <h1>
+                        Turn your ideas into
+                        <span>better content.</span>
+                    </h1>
+
+                    <p class="hero-description">
+                        Generate a draft from your topic, improve your writing,
+                        check similarity, review SEO, and keep your work in one place.
+                    </p>
+
+                    <div class="hero-buttons">
+                        <a class="btn btn-primary" href="/signup">
+                            Start Creating
+                            <span aria-hidden="true">→</span>
+                        </a>
+
+                        <a class="btn btn-secondary" href="#how-it-works">
+                            See How It Works
+                        </a>
+                    </div>
+
+                    <p class="hero-footnote">
+                        Blogs · Essays · Articles · Assignments · Reports
+                    </p>
+
+                </div>
+
+                <!-- IMAGE REPLACES THE OLD CIRCLE GRAPHIC -->
+                <div class="hero-preview">
+                    <img
+                        src="{{ url_for('static', filename='images/landing_page.png') }}"
+                        alt="Preview of the PFCG AI writing workspace"
+                    >
+                </div>
+
+            </div>
+        </section>
+
+        <!-- FEATURES -->
+        <section class="section features-section" id="features">
+            <div class="container">
+
+                <div class="section-heading">
+                    <span class="section-label">FEATURES</span>
+                    <h2>Everything you need for your writing</h2>
+                    <p>
+                        Create, improve, review, and save your content
+                        from one workspace.
+                    </p>
+                </div>
+
+                <div class="feature-grid">
+
+                    <article class="feature-card">
+                        <span class="feature-icon">✦</span>
+                        <h3>Content Generation</h3>
+                        <p>
+                            Generate blogs, essays, articles, assignments,
+                            and reports from your topic.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <span class="feature-icon">✎</span>
+                        <h3>Humanize & Edit</h3>
+                        <p>
+                            Rewrite content in a more natural style and make
+                            changes in the editor.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <span class="feature-icon">✓</span>
+                        <h3>Plagiarism Check</h3>
+                        <p>
+                            Check similarity and review matched sources
+                            when they are available.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <span class="feature-icon">↗</span>
+                        <h3>SEO Analysis</h3>
+                        <p>
+                            Review keywords, headings, and useful
+                            suggestions for your content.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <span class="feature-icon">▣</span>
+                        <h3>Saved Documents</h3>
+                        <p>
+                            Save your work and access your documents
+                            from your account.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <span class="feature-icon">↓</span>
+                        <h3>Export Content</h3>
+                        <p>
+                            Copy your content or export it when your
+                            document is ready.
+                        </p>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="section workflow-section" id="how-it-works">
+            <div class="container workflow-layout">
+
+                <div class="workflow-intro">
+                    <span class="section-label">HOW IT WORKS</span>
+                    <h2>A simple way to create content</h2>
+                    <p>
+                        Start with a topic. PFCG AI helps you create a draft
+                        and gives you tools to improve it.
+                    </p>
+
+                    <a href="/signup" class="text-link">
+                        Create your account
+                        <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+
+                <div class="workflow-steps">
+
+                    <div class="workflow-step">
+                        <span class="step-number">01</span>
+                        <div>
+                            <h3>Enter your topic</h3>
+                            <p>
+                                Choose your role, content type, word count,
+                                and topic.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <span class="step-number">02</span>
+                        <div>
+                            <h3>Generate your draft</h3>
+                            <p>
+                                Create content based on the settings
+                                you selected.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <span class="step-number">03</span>
+                        <div>
+                            <h3>Improve and review</h3>
+                            <p>
+                                Humanize or edit the draft, then check
+                                similarity and SEO.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <span class="step-number">04</span>
+                        <div>
+                            <h3>Save or export</h3>
+                            <p>
+                                Keep your finished document or download
+                                it for later use.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="section faq-section" id="faq">
+            <div class="container faq-layout">
+
+                <div class="faq-intro">
+                    <span class="section-label">FAQ</span>
+                    <h2>Frequently asked questions</h2>
+                    <p>
+                        Quick answers about the main PFCG AI features.
+                    </p>
+                </div>
+
+                <div class="faq-list">
+
+                    <details class="faq-item">
+                        <summary>What can I create with PFCG AI?</summary>
+                        <p>
+                            You can generate blogs, essays, articles,
+                            assignments, and reports.
+                        </p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Can I edit generated content?</summary>
+                        <p>
+                            Yes. You can edit your draft or use the
+                            humanize feature to refine its wording.
+                        </p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Can I check plagiarism?</summary>
+                        <p>
+                            Yes. You can run a similarity check and
+                            review the results and available matched sources.
+                        </p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Does the system include SEO analysis?</summary>
+                        <p>
+                            Yes. The SEO analyzer reviews your content
+                            and provides improvement suggestions.
+                        </p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Can I save and export my work?</summary>
+                        <p>
+                            Yes. You can save your documents and use
+                            the available export options.
+                        </p>
+                    </details>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- FINAL CTA -->
+        <section class="cta-section">
+            <div class="container cta-card">
+
+                <div>
+                    <span class="cta-label">GET STARTED</span>
+                    <h2>Ready to turn your ideas into content?</h2>
+                    <p>
+                        Create an account and start writing with PFCG AI.
+                    </p>
+                </div>
+
+                <a class="btn btn-white" href="/signup">
+                    Create Account
+                    <span aria-hidden="true">→</span>
+                </a>
+
+            </div>
+        </section>
+
+    </main>
+
+  
+</body>
+</html>

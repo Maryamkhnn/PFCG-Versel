@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | PFCG AI</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/auth/signup.css') }}">
+</head>
+
+<body>
+
+<main class="signup-layout">
+
+    <!-- Portrait image CSS background ke through lagegi -->
+    <section class="visual-panel"
+             aria-label="PFCG AI illustration">
+    </section>
+
+    <section class="form-panel">
+
+        <div class="signup-card">
+
+            <div class="card-heading">
+                <span class="heading-icon">
+                    <i class="fa-solid fa-user-plus"
+                       aria-hidden="true"></i>
+                </span>
+
+                <div>
+                    <h1>Create Account</h1>
+                    <p>Start creating original content with PFCG AI.</p>
+                </div>
+            </div>
+
+            {% if error %}
+            <div class="server-error" role="alert">
+                <i class="fa-solid fa-circle-exclamation"
+                   aria-hidden="true"></i>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+
+            <form action="/signup"
+                  method="POST"
+                  id="signupForm"
+                  autocomplete="off"
+                  novalidate>
+
+                <div class="fields-grid">
+
+                    <!-- FULL NAME -->
+                    <div class="form-group">
+                        <label for="username">Full Name</label>
+
+                        <div class="input-box">
+                            <i class="fa-solid fa-user field-icon"
+                               aria-hidden="true"></i>
+
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                placeholder="Your full name"
+                                required>
+                        </div>
+
+                        <small class="error-message"
+                               id="nameError"></small>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+
+                        <div class="input-box">
+                            <i class="fa-solid fa-envelope field-icon"
+                               aria-hidden="true"></i>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="you@example.com"
+                                required>
+                        </div>
+
+                        <small class="error-message"
+                               id="emailError"></small>
+                    </div>
+
+                    <!-- PASSWORD -->
+                    <div class="form-group password-group">
+                        <label for="password">Password</label>
+
+                        <div class="input-box">
+                            <i class="fa-solid fa-lock field-icon"
+                               aria-hidden="true"></i>
+
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Create a password"
+                                autocomplete="new-password"
+                                minlength="8"
+                                aria-describedby="passwordRules"
+                                required>
+
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="password"
+                                aria-label="Show password">
+                                <i class="fa-solid fa-eye"
+                                   aria-hidden="true"></i>
+                            </button>
+                        </div>
+
+                        <small class="error-message"
+                               id="passwordError"></small>
+
+                        <div class="password-strength">
+                            <div id="strengthBar"></div>
+                        </div>
+
+                        <small id="strengthText">
+                            Enter a strong password
+                        </small>
+
+                        <!-- Sirf ek rules box -->
+                      
+                    </div>
+
+                    <!-- CONFIRM PASSWORD -->
+                    <div class="form-group">
+                        <label for="confirmPassword">
+                            Confirm Password
+                        </label>
+
+                        <div class="input-box">
+                            <i class="fa-solid fa-lock field-icon"
+                               aria-hidden="true"></i>
+
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirm_password"
+                                placeholder="Repeat your password"
+                                autocomplete="new-password"
+                                required>
+
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="confirmPassword"
+                                aria-label="Show confirmed password">
+                                <i class="fa-solid fa-eye"
+                                   aria-hidden="true"></i>
+                            </button>
+                        </div>
+
+                        <small class="error-message"
+                               id="confirmError"></small>
+                    </div>
+
+                </div>
+
+                <!-- TERMS -->
+                <div class="checkbox-row">
+                    <input type="checkbox"
+                           id="agree"
+                           required>
+
+                    <label for="agree">
+                        I agree to the
+                        <a href="/terms">Terms &amp; Conditions.</a>
+                        
+                </div>
+
+                <small class="error-message"
+                       id="agreeError"></small>
+
+                <!-- SUBMIT -->
+                <button type="submit"
+                        class="signup-button"
+                        id="signupBtn">
+                    <i class="fa-solid fa-user-plus"
+                       aria-hidden="true"></i>
+                    <span>Create Account</span>
+                </button>
+
+                <p class="login-text">
+                    Already have an account?
+                    <a href="/login">Log in</a>
+                </p>
+
+            </form>
+
+        </div>
+    </section>
+
+</main>
+
+<script src="{{ url_for('static', filename='js/auth/auth.js') }}"></script>
+
+</body>
+</html>

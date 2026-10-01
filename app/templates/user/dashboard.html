@@ -1,0 +1,836 @@
+{% extends "user/base.html" %}
+
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+
+{% block css %}
+
+<link 
+    rel="stylesheet" 
+    href="{{ url_for('static', filename='css/user/dashboard.css', v='8') }}"
+>
+
+{% endblock %}
+
+
+{% block page_title %}{% endblock %}
+
+
+{% block content %}
+
+
+<!-- =========================================================
+     HERO SECTION
+========================================================= -->
+
+<div class="dashboard-header">
+
+    <div class="welcome-box">
+
+        <div class="welcome-content">
+
+            <h2>
+                Welcome Back,
+                <span class="user-name">
+                    {{ session.get("user_name", "User") }}
+                </span>
+                👋
+            </h2>
+
+            <p>
+                Create plagiarism-free, AI-powered content with ease.
+                Your workspace is ready for today's productivity.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="today-card">
+
+        <div class="rocket-circle">
+            <i class="fas fa-robot" aria-hidden="true"></i>
+        </div>
+
+        <div>
+
+            <h3>AI Assistant</h3>
+
+            <p>
+                Generate, humanize and analyze your content easily.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     STAT CARDS
+========================================================= -->
+
+<div class="dashboard-cards">
+
+
+    <!-- FIRST ROW -->
+
+    <div class="cards-row">
+
+
+        <!-- GENERATED CONTENT -->
+
+        <a 
+            href="/user/my-content" 
+            class="stat-card generated stat-card-link"
+        >
+
+            <div class="card-icon">
+                <i class="fas fa-file-lines"></i>
+            </div>
+
+            <div class="card-info">
+
+                <small>
+                    Generated Content
+                </small>
+
+                <h2>
+                    {{ generated_count | default(0) }}
+                </h2>
+
+            </div>
+
+        </a>
+
+
+
+        <!-- HUMANIZED -->
+
+        <a 
+            href="/user/generator" 
+            class="stat-card humanized stat-card-link"
+        >
+
+            <div class="card-icon">
+                <i class="fas fa-user-pen"></i>
+            </div>
+
+            <div class="card-info">
+
+                <small>
+                    Humanized
+                </small>
+
+                <h2>
+                    {{ humanized_count | default(0) }}
+                </h2>
+
+            </div>
+
+        </a>
+
+
+
+        <!-- TOTAL WORDS -->
+
+        <a 
+            href="/user/my-content" 
+            class="stat-card words stat-card-link"
+        >
+
+            <div class="card-icon">
+                <i class="fas fa-keyboard"></i>
+            </div>
+
+            <div class="card-info">
+
+                <small>
+                    Total Words
+                </small>
+
+                <h2>
+                    {{ total_words | default(0) }}
+                </h2>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+
+    <!-- SECOND ROW -->
+
+    <!-- SECOND ROW -->
+<div class="cards-row second-row">
+<!-- PLAGIARISM REPORTS: complete history -->
+<a href="/user/reports"
+   class="stat-card plagiarism-report stat-card-link">
+    <div class="card-icon">
+        <i class="fas fa-file-circle-check"></i>
+    </div>
+    <div class="card-info">
+        <small>Plagiarism Reports</small>
+        <h2>{{ plagiarism_report_count }}</h2>
+    </div>
+</a>
+
+<!-- SEO REPORTS: complete history -->
+<a href="/user/seo-history"
+   class="stat-card seo-report stat-card-link">
+    <div class="card-icon">
+        <i class="fas fa-chart-line"></i>
+    </div>
+    <div class="card-info">
+        <small>SEO Reports</small>
+        <h2>{{ seo_report_count }}</h2>
+    </div>
+</a>
+
+    <!-- SAVED DOCUMENTS -->
+    <a href="/user/saved-documents"
+       class="stat-card saved stat-card-link">
+        <div class="card-icon">
+            <i class="fas fa-bookmark" aria-hidden="true"></i>
+        </div>
+        <div class="card-info">
+            <small>Saved Documents</small>
+            <h2>{{ saved_documents | default(0) }}</h2>
+        </div>
+    </a>
+
+</div>
+</div>
+
+
+
+<!-- =========================================================
+     MAIN DASHBOARD GRID
+========================================================= -->
+
+<div class="dashboard-grid">
+
+
+
+<!-- =========================================================
+     RECENT ACTIVITY
+========================================================= -->
+
+<div class="recent-activity-section">
+
+
+
+    <!-- =====================================================
+         AI GENERATED CONTENT
+    ====================================================== -->
+
+    <div class="dashboard-table activity-card">
+
+
+        <!-- HEADING -->
+
+        <div class="table-title activity-heading">
+
+            <div class="activity-heading-title">
+
+                <i class="fas fa-file-lines"></i>
+
+                <h3>
+                    AI Generated Content
+                </h3>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- LIST -->
+
+        <div class="activity-list">
+
+
+            {% set generated = namespace(found=false) %}
+
+
+            {% for activity in recent_activities %}
+
+
+                {% if activity.activity_type == "generated" %}
+
+                    {% set generated.found = true %}
+
+
+                    <div class="activity-item">
+
+
+                        <div class="activity-icon activity-generated">
+
+                            <i class="fas fa-file-lines"></i>
+
+                        </div>
+
+
+                        <div class="activity-content">
+
+
+                            <h4>
+                                {{ activity.title }}
+                            </h4>
+
+
+                            <span>
+                                {{ activity.word_count | default(0) }} words
+                            </span>
+
+
+                            <small>
+
+                                {% if activity.created_at %}
+
+                                    {{ 
+                                        activity.created_at.strftime(
+                                            "%d %b %Y, %I:%M %p"
+                                        ) 
+                                    }}
+
+                                {% endif %}
+
+                            </small>
+
+
+                        </div>
+
+                    </div>
+
+
+                {% endif %}
+
+
+            {% endfor %}
+
+
+
+            {% if not generated.found %}
+
+                <div class="empty-state">
+
+                    <i class="fas fa-folder-open"></i>
+
+                    <p>
+                        No generated content found.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+
+        </div>
+
+    </div>
+
+
+
+
+    <!-- =====================================================
+         HUMANIZED CONTENT
+    ====================================================== -->
+
+    <div class="dashboard-table activity-card">
+
+
+        <!-- HEADING -->
+
+        <div class="table-title activity-heading">
+
+            <div class="activity-heading-title">
+
+                <i class="fas fa-user-pen"></i>
+
+                <h3>
+                    Humanized Content
+                </h3>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- LIST -->
+
+        <div class="activity-list">
+
+
+            {% set humanized = namespace(found=false) %}
+
+
+            {% for activity in recent_activities %}
+
+
+                {% if activity.activity_type == "humanized" %}
+
+                    {% set humanized.found = true %}
+
+
+                    <div class="activity-item">
+
+
+                        <div class="activity-icon activity-humanized">
+
+                            <i class="fas fa-user-pen"></i>
+
+                        </div>
+
+
+                        <div class="activity-content">
+
+
+                            <h4>
+                                {{ activity.title }}
+                            </h4>
+
+
+                            <span>
+                                {{ activity.word_count | default(0) }} words
+                            </span>
+
+
+                            <small>
+
+                                {% if activity.created_at %}
+
+                                    {{ 
+                                        activity.created_at.strftime(
+                                            "%d %b %Y, %I:%M %p"
+                                        ) 
+                                    }}
+
+                                {% endif %}
+
+                            </small>
+
+
+                        </div>
+
+                    </div>
+
+
+                {% endif %}
+
+
+            {% endfor %}
+
+
+
+            {% if not humanized.found %}
+
+                <div class="empty-state">
+
+                    <i class="fas fa-folder-open"></i>
+
+                    <p>
+                        No humanized content found.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+
+        </div>
+
+    </div>
+
+
+
+
+    <!-- =====================================================
+         PLAGIARISM REPORTS
+    ====================================================== -->
+
+    <div class="dashboard-table activity-card">
+
+
+        <!-- HEADING -->
+
+        <div class="table-title activity-heading">
+
+            <div class="activity-heading-title">
+
+                <i class="fas fa-file-circle-check"></i>
+
+                <h3>
+                    Plagiarism Reports
+                </h3>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- LIST -->
+
+        <div class="activity-list">
+
+
+            {% set plagiarism = namespace(found=false) %}
+
+
+            {% for activity in recent_activities %}
+
+
+                {% if activity.activity_type == "plagiarism" %}
+
+                    {% set plagiarism.found = true %}
+
+
+                    <div class="activity-item">
+
+
+                        <div class="activity-icon activity-plagiarism">
+
+                            <i class="fas fa-file-circle-check"></i>
+
+                        </div>
+
+
+                        <div class="activity-content">
+
+
+                            <h4>
+                                {{ activity.title }}
+                            </h4>
+
+
+                            <span>
+                                {{ activity.word_count | default(0) }} words
+                            </span>
+
+
+                            <small>
+
+                                {% if activity.created_at %}
+
+                                    {{ 
+                                        activity.created_at.strftime(
+                                            "%d %b %Y, %I:%M %p"
+                                        ) 
+                                    }}
+
+                                {% endif %}
+
+                            </small>
+
+
+                        </div>
+
+                    </div>
+
+
+                {% endif %}
+
+
+            {% endfor %}
+
+
+
+            {% if not plagiarism.found %}
+
+                <div class="empty-state">
+
+                    <i class="fas fa-folder-open"></i>
+
+                    <p>
+                        No plagiarism reports found.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+
+        </div>
+
+    </div>
+
+
+
+
+    <!-- =====================================================
+         SEO REPORTS
+    ====================================================== -->
+
+    <div class="dashboard-table activity-card">
+
+
+        <!-- HEADING -->
+
+        <div class="table-title activity-heading">
+
+            <div class="activity-heading-title">
+
+                <i class="fas fa-chart-line"></i>
+
+                <h3>
+                    SEO Reports
+                </h3>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- LIST -->
+
+        <div class="activity-list">
+
+
+            {% set seo = namespace(found=false) %}
+
+
+            {% for activity in recent_activities %}
+
+
+                {% if activity.activity_type == "seo" %}
+
+                    {% set seo.found = true %}
+
+
+                    <div class="activity-item">
+
+
+                        <div class="activity-icon activity-seo">
+
+                            <i class="fas fa-chart-line"></i>
+
+                        </div>
+
+
+                        <div class="activity-content">
+
+
+                            <h4>
+                                {{ activity.title }}
+                            </h4>
+
+
+                            <span>
+                                {{ activity.word_count | default(0) }} words
+                            </span>
+
+
+                            <small>
+
+                                {% if activity.created_at %}
+
+                                    {{ 
+                                        activity.created_at.strftime(
+                                            "%d %b %Y, %I:%M %p"
+                                        ) 
+                                    }}
+
+                                {% endif %}
+
+                            </small>
+
+
+                        </div>
+
+                    </div>
+
+
+                {% endif %}
+
+
+            {% endfor %}
+
+
+
+            {% if not seo.found %}
+
+                <div class="empty-state">
+
+                    <i class="fas fa-folder-open"></i>
+
+                    <p>
+                        No SEO reports found.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =========================================================
+     TOP TOPICS
+========================================================= -->
+
+<div class="dashboard-table topics-card-section">
+
+
+    <!-- TOPICS HEADER -->
+
+    <div class="table-title">
+
+        <div class="topics-title">
+
+
+            <div class="topics-main-icon">
+
+                <i class="fas fa-fire"></i>
+
+            </div>
+
+
+            <div>
+
+                <h3>
+                    Top Topics
+                </h3>
+
+                <p>
+                    Your most frequently generated topics
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- TOPIC CARDS -->
+
+    <div class="topics-card-grid">
+
+
+        {% if top_topics %}
+
+
+            {% for topic in top_topics %}
+
+
+                <div class="topic-card">
+
+
+                    <!-- ICON -->
+
+                    <div class="topic-card-icon">
+
+                        <i class="fas fa-book-open"></i>
+
+                    </div>
+
+
+
+                    <!-- CONTENT -->
+
+                    <div class="topic-card-content">
+
+
+                        <span>
+                            TOPIC {{ loop.index }}
+                        </span>
+
+
+                        <h4>
+                            {{ topic[0] }}
+                        </h4>
+
+
+                        <p>
+
+                            {{ topic[1] }}
+
+                            {% if topic[1] == 1 %}
+
+                                time generated
+
+                            {% else %}
+
+                                times generated
+
+                            {% endif %}
+
+                        </p>
+
+
+                    </div>
+
+
+
+                    <!-- NUMBER -->
+
+                    <div class="topic-number">
+
+                        {{ topic[1] }}
+
+                    </div>
+
+
+                </div>
+
+
+            {% endfor %}
+
+
+        {% else %}
+
+
+            <div class="topics-empty">
+
+
+                <i class="fas fa-folder-open"></i>
+
+
+                <h4>
+                    No Topics Available
+                </h4>
+
+
+                <p>
+                    Your frequently generated topics will appear here.
+                </p>
+
+
+            </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+{% endblock %}
