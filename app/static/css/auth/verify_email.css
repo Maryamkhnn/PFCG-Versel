@@ -527,3 +527,44 @@ body {
         height: 53px;
     }
 }
+/* Adjust spacing after removing the brand and heading icon */
+.illustration-content {
+    margin-top: 20px;
+}
+
+.form-panel,
+.form-content {
+    min-width: 0;
+}
+
+.email-box span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+    .verify-wrapper {
+        min-height: 0;
+    }
+
+    .form-panel {
+        padding: 32px 36px;
+    }
+}
+
+@media (max-width: 520px) {
+    .verify-wrapper {
+        min-height: 100vh;
+        min-height: 100svh;
+    }
+
+    .form-panel {
+        min-height: 100vh;
+        min-height: 100svh;
+        padding: 28px 22px 32px;
+    }
+}
+/* Remove the icon above the verification heading */
+.form-content > .form-icon {
+    display: none !important;
+}

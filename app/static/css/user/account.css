@@ -542,3 +542,248 @@ body.user-layout .main > .user-page-header {
         right: 16px;
     }
 }
+/* ACCOUNT — MOBILE LAYOUT */
+@media (max-width: 768px) {
+    .account-page {
+        min-width: 0;
+        padding-bottom: 16px;
+    }
+
+    .account-heading {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .account-heading-icon {
+        flex: 0 0 42px;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        font-size: 19px;
+    }
+
+    .account-heading > div {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .account-heading h1 {
+        margin-bottom: 4px;
+        font-size: 24px;
+        line-height: 1.3;
+    }
+
+    .account-heading p {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .account-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .account-sections {
+        gap: 16px;
+    }
+
+    .account-summary,
+    .account-card {
+        border-radius: 16px;
+    }
+
+    /* Compact profile card */
+    .account-cover {
+        height: 70px;
+    }
+
+    .account-summary-body {
+        padding: 0 18px 18px;
+    }
+
+    .account-avatar {
+        width: 84px;
+        height: 84px;
+        margin: -38px auto 12px;
+        border-width: 4px;
+    }
+
+    #accountInitials {
+        font-size: 28px;
+    }
+
+    .account-summary h2 {
+        font-size: 20px;
+        line-height: 1.4;
+    }
+
+    #accountEmail {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .account-role {
+        margin: 10px 0 16px;
+    }
+
+    .account-upload {
+        min-height: 46px;
+        font-size: 13px;
+    }
+
+    .account-photo-help {
+        margin: 8px 0 16px;
+    }
+
+    .account-summary-note {
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .account-summary-note i {
+        flex-shrink: 0;
+    }
+
+    /* Form headings */
+    .account-card {
+        padding: 18px 16px;
+    }
+
+    .account-card-heading {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 16px;
+        margin-bottom: 18px;
+    }
+
+    .account-section-icon {
+        flex: 0 0 38px;
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        font-size: 17px;
+    }
+
+    .account-card-heading > div {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .account-card-heading h2 {
+        font-size: 17px;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+
+    .account-card-heading p {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    /* One field per row */
+    .account-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 17px;
+    }
+
+    .account-field input {
+        height: 48px;
+        padding-left: 12px;
+        font-size: 16px;
+    }
+
+    .account-field small {
+        font-size: 11px;
+        overflow-wrap: anywhere;
+    }
+
+    /* Password Show button */
+    .account-password input {
+        padding-right: 70px;
+    }
+
+    .account-password button {
+        top: 2px;
+        right: 3px;
+        min-width: 58px;
+        height: 44px;
+        padding: 0 8px;
+        font-size: 12px;
+    }
+
+    .account-password-tip {
+        font-size: 11px;
+        gap: 8px;
+    }
+
+    .account-password-tip i {
+        flex-shrink: 0;
+    }
+
+    .account-form-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-top: 20px;
+        padding-top: 16px;
+    }
+
+    .account-form-footer > span {
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    .account-primary {
+        width: 100%;
+        min-height: 48px;
+        font-size: 14px;
+    }
+
+    /* Loading error */
+    .account-load-error {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 14px;
+        font-size: 13px;
+    }
+
+    .account-load-error p {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .account-load-error button {
+        min-height: 44px;
+    }
+
+    /* Notification */
+    .account-toast {
+        top: 12px;
+        right: 12px;
+        width: calc(100% - 24px);
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .account-toast p {
+        min-width: 0;
+    }
+
+    .account-toast button {
+        display: grid;
+        place-items: center;
+        flex: 0 0 44px;
+        width: 44px;
+        height: 44px;
+    }
+}
+
+@media (hover: none) {
+    .account-page button:hover,
+    .account-toast button:hover {
+        transform: none;
+    }
+}

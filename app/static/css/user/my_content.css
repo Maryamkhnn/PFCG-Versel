@@ -1634,3 +1634,302 @@ body.modal-open {
     .content-page .content-badges { justify-content: flex-start; width: 100%; }
     .content-page .delete-btn { margin-left: 0; }
 }
+/* My Content mobile layout */
+.content-heading > div,
+.content-page .card-heading {
+    min-width: 0;
+}
+
+@media (max-width: 768px) {
+    .content-page {
+        padding-bottom: 16px;
+    }
+
+    .content-page .content-top {
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .content-page .content-heading {
+        width: 100%;
+    }
+
+    .content-page .content-heading h1 {
+        font-size: 24px;
+    }
+
+    .content-page .content-heading p {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .content-page .content-total {
+        max-width: 100%;
+        padding: 7px 11px;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    /* Full-width search and type; dates side by side */
+    .content-page .content-filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 10px;
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .content-filters .search-field,
+    .content-filters .filter-field:has(#filterType) {
+        grid-column: 1 / -1;
+    }
+
+    .content-page .content-filters input,
+    .content-page .content-filters select {
+        max-width: 100%;
+        height: 46px;
+        font-size: 16px;
+    }
+
+    .content-page .search-wrapper input {
+        padding-left: 36px;
+    }
+
+    .content-page .reset-btn {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+        width: 100%;
+        height: 44px;
+        font-size: 13px;
+    }
+
+    .content-page .list-summary {
+        margin: 16px 0 12px;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    /* One document card per row */
+    .content-page .content-list {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .content-page .content-card {
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .content-page .card-header {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .content-page .card-document-icon {
+        flex: 0 0 38px;
+        height: 42px;
+        border-radius: 11px;
+        font-size: 17px;
+    }
+
+    .content-page .card-heading {
+        flex: 1;
+    }
+
+    .content-page .card-header h3 {
+        font-size: 16px;
+        line-height: 1.45;
+    }
+
+    .content-page .card-header p {
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .content-page .content-badges {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 6px;
+    }
+
+    .content-page .content-source-badge,
+    .content-page .content-saved-badge {
+        max-width: 100%;
+        padding: 6px 9px;
+        font-size: 11px;
+        line-height: 1.3;
+        overflow-wrap: anywhere;
+    }
+
+    .content-page .card-body {
+        margin-bottom: 14px;
+        font-size: 13px;
+        line-height: 1.75;
+    }
+
+    /* Equal-width action buttons */
+    .content-page .card-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        padding-top: 12px;
+    }
+
+    .content-page .card-actions > button,
+    .content-page .card-export-wrap > button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-width: 0;
+        min-height: 44px;
+        margin: 0;
+        padding: 10px 8px;
+        font-size: 12px;
+        line-height: 1.4;
+        white-space: normal;
+    }
+
+    .content-page .card-export-wrap {
+        min-width: 0;
+    }
+
+    .content-page .delete-btn {
+        margin-left: 0;
+    }
+
+    .content-page .card-export-menu {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .content-page .card-export-menu button {
+        min-height: 44px;
+    }
+
+    /* Page information above Previous / Next */
+    .content-page .content-pagination {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        padding: 14px;
+        margin-top: 16px;
+    }
+
+    .content-page .content-pagination[hidden] {
+        display: none;
+    }
+
+    .content-page #pageInfo {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    .content-page .content-pagination button {
+        justify-content: center;
+        min-width: 0;
+        min-height: 44px;
+        padding: 10px 8px;
+    }
+
+    /* Content viewer */
+    .content-modal {
+        padding: 12px;
+        z-index: 10020;
+    }
+
+    .content-modal-box {
+        width: 100%;
+        max-height: calc(100vh - 24px);
+        max-height: calc(100dvh - 24px);
+        border-radius: 16px;
+    }
+
+    .content-modal-header,
+    .content-modal-footer {
+        padding: 14px;
+    }
+
+    .content-modal-header h2 {
+        font-size: 18px;
+        line-height: 1.4;
+    }
+
+    .content-modal .modal-close {
+        width: 44px;
+        height: 44px;
+        flex-basis: 44px;
+    }
+
+    .content-modal-body {
+        padding: 16px;
+        font-size: 15px;
+        line-height: 1.8;
+        overscroll-behavior: contain;
+    }
+
+    .content-modal-body img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .content-modal-body pre {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .content-modal .modal-close-btn {
+        width: 100%;
+        min-height: 44px;
+        font-size: 13px;
+    }
+
+    /* Delete confirmation */
+    .delete-confirm-overlay {
+        padding: 16px;
+        z-index: 10030;
+    }
+
+    .delete-confirm-box {
+        padding: 22px 18px;
+        max-height: calc(100vh - 32px);
+        max-height: calc(100dvh - 32px);
+        border-radius: 16px;
+    }
+
+    .delete-confirm-actions {
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .delete-confirm-actions button {
+        min-width: 0;
+        min-height: 46px;
+        padding: 10px;
+    }
+
+    .custom-notification {
+        top: 16px;
+        right: 16px;
+        width: calc(100vw - 32px);
+        z-index: 10040;
+    }
+}
+
+@media (max-width: 359px) {
+    .content-page .content-filters,
+    .content-page .card-actions {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (hover: none) {
+    .content-page .content-card:hover,
+    .content-page .card-actions button:hover,
+    .content-page button:hover:not(:disabled) {
+        transform: none;
+    }
+}

@@ -10,7 +10,7 @@ Dashboard
 
 <link 
     rel="stylesheet" 
-    href="{{ url_for('static', filename='css/user/dashboard.css', v='8') }}"
+    href="{{ url_for('static', filename='css/user/dashboard.css', v='9') }}"
 >
 
 {% endblock %}
@@ -156,7 +156,7 @@ Dashboard
                 </small>
 
                 <h2>
-                    {{ total_words | default(0) }}
+                 {{ "{:,}".format(total_words | default(0, true) | int) }}
                 </h2>
 
             </div>

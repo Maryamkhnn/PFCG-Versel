@@ -958,3 +958,253 @@
         border-radius: 15px;
     }
 }
+/* Keep card content within its available width */
+.stat-card {
+    min-width: 0;
+}
+
+.card-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.card-info h2 {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: normal;
+    overflow-wrap: anywhere;
+}
+
+.card-info small {
+    line-height: 1.45;
+}
+
+/* Welcome greeting is provided by base.html */
+.dashboard-header {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    .recent-activity-section {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .topics-card-grid,
+    .summary-box {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .dashboard-page {
+        min-height: auto;
+        padding: 0;
+    }
+
+    .dashboard-header {
+        gap: 0;
+        margin-bottom: 16px;
+    }
+
+    .today-card {
+        min-height: 0;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .today-card > div:last-child {
+        min-width: 0;
+    }
+
+    .rocket-circle {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        font-size: 18px;
+    }
+
+    .today-card h3 {
+        font-size: 15px;
+    }
+
+    .today-card p {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    /* Combine both rows into one continuous six-card grid */
+    .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .dashboard-cards > .cards-row {
+        display: contents;
+    }
+
+    .dashboard-cards .stat-card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 10px;
+        min-height: 150px;
+        margin: 0;
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .dashboard-cards .card-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        font-size: 17px;
+    }
+
+    .dashboard-cards .card-info {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        flex: 1;
+    }
+
+    .dashboard-cards .card-info small {
+        margin: 0 0 7px;
+        color: #746c84;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .dashboard-cards .card-info h2 {
+        margin: auto 0 0;
+        font-size: 26px;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .recent-activity-section {
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .activity-heading {
+        min-height: 60px;
+        padding: 12px 14px;
+    }
+
+    .activity-heading-title {
+        min-width: 0;
+        gap: 10px;
+    }
+
+    .activity-heading-title > i {
+        flex-shrink: 0;
+        width: 34px;
+        height: 34px;
+    }
+
+    .activity-heading-title h3 {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .activity-list {
+        padding: 4px 14px;
+    }
+
+    .activity-item {
+        gap: 10px;
+        padding: 12px 0;
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-content h4 {
+        white-space: normal;
+        overflow-wrap: anywhere;
+        line-height: 1.45;
+    }
+
+    .activity-content small {
+        line-height: 1.5;
+    }
+
+    .topics-card-section {
+        margin-bottom: 18px;
+    }
+
+    .topics-card-section > .table-title {
+        padding: 14px;
+    }
+
+    .topics-main-icon {
+        flex-shrink: 0;
+    }
+
+    .topics-title p {
+        line-height: 1.5;
+    }
+
+    .topics-card-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+        padding: 14px;
+    }
+
+    .topic-card {
+        min-height: 80px;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .topic-card-content h4 {
+        white-space: normal;
+        overflow-wrap: anywhere;
+        line-height: 1.4;
+    }
+
+    .summary-box {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding: 14px;
+    }
+
+    .summary-item {
+        min-width: 0;
+    }
+
+    .summary-item strong {
+        overflow-wrap: anywhere;
+    }
+}
+
+/* Very narrow phones */
+@media (max-width: 359px) {
+    .dashboard-cards,
+    .summary-box {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .dashboard-cards .stat-card {
+        min-height: 100px;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .dashboard-cards .card-info h2 {
+        margin-top: 0;
+    }
+}
+
+@media (hover: none) {
+    .stat-card:hover,
+    .dashboard-table.activity-card:hover,
+    .topic-card:hover {
+        transform: none;
+    }
+}

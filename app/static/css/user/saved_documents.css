@@ -802,3 +802,324 @@
         font-size: 11px;
     }
 }
+/* Saved Documents mobile layout */
+@media (max-width: 768px) {
+    .saved-page {
+        padding-bottom: 16px;
+    }
+
+    .saved-page .saved-page-header {
+        margin-bottom: 18px;
+        padding-bottom: 16px;
+    }
+
+    .saved-page .saved-heading {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .saved-heading > div:last-child {
+        min-width: 0;
+    }
+
+    .saved-page .saved-heading-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        font-size: 18px;
+    }
+
+    .saved-page .saved-heading h1 {
+        font-size: 24px;
+        line-height: 1.35;
+    }
+
+    .saved-page .saved-heading p {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .saved-page .saved-library {
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .saved-library-heading {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .saved-library-heading > div {
+        min-width: 0;
+        flex: 1 1 140px;
+    }
+
+    .saved-library-heading h2 {
+        font-size: 17px;
+    }
+
+    .saved-library-heading p {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    #refreshSaved {
+        min-height: 44px;
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    /* Search and type full width; dates side by side */
+    .saved-tools {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 10px;
+    }
+
+    .saved-tools .saved-search-field,
+    .saved-tools .saved-field:has(#savedFilter),
+    .saved-tools .saved-field:has(#savedSort) {
+        grid-column: 1 / -1;
+    }
+
+    .saved-page .saved-field input,
+    .saved-page .saved-field select {
+        max-width: 100%;
+        height: 46px;
+        font-size: 16px;
+    }
+
+    #clearSavedFilters {
+        grid-column: 1 / -1;
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .saved-results-heading {
+        align-items: flex-start;
+        gap: 12px;
+        margin: 16px 0 12px;
+    }
+
+    .saved-results-heading p {
+        flex: 1 1 160px;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .saved-page-size {
+        gap: 8px;
+    }
+
+    .saved-page .saved-page-size select {
+        height: 44px;
+        font-size: 16px;
+    }
+
+    /* One document per row */
+    .saved-list {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .saved-page .saved-card {
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .saved-card-header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .saved-card-title {
+        width: 100%;
+        gap: 10px;
+    }
+
+    .saved-card-title > div {
+        min-width: 0;
+    }
+
+    .saved-file-icon {
+        width: 36px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .saved-card h3 {
+        font-size: 16px;
+        line-height: 1.45;
+    }
+
+    .saved-source-badge,
+    .saved-badge {
+        max-width: 100%;
+        padding: 6px 9px;
+        font-size: 11px;
+        line-height: 1.4;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .saved-card-meta {
+        gap: 8px 12px;
+        margin-top: 12px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    .saved-card-preview {
+        margin: 12px 0 16px;
+        font-size: 13px;
+        line-height: 1.75;
+    }
+
+    .saved-card-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        padding-top: 12px;
+    }
+
+    .saved-card-actions button,
+    .saved-card-actions a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        width: 100%;
+        min-width: 0;
+        min-height: 44px;
+        padding: 10px 8px;
+        font-size: 12px;
+        line-height: 1.4;
+        white-space: normal;
+    }
+
+    .saved-card-actions .sd-remove {
+        margin-left: 0;
+    }
+
+    .saved-state {
+        padding: 30px 18px;
+    }
+
+    /* Pagination */
+    .saved-pagination {
+        gap: 8px;
+        margin-top: 18px;
+    }
+
+    .saved-pagination button {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    /* Document preview */
+    .sd-dialog {
+        width: calc(100vw - 24px);
+        max-height: calc(100vh - 24px);
+        max-height: calc(100dvh - 24px);
+        border-radius: 16px;
+    }
+
+    .sd-preview[open] {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .sd-dialog-header,
+    .sd-dialog-footer {
+        flex-shrink: 0;
+        padding: 14px;
+    }
+
+    .sd-dialog-header > div {
+        min-width: 0;
+    }
+
+    .sd-dialog h2 {
+        font-size: 18px;
+        line-height: 1.4;
+    }
+
+    .sd-dialog-header p {
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    .sd-icon-button {
+        width: 44px;
+        height: 44px;
+    }
+
+    .sd-document-content {
+        min-height: 0;
+        padding: 16px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        font-size: 15px;
+        line-height: 1.8;
+    }
+
+    .sd-document-content img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .sd-document-content pre {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .sd-dialog-footer .sd-button {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    /* Remove confirmation */
+    .sd-confirm {
+        padding: 22px 18px;
+    }
+
+    .sd-confirm-actions {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .sd-confirm-actions button {
+        width: 100%;
+        min-height: 46px;
+        white-space: normal;
+    }
+
+    .sd-toast {
+        top: 16px;
+        right: 16px;
+    }
+
+    .sd-toast span {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 359px) {
+    .saved-tools,
+    .saved-card-actions {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (hover: none) {
+    .saved-page button:hover,
+    .sd-dialog button:hover {
+        transform: none;
+    }
+}

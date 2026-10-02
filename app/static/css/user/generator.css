@@ -986,3 +986,253 @@
     outline: 2px solid #6944ed;
     outline-offset: 2px;
 }
+/* Generator responsive adjustments */
+.workspace > *,
+.workspace .workspace-right > *,
+.workspace .action-source {
+    min-width: 0;
+}
+
+@media (max-width: 900px) {
+    .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    .workspace .editor-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .workspace .action-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .workspace .action-source {
+        grid-column: 1 / -1;
+        width: 100%;
+        margin: 0;
+    }
+
+    .workspace #generatorPdfSource {
+        flex: 1;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .workspace .action-bar > button {
+        width: 100%;
+        min-width: 0;
+        min-height: 46px;
+        padding: 11px 8px;
+        white-space: normal;
+    }
+}
+
+@media (max-width: 768px) {
+    .workspace {
+        gap: 16px;
+    }
+
+    .workspace-right {
+        gap: 16px;
+    }
+
+    .workspace .settings-card,
+    .workspace .plagiarism-card {
+        padding: 18px;
+        border-radius: 16px;
+    }
+
+    .workspace .settings-card h2,
+    .workspace .plagiarism-header h2 {
+        font-size: 18px;
+        line-height: 1.4;
+    }
+
+    .workspace .settings-description {
+        margin-bottom: 18px;
+        font-size: 13px;
+    }
+
+    .workspace .form-group {
+        margin-bottom: 16px;
+    }
+
+    .workspace .form-group label {
+        font-size: 13px;
+    }
+
+    .workspace .form-group :is(input, select, textarea),
+    .workspace #generatorPdfSource {
+        /* Comfortable input size; prevents focus zoom on iPhones */
+        font-size: 16px;
+    }
+
+    .workspace .form-group :is(input, select) {
+        min-height: 46px;
+    }
+
+    .workspace #prompt {
+        min-height: 120px;
+        padding: 12px;
+    }
+
+    .workspace #generateBtn {
+        min-height: 48px;
+        font-size: 14px;
+    }
+
+    .workspace .editor-grid {
+        gap: 16px;
+    }
+
+    .workspace .editor-card {
+        border-radius: 16px;
+    }
+
+    .workspace .editor-top {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        padding: 14px;
+    }
+
+    .workspace .editor-title {
+        gap: 8px;
+    }
+
+    .workspace .editor-title > i {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        font-size: 15px;
+    }
+
+    .workspace .editor-title h3 {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .workspace :is(#generatedWords, #humanWords) {
+        max-width: 100%;
+        padding: 5px 7px;
+        font-size: 11px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        text-align: center;
+    }
+
+    .workspace .editor-card textarea {
+        min-height: 260px;
+        padding: 16px;
+        font-size: 16px;
+        line-height: 1.75;
+    }
+
+    .workspace .editor-footer {
+        padding: 12px 14px;
+    }
+
+    .workspace .editor-footer button {
+        width: 100%;
+        min-height: 44px;
+        font-size: 13px;
+    }
+
+    .workspace .action-bar {
+        margin: 0;
+        padding: 14px;
+        border-radius: 16px;
+    }
+
+    .workspace .action-source {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        margin-bottom: 4px;
+    }
+
+    .workspace .action-source label {
+        font-size: 13px;
+    }
+
+    .workspace #generatorPdfSource {
+        flex: none;
+        height: 46px;
+    }
+
+    .workspace .plagiarism-header p {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .workspace .plagiarism-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .workspace .plagiarism-buttons button {
+        min-width: 0;
+        min-height: 46px;
+        padding: 10px 8px;
+        font-size: 12px;
+        white-space: normal;
+    }
+
+    .workspace .plagiarism-grid,
+    .workspace .sources-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .workspace .result-card,
+    .workspace .sources-card {
+        padding: 16px;
+    }
+
+    .workspace .result-head {
+        line-height: 1.5;
+    }
+
+    .workspace .result-card h2 {
+        font-size: 27px;
+    }
+
+    .workspace .sources-card h3 {
+        line-height: 1.5;
+    }
+
+    .workspace .prompt-suggestion-button {
+        overflow-wrap: anywhere;
+    }
+
+    #generatorPdfToast {
+        right: 16px;
+        bottom: 16px;
+    }
+}
+
+@media (max-width: 359px) {
+    .workspace .editor-top {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .workspace :is(#generatedWords, #humanWords) {
+        justify-self: start;
+    }
+
+    .workspace .action-bar,
+    .workspace .plagiarism-buttons {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (hover: none) {
+    .workspace button:hover {
+        transform: none;
+    }
+}
