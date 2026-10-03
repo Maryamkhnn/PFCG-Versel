@@ -363,3 +363,326 @@
 .blocked-pagination span {
     color: #77718b;
 }
+/* Search and pagination */
+
+.blocked-search {
+    min-width: 0;
+    padding: 5px 6px 5px 12px;
+}
+
+.blocked-search > i {
+    flex-shrink: 0;
+}
+
+.blocked-search input[type="search"] {
+    flex: 1;
+    min-width: 0;
+    min-height: 38px;
+}
+
+.blocked-search button {
+    flex-shrink: 0;
+    min-height: 40px;
+    padding: 9px 12px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.blocked-pagination {
+    border-top: 1px solid #eee8f6;
+}
+
+.blocked-pagination a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.blocked-pagination span {
+    font-size: 13px;
+}
+
+.selected-user-note {
+    margin-top: 12px !important;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.selected-user-note a {
+    display: inline-block;
+}
+
+
+/* Mobile layout */
+
+@media (max-width: 768px) {
+
+    .blocked-page {
+        min-width: 0;
+        padding: 0 0 20px;
+    }
+
+    .blocked-header {
+        padding: 20px 17px;
+        margin-bottom: 16px;
+        border-radius: 15px;
+    }
+
+    .blocked-header > div:first-child {
+        min-width: 0;
+    }
+
+    .blocked-eyebrow {
+        margin-bottom: 8px;
+        font-size: 10px;
+    }
+
+    .blocked-header h1 {
+        font-size: 23px;
+        line-height: 1.35;
+    }
+
+    .blocked-header p {
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .blocked-header-icon {
+        display: none;
+    }
+
+    /* Three compact summary cards */
+
+    .blocked-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 9px;
+        margin-bottom: 16px;
+    }
+
+    .blocked-stat-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 11px;
+        padding: 14px 10px;
+        border-radius: 12px;
+    }
+
+    .blocked-stat-icon {
+        flex: 0 0 38px;
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+        border-radius: 10px;
+    }
+
+    .blocked-stat-card > div:last-child {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .blocked-stat-card span {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .blocked-stat-card strong {
+        font-size: 24px;
+        line-height: 1.3;
+        font-variant-numeric: tabular-nums;
+        overflow-wrap: anywhere;
+    }
+
+    /* Heading and search */
+
+    .blocked-table-card {
+        min-width: 0;
+        border-radius: 15px;
+    }
+
+    .blocked-table-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+        padding: 16px;
+    }
+
+    .blocked-table-header h2 {
+        font-size: 18px;
+    }
+
+    .blocked-table-header p {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .blocked-search {
+        width: 100%;
+    }
+
+    .blocked-search input[type="search"] {
+        font-size: 16px;
+    }
+
+    /* Table rows become cards */
+
+    .blocked-table-scroll {
+        padding: 10px;
+        overflow: visible;
+        background: #faf9fd;
+    }
+
+    .blocked-table {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .blocked-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .blocked-table tbody {
+        display: grid;
+        gap: 12px;
+    }
+
+    .blocked-table tbody tr {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        min-width: 0;
+        padding: 15px;
+        background: #fff;
+        border: 1px solid #e5ddf0;
+        border-radius: 12px;
+    }
+
+    .blocked-table tbody tr[hidden] {
+        display: none !important;
+    }
+
+    .blocked-table td {
+        display: block;
+        min-width: 0;
+        padding: 0;
+        border: 0;
+        font-size: 13px;
+        overflow-wrap: anywhere;
+    }
+
+    /* Name and email */
+
+    .blocked-table td:nth-child(1) {
+        grid-column: 1 / -1;
+    }
+
+    .blocked-user {
+        min-width: 0;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .blocked-user > span:last-child {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .blocked-user strong {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .blocked-user small {
+        font-size: 12px;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+
+    /* User ID */
+
+    .blocked-table td:nth-child(2) {
+        grid-column: 1 / -1;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee8f6;
+    }
+
+    .blocked-table td:nth-child(2)::before {
+        content: "User ID: ";
+        color: #81758f;
+        font-size: 12px;
+    }
+
+    .blocked-id {
+        font-size: 12px;
+    }
+
+    /* Category and attempts */
+
+    .blocked-table td:nth-child(3)::before,
+    .blocked-table td:nth-child(4)::before {
+        display: block;
+        margin-bottom: 6px;
+        color: #81758f;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .blocked-table td:nth-child(3)::before {
+        content: "Category";
+    }
+
+    .blocked-table td:nth-child(4)::before {
+        content: "Attempts";
+    }
+
+    .blocked-category {
+        max-width: 100%;
+        font-size: 12px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    .blocked-category i {
+        flex-shrink: 0;
+    }
+
+    .blocked-count {
+        min-width: 38px;
+        height: auto;
+        min-height: 32px;
+        font-size: 14px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Pagination */
+
+    .blocked-pagination {
+        gap: 10px;
+        padding: 15px 12px;
+    }
+
+    .blocked-pagination span {
+        order: -1;
+        width: 100%;
+        text-align: center;
+    }
+
+    .blocked-pagination a {
+        flex: 1;
+        max-width: 160px;
+    }
+
+    .blocked-empty {
+        padding: 32px 16px;
+        line-height: 1.7;
+    }
+}

@@ -63,9 +63,15 @@
          SIDEBAR
     ====================================================== -->
 
-    <aside class="admin-sidebar">
-
-
+  <aside class="admin-sidebar" id="adminSidebar" tabindex="-1">
+<button
+    type="button"
+    id="closeAdminMenu"
+    class="admin-menu-close"
+    aria-label="Close menu"
+>
+    <i class="fas fa-xmark" aria-hidden="true"></i>
+</button>
         <div class="sidebar-top">
 
 
@@ -218,8 +224,9 @@
 
         </div>
 
+</aside>
 
-    </aside>
+<div id="adminMenuOverlay" class="admin-menu-overlay" hidden></div>
 
 
     <!-- =====================================================
@@ -235,7 +242,16 @@
 
         <header class="admin-header">
 
-
+<button
+    type="button"
+    id="adminMenuBtn"
+    class="admin-menu-toggle"
+    aria-label="Open menu"
+    aria-controls="adminSidebar"
+    aria-expanded="false"
+>
+    <i class="fas fa-bars" aria-hidden="true"></i>
+</button>
             <!-- PAGE TITLE -->
 
             <div class="header-left">
@@ -276,7 +292,97 @@
 {% block extra_js %}
 {% endblock %}
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const sidebar = document.getElementById("adminSidebar");
+    const openBtn = document.getElementById("adminMenuBtn");
+    const closeBtn = document.getElementById("closeAdminMenu");
+    const overlay = document.getElementById("adminMenuOverlay");
+    const main = document.querySelector(".admin-main");
+    const mobile = window.matchMedia("(max-width: 768px)");
 
+    if (!sidebar || !openBtn || !closeBtn || !overlay || !main) {
+        return;
+    }
+
+    function closeMenu(restoreFocus = true) {
+        const wasOpen = sidebar.classList.contains("is-open");
+
+        sidebar.classList.remove("is-open");
+        document.body.classList.remove("admin-menu-open");
+        overlay.hidden = true;
+        main.inert = false;
+        sidebar.inert = mobile.matches;
+        openBtn.setAttribute("aria-expanded", "false");
+
+        if (wasOpen && restoreFocus && mobile.matches) {
+            openBtn.focus();
+        }
+    }
+
+    function openMenu() {
+        if (!mobile.matches) return;
+
+        sidebar.inert = false;
+        sidebar.classList.add("is-open");
+        overlay.hidden = false;
+        main.inert = true;
+        document.body.classList.add("admin-menu-open");
+        openBtn.setAttribute("aria-expanded", "true");
+        closeBtn.focus();
+    }
+
+    openBtn.addEventListener("click", openMenu);
+    closeBtn.addEventListener("click", () => closeMenu());
+    overlay.addEventListener("click", () => closeMenu());
+
+    sidebar.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => closeMenu(false));
+    });
+
+    document.addEventListener("keydown", event => {
+        if (!sidebar.classList.contains("is-open")) return;
+
+        if (event.key === "Escape") {
+            closeMenu();
+        }
+
+        if (event.key === "Tab") {
+            const items = [...sidebar.querySelectorAll(
+                'a[href], button:not([disabled]), [tabindex="0"]'
+            )].filter(element => element.getClientRects().length);
+
+            if (!items.length) {
+                event.preventDefault();
+                sidebar.focus();
+                return;
+            }
+
+            const first = items[0];
+            const last = items[items.length - 1];
+
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+    });
+
+    mobile.addEventListener("change", () => {
+        const focusWasInside = sidebar.contains(document.activeElement);
+        closeMenu(false);
+
+        if (mobile.matches && focusWasInside) {
+            openBtn.focus();
+        }
+    });
+
+    closeMenu(false);
+});
+</script>
 </body>
 
 </html>

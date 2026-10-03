@@ -2,35 +2,60 @@
 
 {% block title %}Blocked Topic Attempts | PFCG AI{% endblock %}
 
-{% block content %}
-<link rel="stylesheet"
-      href="{{ url_for('static', filename='css/admin/blocked_attempts.css') }}">
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/admin/blocked_attempts.css',
+        v='2'
+    ) }}"
+>
+{% endblock %}
 
+{% block page_header %}
+<div class="logs-top-header">
+    <h1>Blocked Attempts</h1>
+    <p>Monitor restricted content requests.</p>
+</div>
+{% endblock %}
+
+{% block content %}
 <div class="blocked-page">
 
-    <div class="blocked-header">
+    <header class="blocked-header">
         <div>
             <span class="blocked-eyebrow">CONTENT SAFETY</span>
             <h1>Blocked Topic Attempts</h1>
+            <p>
+                Monitor attempts to generate content on restricted topics.
+            </p>
+
             {% if selected_email %}
-<p class="selected-user-note">
-    Showing attempts for <strong>{{ selected_email }}</strong>
-    <a href="{{ url_for('admin.blocked_attempts') }}">View all attempts</a>
-</p>
-{% endif %}
-            <p>Monitor attempts to generate content on restricted topics.</p>
+            <p class="selected-user-note">
+                Showing attempts for
+                <strong>{{ selected_email }}</strong>
+
+                <a href="{{ url_for('admin.blocked_attempts') }}">
+                    View all attempts
+                </a>
+            </p>
+            {% endif %}
         </div>
 
         <div class="blocked-header-icon">
-            <i class="fa-solid fa-shield-halved"></i>
+            <i
+                class="fa-solid fa-shield-halved"
+                aria-hidden="true"
+            ></i>
         </div>
-    </div>
-
+    </header>
 
     <div class="blocked-stats">
+
         <div class="blocked-stat-card">
             <div class="blocked-stat-icon purple">
-                <i class="fa-solid fa-ban"></i>
+                <i class="fa-solid fa-ban" aria-hidden="true"></i>
             </div>
             <div>
                 <span>Total Attempts</span>
@@ -40,7 +65,7 @@
 
         <div class="blocked-stat-card">
             <div class="blocked-stat-icon pink">
-                <i class="fa-solid fa-list"></i>
+                <i class="fa-solid fa-list" aria-hidden="true"></i>
             </div>
             <div>
                 <span>Records</span>
@@ -50,147 +75,158 @@
 
         <div class="blocked-stat-card">
             <div class="blocked-stat-icon blue">
-                <i class="fa-solid fa-users"></i>
+                <i class="fa-solid fa-users" aria-hidden="true"></i>
             </div>
             <div>
                 <span>Users</span>
                 <strong>
-                    {{ attempts | map(attribute='user_id') | unique | list | length }}
+                    {{ attempts
+                        | map(attribute='user_id')
+                        | unique
+                        | list
+                        | length }}
                 </strong>
             </div>
         </div>
+
     </div>
 
     <section class="blocked-table-card">
+
         <div class="blocked-table-header">
             <div>
                 <h2>Attempt Records</h2>
                 <p>Review blocked attempts by user and category.</p>
             </div>
 
-          <form class="blocked-search" method="get" action="{{ url_for('admin.blocked_attempts') }}">
-    {% if selected_email %}
-        <input type="hidden" name="email" value="{{ selected_email }}">
-    {% endif %}
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <input type="search" name="search" value="{{ search }}"
-           placeholder="Search user or category..."
-           aria-label="Search blocked attempts">
-    <button type="submit">Search</button>
-</form>
+            <form
+                class="blocked-search"
+                method="get"
+                action="{{ url_for('admin.blocked_attempts') }}"
+            >
+                {% if selected_email %}
+                <input
+                    type="hidden"
+                    name="email"
+                    value="{{ selected_email }}"
+                >
+                {% endif %}
+
+                <i
+                    class="fa-solid fa-magnifying-glass"
+                    aria-hidden="true"
+                ></i>
+
+                <input
+                    type="search"
+                    name="search"
+                    value="{{ search or '' }}"
+                    placeholder="Search user or category..."
+                    aria-label="Search blocked attempts"
+                >
+
+                <button type="submit">Search</button>
+            </form>
         </div>
-{% if attempts %}
-<div class="blocked-table-scroll">
-    <table class="blocked-table">
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>User ID</th>
-                <th>Category</th>
-                <th>Attempts</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in attempts %}
-            <tr>
-                <td>
-                    <div class="blocked-user">
-                        <span class="blocked-avatar">
-                            {{ (item.name or 'U')[:1] | upper }}
-                        </span>
-                        <span>
-                            <strong>{{ item.name }}</strong>
-                            <small>{{ item.email }}</small>
-                        </span>
-                    </div>
-                </td>
-                <td><span class="blocked-id">#{{ item.user_id }}</span></td>
-                <td>
-                    <span class="blocked-category">
-                        <i class="fa-solid fa-shield-halved"></i>
-                        {{ item.category }}
-                    </span>
-                </td>
-                <td><span class="blocked-count">{{ item.attempt_count }}</span></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 
-{% if total_pages > 1 %}
-<nav class="blocked-pagination" aria-label="Attempts pages">
-    {% if page > 1 %}
-    <a href="{{ url_for('admin.blocked_attempts', page=page-1, search=search, email=selected_email) }}">
-        Previous
-    </a>
-    {% endif %}
-
-    <span>Page {{ page }} of {{ total_pages }}</span>
-
-    {% if page < total_pages %}
-    <a href="{{ url_for('admin.blocked_attempts', page=page+1, search=search, email=selected_email) }}">
-        Next
-    </a>
-    {% endif %}
-</nav>
-{% endif %}
-
-{% else %}
-<div class="blocked-empty">
-    <i class="fa-solid fa-circle-check"></i>
-    <h3>No blocked attempts found</h3>
-    <p>No records match the current search or filter.</p>
-</div>
-{% endif %}
         {% if attempts %}
-       {% if total_pages > 1 %}
-<nav class="blocked-pagination" aria-label="Attempts pages">
-    {% if page > 1 %}
-        <a href="{{ url_for('admin.blocked_attempts', page=page-1, search=search, email=selected_email) }}">Previous</a>
-    {% endif %}
 
-    <span>Page {{ page }} of {{ total_pages }}</span>
+        <div class="blocked-table-scroll">
+            <table class="blocked-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>User ID</th>
+                        <th>Category</th>
+                        <th>Attempts</th>
+                    </tr>
+                </thead>
 
-    {% if page < total_pages %}
-        <a href="{{ url_for('admin.blocked_attempts', page=page+1, search=search, email=selected_email) }}">Next</a>
-    {% endif %}
-</nav>
-{% endif %}
+                <tbody>
+                    {% for item in attempts %}
+                    <tr>
+                        <td>
+                            <div class="blocked-user">
+                                <span class="blocked-avatar">
+                                    {{ (item.name or 'U')[:1] | upper }}
+                                </span>
 
-        <div id="blockedNoResults" class="blocked-empty" hidden>
-            No records match your search.
+                                <span>
+                                    <strong>
+                                        {{ item.name or 'Unknown User' }}
+                                    </strong>
+                                    <small>{{ item.email or '—' }}</small>
+                                </span>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="blocked-id">
+                                #{{ item.user_id }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="blocked-category">
+                                <i
+                                    class="fa-solid fa-shield-halved"
+                                    aria-hidden="true"
+                                ></i>
+                                {{ item.category }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="blocked-count">
+                                {{ item.attempt_count }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        {% else %}
-        <div class="blocked-empty">
-            <i class="fa-solid fa-circle-check"></i>
-            <h3>No blocked attempts</h3>
-            <p>No blocked topic attempts have been recorded yet.</p>
-        </div>
+
+        {% if total_pages > 1 %}
+        <nav class="blocked-pagination" aria-label="Attempts pages">
+
+            {% if page > 1 %}
+            <a href="{{ url_for(
+                'admin.blocked_attempts',
+                page=page-1,
+                search=search,
+                email=selected_email
+            ) }}">
+                Previous
+            </a>
+            {% endif %}
+
+            <span>Page {{ page }} of {{ total_pages }}</span>
+
+            {% if page < total_pages %}
+            <a href="{{ url_for(
+                'admin.blocked_attempts',
+                page=page+1,
+                search=search,
+                email=selected_email
+            ) }}">
+                Next
+            </a>
+            {% endif %}
+
+        </nav>
         {% endif %}
+
+        {% else %}
+
+        <div class="blocked-empty">
+            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+            <h3>No blocked attempts found</h3>
+            <p>No records match the current search or filter.</p>
+        </div>
+
+        {% endif %}
+
     </section>
 </div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const search = document.getElementById("blockedSearch");
-    const rows = document.querySelectorAll("#blockedTableBody tr");
-    const noResults = document.getElementById("blockedNoResults");
-
-    if (!search || !rows.length) return;
-
-    search.addEventListener("input", function () {
-        const query = search.value.trim().toLowerCase();
-        let visible = 0;
-
-        rows.forEach(function (row) {
-            const match = row.textContent.toLowerCase().includes(query);
-            row.hidden = !match;
-            if (match) visible++;
-        });
-
-        noResults.hidden = visible !== 0;
-    });
-});
-</script>
 {% endblock %}

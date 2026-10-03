@@ -1312,7 +1312,7 @@ def blocked_attempts():
     except ValueError:
         page = 1
 
-    per_page = 10
+    per_page = 5
 
     filters = """
         WHERE (:selected_email = '' OR LOWER(u.email) = :selected_email)

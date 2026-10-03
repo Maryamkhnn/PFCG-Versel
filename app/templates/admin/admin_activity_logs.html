@@ -5,50 +5,13 @@
 {% block extra_css %}
 <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/admin/admin_activity_logs.css') }}"
+    href="{{ url_for(
+        'static',
+        filename='css/admin/admin_activity_logs.css',
+        v='2'
+    ) }}"
 >
-
-<style>
-    .logs-table tbody tr[hidden],
-    .logs-pagination[hidden] {
-        display: none !important;
-    }
-
-    .logs-pagination {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 16px;
-        padding: 20px 16px;
-    }
-
-    .logs-pagination button {
-        padding: 9px 15px;
-        border: 1px solid #ddd6fe;
-        border-radius: 8px;
-        background: #fff;
-        color: #6d28d9;
-        font: inherit;
-        cursor: pointer;
-    }
-
-    .logs-pagination button:hover:not(:disabled) {
-        background: #f5f3ff;
-    }
-
-    .logs-pagination button:disabled {
-        opacity: 0.45;
-        cursor: not-allowed;
-    }
-
-    .logs-pagination span {
-        color: #4b5563;
-        font-size: 14px;
-    }
-</style>
 {% endblock %}
-
-
 {% block page_header %}
 <div class="logs-top-header">
 

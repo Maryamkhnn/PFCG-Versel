@@ -490,3 +490,221 @@ html[data-admin-theme="dark"] .account-badge {
         font-size: 16px;
     }
 }
+/* Mobile account layout */
+
+@media (max-width: 768px) {
+
+    .account-page {
+        min-width: 0;
+        padding-bottom: 20px;
+    }
+
+    .account-heading h1 {
+        font-size: 23px;
+        line-height: 1.4;
+    }
+
+    .account-heading p {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    /* Profile summary */
+
+    .account-hero {
+        display: grid;
+        grid-template-columns: 48px minmax(0, 1fr);
+        gap: 12px;
+        padding: 17px;
+        margin-bottom: 16px;
+        border-radius: 14px;
+    }
+
+    .account-avatar {
+        width: 48px;
+        height: 48px;
+        font-size: 21px;
+        border-radius: 13px;
+    }
+
+    .account-hero-details {
+        min-width: 0;
+    }
+
+    .account-hero-details h2 {
+        font-size: 17px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    .account-hero-details p {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .account-badge {
+        display: inline-flex;
+        grid-column: 2;
+        justify-self: start;
+        margin: 0;
+        padding: 6px 10px;
+        font-size: 11px;
+        white-space: normal;
+    }
+
+    /* Section navigation */
+
+    .account-nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        margin-bottom: 18px;
+    }
+
+    .account-nav-link {
+        justify-content: flex-start;
+        min-width: 0;
+        min-height: 48px;
+        padding: 11px 12px;
+        gap: 8px;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .account-nav-link i {
+        flex-shrink: 0;
+        width: 17px;
+        text-align: center;
+    }
+
+    /* Section cards */
+
+    .account-card {
+        min-width: 0;
+        padding: 17px;
+        margin-bottom: 16px;
+        border-radius: 14px;
+        scroll-margin-top: 16px;
+    }
+
+    .account-card-header {
+        align-items: flex-start;
+        gap: 11px;
+        padding-bottom: 15px;
+        margin-bottom: 18px;
+    }
+
+    .account-card-header > div:last-child {
+        min-width: 0;
+    }
+
+    .account-card-icon {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        border-radius: 11px;
+        font-size: 17px;
+    }
+
+    .account-card-header h2 {
+        font-size: 17px;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+
+    .account-card-header p {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    /* Form fields */
+
+    .account-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 17px;
+    }
+
+    .account-field {
+        gap: 8px;
+    }
+
+    .account-field label {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .account-field input {
+        height: 48px;
+        padding: 0 12px;
+        font-size: 16px;
+        border-radius: 10px;
+    }
+
+    /* Save buttons */
+
+    .account-card-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 13px;
+        padding-top: 16px;
+        margin-top: 20px;
+    }
+
+    .account-card-actions > span {
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .account-button {
+        width: 100%;
+        min-height: 48px;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 14px;
+        line-height: 1.5;
+        white-space: normal;
+    }
+
+    .account-button i {
+        flex-shrink: 0;
+    }
+
+    /* Appearance switch */
+
+    .account-toggle-row {
+        gap: 14px;
+    }
+
+    .account-toggle-row > div {
+        min-width: 0;
+    }
+
+    .account-toggle-row h3 {
+        font-size: 14px;
+    }
+
+    .account-toggle-row p {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .account-switch {
+        flex-shrink: 0;
+    }
+
+    /* Success and error messages */
+
+    .account-message {
+        padding: 13px 14px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (hover: none) {
+    .account-page .account-button:hover {
+        transform: none;
+    }
+}
