@@ -31,8 +31,9 @@ def unauthorized_response():
 
 @notifications.route("", methods=["GET"])
 @notifications.route("/", methods=["GET"])
+@notifications.route("", methods=["GET"])
+@notifications.route("/", methods=["GET"])
 def get_notifications():
-
     user_id = session.get("user_id")
 
     if not user_id:
@@ -40,6 +41,7 @@ def get_notifications():
 
     try:
         restricted_until = sync_generator_restriction(user_id)
+
         rows = db.session.execute(
             text("""
                 SELECT
@@ -54,9 +56,7 @@ def get_notifications():
                 ORDER BY created_at DESC, id DESC
                 LIMIT 30
             """),
-            {
-                "user_id": user_id
-            }
+            {"user_id": user_id}
         ).mappings().all()
 
         unread_count = db.session.execute(
@@ -66,9 +66,7 @@ def get_notifications():
                 WHERE user_id = :user_id
                   AND is_read = 0
             """),
-            {
-                "user_id": user_id
-            }
+            {"user_id": user_id}
         ).scalar() or 0
 
         data = []
@@ -89,7 +87,7 @@ def get_notifications():
                 )
             })
 
-            return jsonify({
+        return jsonify({
             "success": True,
             "data": data,
             "unread_count": int(unread_count),
@@ -98,11 +96,10 @@ def get_notifications():
                 restricted_until.isoformat() + "Z"
                 if restricted_until
                 else None
-            ),
+            )
         })
 
     except Exception:
-
         db.session.rollback()
 
         return jsonify({
@@ -111,8 +108,6 @@ def get_notifications():
             "data": [],
             "unread_count": 0
         }), 500
-
-
 # ============================================================
 # MARK ONE AS READ
 # URL: /user/api/notifications/<id>/read

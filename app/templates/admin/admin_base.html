@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -10,302 +9,694 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        {% block title %}
-            Admin | PFCG AI
-        {% endblock %}
-    </title>
+    <title>{% block title %}Admin | PFCG AI{% endblock %}</title>
 
+    <script>
+        try {
+            document.documentElement.dataset.adminTheme =
+                localStorage.getItem("adminTheme") === "dark"
+                    ? "dark"
+                    : "light";
+        } catch (error) {
+            document.documentElement.dataset.adminTheme = "light";
+        }
+    </script>
 
-    <!-- FONT AWESOME -->
-<script>
-    try {
-        document.documentElement.dataset.adminTheme =
-            localStorage.getItem("adminTheme") === "dark"
-                ? "dark"
-                : "light";
-    } catch (error) {
-        document.documentElement.dataset.adminTheme = "light";
-    }
-</script>
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     >
 
-
-    <!-- ADMIN COMMON CSS -->
-
     <link
         rel="stylesheet"
-        href="{{ url_for(
-            'static',
-            filename='css/admin/common.css'
-        ) }}"
+        href="{{ url_for('static', filename='css/admin/common.css') }}"
     >
 
+    {% block extra_css %}{% endblock %}
 
-    <!-- PAGE-SPECIFIC CSS -->
+    <style>
+        :root {
+            --admin-shell-surface: #ffffff;
+            --admin-shell-border: #e8e1f4;
+            --admin-shell-text: #28165e;
+            --admin-shell-muted: #867c99;
+        }
 
-    {% block extra_css %}
-    {% endblock %}
+        html[data-admin-theme="dark"] {
+            --admin-shell-surface: #241c38;
+            --admin-shell-border: #3c3054;
+            --admin-shell-text: #f0eaff;
+            --admin-shell-muted: #b5a9cb;
+        }
 
+        body {
+            margin: 0;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        /* SIDEBAR */
+
+        #adminSidebar {
+            position: fixed;
+            inset: 0 auto 0 0;
+            z-index: 1000;
+            display: flex !important;
+            flex-direction: column;
+            width: 260px !important;
+            height: 100vh;
+            height: 100dvh;
+            padding: 24px 16px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: #211640;
+            color: #ffffff;
+            transform: none;
+        }
+
+        #adminSidebar .sidebar-top {
+            flex: 1 0 auto;
+            min-width: 0;
+        }
+
+        /* LOGO */
+
+        #adminSidebar .admin-logo {
+            display: flex !important;
+            align-items: center;
+            gap: 11px;
+            margin: 0 0 28px;
+            padding: 0 10px;
+        }
+
+        #adminSidebar .admin-brand-icon {
+            display: grid !important;
+            place-items: center;
+            width: 40px !important;
+            height: 40px !important;
+            flex: 0 0 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #45268a, #623cff);
+        }
+
+        #adminSidebar .admin-brand-icon svg {
+            display: block !important;
+            width: 30px !important;
+            height: 30px !important;
+        }
+
+        #adminSidebar .admin-brand-name {
+            display: inline !important;
+            color: #ffffff;
+            font-size: 25px;
+            font-weight: 700;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        #adminSidebar .admin-brand-ai {
+            display: inline !important;
+            color: #8967ff;
+        }
+
+        /* NAVIGATION */
+
+        #adminSidebar .admin-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        #adminSidebar .admin-nav > a {
+            display: flex !important;
+            align-items: center;
+            gap: 12px;
+            min-height: 48px;
+            margin: 0;
+            padding: 12px 14px;
+            box-sizing: border-box;
+            border: 0;
+            border-radius: 12px;
+            background: transparent;
+            color: #d2c8e9;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+            text-decoration: none;
+        }
+
+        #adminSidebar .admin-nav > a:hover {
+            background: rgba(255, 255, 255, 0.07);
+            color: #ffffff;
+        }
+
+        #adminSidebar .admin-nav > a.active {
+            background: #6035f3;
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: inset 4px 0 0 #ffffff;
+        }
+
+        #adminSidebar .admin-nav > a > i {
+            width: 20px;
+            flex: 0 0 20px;
+            font-size: 17px;
+            text-align: center;
+        }
+
+        #adminSidebar .admin-nav .admin-nav-label {
+            display: block !important;
+            min-width: 0;
+            white-space: nowrap;
+        }
+
+        .admin-review-badge {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            margin-left: auto;
+            padding: 0 5px;
+            box-sizing: border-box;
+            border-radius: 20px;
+            background: #dc4f5d;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .admin-review-badge[hidden] {
+            display: none !important;
+        }
+
+        /* ACCOUNT AND LOGOUT */
+
+        #adminSidebar .admin-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        #adminSidebar .admin-account-link {
+            display: flex !important;
+            align-items: center;
+            gap: 11px;
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        #adminSidebar .admin-account-link:hover,
+        #adminSidebar .admin-account-link.active {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        #adminSidebar .admin-account-avatar {
+            display: grid !important;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            flex: 0 0 38px;
+            border-radius: 11px;
+            background: #49386f;
+            color: #ded2ff;
+            font-size: 17px;
+        }
+
+        #adminSidebar .admin-account-details {
+            display: flex !important;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        #adminSidebar .admin-account-details strong {
+            display: block;
+            overflow: hidden;
+            font-size: 13px;
+            font-weight: 600;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #adminSidebar .admin-account-details small {
+            display: block;
+            color: #c8bce1;
+            font-size: 11px;
+        }
+
+        #adminSidebar .admin-account-arrow {
+            flex: 0 0 auto;
+            color: #b5a1d6;
+            font-size: 11px;
+        }
+
+        #adminSidebar .logout {
+            display: flex !important;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            color: #e1d8f1;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        #adminSidebar .logout:hover {
+            background: rgba(220, 79, 93, 0.15);
+            color: #ffabb4;
+        }
+
+        #adminSidebar .logout i {
+            width: 20px;
+            font-size: 17px;
+            text-align: center;
+        }
+
+        #adminSidebar .logout span {
+            display: inline !important;
+        }
+
+        /* MAIN HEADER */
+
+        .admin-layout > .admin-main {
+            flex: 1;
+            width: calc(100% - 260px);
+            min-width: 0;
+            margin-left: 260px;
+            padding: 0;
+        }
+
+        .admin-main > .admin-header {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 20px 24px;
+            box-sizing: border-box;
+            overflow: visible;
+            background: var(--admin-shell-surface);
+            border-bottom: 1px solid var(--admin-shell-border);
+        }
+
+        .admin-header > .header-left {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .admin-header .header-left h1 {
+            margin: 0;
+            color: var(--admin-shell-text);
+            font-size: 24px;
+            line-height: 1.4;
+        }
+
+        .admin-header .header-left p {
+            margin: 5px 0 0;
+            color: var(--admin-shell-muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* REVIEW BELL */
+
+        #adminReviewBell {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
+            margin-left: auto;
+            border: 1px solid var(--admin-shell-border);
+            border-radius: 12px;
+            background: var(--admin-shell-surface);
+            color: #8967ff;
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        #adminReviewBell:hover {
+            filter: brightness(0.96);
+        }
+
+        #adminReviewBellCount {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            display: grid;
+            place-items: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 5px;
+            box-sizing: border-box;
+            border: 2px solid var(--admin-shell-surface);
+            border-radius: 20px;
+            background: #dc4f5d;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        #adminReviewBellCount[hidden] {
+            display: none !important;
+        }
+
+        /* MOBILE MENU CONTROLS */
+
+        #adminMenuBtn,
+        #closeAdminMenu {
+            display: none !important;
+        }
+
+        #adminMenuOverlay[hidden] {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            #adminSidebar {
+                z-index: 3000;
+                width: min(280px, calc(100vw - 24px)) !important;
+                padding: 22px 14px;
+                visibility: hidden;
+                transform: translateX(-100%);
+                transition:
+                    transform 0.2s ease,
+                    visibility 0.2s ease;
+            }
+
+            #adminSidebar.is-open {
+                visibility: visible;
+                transform: translateX(0);
+            }
+
+            #adminSidebar .admin-logo {
+                padding-right: 35px;
+                margin-bottom: 24px;
+            }
+
+            #adminSidebar .admin-brand-icon {
+                width: 36px !important;
+                height: 36px !important;
+                flex-basis: 36px;
+                border-radius: 10px;
+            }
+
+            #adminSidebar .admin-brand-icon svg {
+                width: 27px !important;
+                height: 27px !important;
+            }
+
+            #adminSidebar .admin-brand-name {
+                font-size: 23px;
+            }
+
+            .admin-layout > .admin-main {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .admin-main > .admin-header {
+                gap: 10px;
+                padding: 16px;
+            }
+
+            .admin-header .header-left h1 {
+                font-size: 19px;
+            }
+
+            .admin-header .header-left p {
+                font-size: 12px;
+            }
+
+            #adminMenuBtn {
+                display: inline-flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                flex: 0 0 40px;
+                padding: 0;
+                border: 1px solid var(--admin-shell-border);
+                border-radius: 10px;
+                background: var(--admin-shell-surface);
+                color: var(--admin-shell-text);
+                font-size: 18px;
+                cursor: pointer;
+            }
+
+            #closeAdminMenu {
+                position: absolute;
+                top: 20px;
+                right: 14px;
+                display: inline-flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 32px;
+                height: 32px;
+                padding: 0;
+                border: 0;
+                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.09);
+                color: #ffffff;
+                font-size: 17px;
+                cursor: pointer;
+            }
+
+            #adminReviewBell {
+                width: 40px;
+                height: 40px;
+                flex-basis: 40px;
+                font-size: 17px;
+            }
+
+            #adminMenuOverlay {
+                position: fixed;
+                inset: 0;
+                z-index: 2500;
+                background: rgba(18, 10, 40, 0.55);
+            }
+
+            body.admin-menu-open {
+                overflow: hidden;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #adminSidebar {
+                transition: none;
+            }
+        }
+    </style>
 </head>
-
 
 <body>
 
-
 <div class="admin-layout">
 
+    <!-- SIDEBAR -->
 
-    <!-- =====================================================
-         SIDEBAR
-    ====================================================== -->
+    <aside
+        class="admin-sidebar"
+        id="adminSidebar"
+        tabindex="-1"
+        aria-label="Admin navigation"
+    >
+        <button
+            type="button"
+            id="closeAdminMenu"
+            class="admin-menu-close"
+            aria-label="Close menu"
+        >
+            <i class="fas fa-xmark" aria-hidden="true"></i>
+        </button>
 
-  <aside class="admin-sidebar" id="adminSidebar" tabindex="-1">
-<button
-    type="button"
-    id="closeAdminMenu"
-    class="admin-menu-close"
-    aria-label="Close menu"
->
-    <i class="fas fa-xmark" aria-hidden="true"></i>
-</button>
         <div class="sidebar-top">
 
-
-            <!-- =============================================
-                 LOGO
-            ============================================== -->
-
             <div class="admin-logo">
-    <span class="admin-brand-icon" aria-hidden="true">
-        <svg
-            viewBox="0 0 40 40"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <path
-                d="M18 6C20 15 23 18 32 20C23 22 20 25 18 34C16 25 13 22 4 20C13 18 16 15 18 6Z"
-                fill="#ffffff"
-            />
-            <path
-                d="M31 5C32 9 34 11 38 12C34 13 32 15 31 19C30 15 28 13 24 12C28 11 30 9 31 5Z"
-                fill="#d1cbe5"
-            />
-        </svg>
-    </span>
+                <span class="admin-brand-icon" aria-hidden="true">
+                    <svg
+                        viewBox="0 0 40 40"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M18 6C20 15 23 18 32 20C23 22 20 25 18 34C16 25 13 22 4 20C13 18 16 15 18 6Z"
+                            fill="#ffffff"
+                        />
+                        <path
+                            d="M31 5C32 9 34 11 38 12C34 13 32 15 31 19C30 15 28 13 24 12C28 11 30 9 31 5Z"
+                            fill="#d1cbe5"
+                        />
+                    </svg>
+                </span>
 
-    <span class="admin-brand-name">
-        PFCG <span class="admin-brand-ai">AI</span>
-    </span>
-</div>
+                <span class="admin-brand-name">
+                    PFCG <span class="admin-brand-ai">AI</span>
+                </span>
+            </div>
 
+            <nav class="admin-nav" aria-label="Main admin navigation">
 
-            <!-- =============================================
-                 NAVIGATION
-            ============================================== -->
+                {% set navigation = [
+                    ('admin.dashboard', 'fa-house', 'Dashboard'),
+                    ('admin.users', 'fa-users', 'Manage Users'),
+                    ('admin.content', 'fa-file-lines', 'Generated Content'),
+                    ('admin.reports', 'fa-chart-pie', 'Reports'),
+                    ('admin.feedback', 'fa-comments', 'Feedback'),
+                    ('admin.activity_logs', 'fa-clock-rotate-left', 'Activity Logs')
+                ] %}
 
-            <nav class="admin-nav">
+                {% for endpoint, icon, label in navigation %}
+                <a
+                    href="{{ url_for(endpoint) }}"
+                    class="{% if request.endpoint == endpoint %}active{% endif %}"
+                    {% if request.endpoint == endpoint %}
+                        aria-current="page"
+                    {% endif %}
+                >
+                    <i class="fas {{ icon }}" aria-hidden="true"></i>
+                    <span class="admin-nav-label">{{ label }}</span>
+                </a>
+                {% endfor %}
 
-
-                <!-- DASHBOARD -->
+                <!-- ONE MODERATION LINK -->
 
                 <a
-                    href="{{ url_for('admin.dashboard') }}"
-                    class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}"
+                    href="{{ url_for('admin.content_moderation', tab='reviews') }}"
+                    class="{% if request.endpoint == 'admin.content_moderation' %}active{% endif %}"
+                    {% if request.endpoint == 'admin.content_moderation' %}
+                        aria-current="page"
+                    {% endif %}
                 >
+                    <i class="fas fa-shield-halved" aria-hidden="true"></i>
 
-                    <i class="fas fa-home"></i>
+                    <span class="admin-nav-label">
+                        Content Moderation
+                    </span>
 
-                    <span>Dashboard</span>
-
+                    <span
+                        id="adminReviewNavCount"
+                        class="admin-review-badge"
+                        {% if pending_review_count|default(0) == 0 %}
+                            hidden
+                        {% endif %}
+                    >
+                        {{ pending_review_count|default(0) }}
+                    </span>
                 </a>
-
-
-                <!-- MANAGE USERS -->
-
-                <a
-                    href="{{ url_for('admin.users') }}"
-                    class="{% if request.endpoint == 'admin.users' %}active{% endif %}"
-                >
-
-                    <i class="fas fa-users"></i>
-
-                    <span>Manage Users</span>
-
-                </a>
-
-
-                <!-- GENERATED CONTENT -->
-
-                <a
-                    href="{{ url_for('admin.content') }}"
-                    class="{% if request.endpoint == 'admin.content' %}active{% endif %}"
-                >
-
-                    <i class="fas fa-file-alt"></i>
-
-                    <span>Generated Content</span>
-
-                </a>
-
-
-                <!-- REPORTS -->
-
-                <a
-                    href="{{ url_for('admin.reports') }}"
-                    class="{% if request.endpoint == 'admin.reports' %}active{% endif %}"
-                >
-
-                    <i class="fas fa-chart-pie"></i>
-
-                    <span>Reports</span>
-
-                </a>
-
-
-                <!-- FEEDBACK -->
-
-                <a
-                    href="{{ url_for('admin.feedback') }}"
-                    class="{% if request.endpoint == 'admin.feedback' %}active{% endif %}"
-                >
-
-                    <i class="fas fa-comments"></i>
-
-                    <span>Feedback</span>
-
-                </a>
-
-
-                <!-- ACTIVITY LOGS -->
-
-                <a
-                    href="{{ url_for('admin.activity_logs') }}"
-                    class="{% if request.endpoint == 'admin.activity_logs' %}active{% endif %}"
-                >
-
-                    <i class="fas fa-clock-rotate-left"></i>
-
-                    <span>Activity Logs</span>
-
-                </a>
-
-<a href="{{ url_for('admin.blocked_attempts') }}"
-   class="admin-blocked-link {% if request.endpoint == 'admin.blocked_attempts' %}active{% endif %}">
-    <i class="fa-solid fa-shield-halved"></i>
-    <span>Blocked Attempts</span>
-</a>
 
             </nav>
-
         </div>
 
-        <!-- =================================================
-             SIDEBAR BOTTOM
-        ================================================== -->
+        <!-- ACCOUNT AND LOGOUT ONLY -->
 
         <div class="admin-bottom">
-<a
-    href="{{ url_for('admin.account') }}"
-    class="admin-account-link {% if request.endpoint == 'admin.account' %}active{% endif %}"
->
-    <span class="admin-account-avatar">
-        <i class="fas fa-user-shield"></i>
-    </span>
-
-    <span class="admin-account-details">
-        <strong>{{ session.get("user_name") or "Administrator" }}</strong>
-        <small>My Account</small>
-    </span>
-
-    <i class="fas fa-chevron-right admin-account-arrow"></i>
-</a>
-            <!-- LOGOUT -->
 
             <a
-                href="{{ url_for('auth.logout') }}"
-                class="logout"
+                href="{{ url_for('admin.account') }}"
+                class="admin-account-link {% if request.endpoint == 'admin.account' %}active{% endif %}"
+                {% if request.endpoint == 'admin.account' %}
+                    aria-current="page"
+                {% endif %}
             >
+                <span class="admin-account-avatar">
+                    <i class="fas fa-user-shield" aria-hidden="true"></i>
+                </span>
 
-                <i class="fas fa-sign-out-alt"></i>
+                <span class="admin-account-details">
+                    <strong>
+                        {{ session.get('user_name') or 'Administrator' }}
+                    </strong>
+                    <small>My Account</small>
+                </span>
 
-                <span>Logout</span>
-
+                <i
+                    class="fas fa-chevron-right admin-account-arrow"
+                    aria-hidden="true"
+                ></i>
             </a>
 
+            <a href="{{ url_for('auth.logout') }}" class="logout">
+                <i class="fas fa-right-from-bracket" aria-hidden="true"></i>
+                <span>Logout</span>
+            </a>
 
         </div>
+    </aside>
 
-</aside>
+    <div
+        id="adminMenuOverlay"
+        class="admin-menu-overlay"
+        hidden
+    ></div>
 
-<div id="adminMenuOverlay" class="admin-menu-overlay" hidden></div>
-
-
-    <!-- =====================================================
-         MAIN AREA
-    ====================================================== -->
+    <!-- MAIN -->
 
     <main class="admin-main">
 
-
-        <!-- =================================================
-             TOP HEADER
-        ================================================== -->
-
         <header class="admin-header">
 
-<button
-    type="button"
-    id="adminMenuBtn"
-    class="admin-menu-toggle"
-    aria-label="Open menu"
-    aria-controls="adminSidebar"
-    aria-expanded="false"
->
-    <i class="fas fa-bars" aria-hidden="true"></i>
-</button>
-            <!-- PAGE TITLE -->
+            <button
+                type="button"
+                id="adminMenuBtn"
+                class="admin-menu-toggle"
+                aria-label="Open menu"
+                aria-controls="adminSidebar"
+                aria-expanded="false"
+            >
+                <i class="fas fa-bars" aria-hidden="true"></i>
+            </button>
 
             <div class="header-left">
-
                 {% block page_header %}
-
-                    <h1>Admin Panel</h1>
-
-                    <p>
-                        Manage your PFCG AI platform
-                    </p>
-
+                <h1>Admin Panel</h1>
+                <p>Manage your PFCG AI platform.</p>
                 {% endblock %}
-
             </div>
 
+            <a
+                id="adminReviewBell"
+                href="{{ url_for('admin.content_moderation', tab='reviews') }}"
+                data-count-url="{{ url_for('admin.needs_review_count_api') }}"
+                aria-label="Open pending moderation reviews"
+                title="Pending moderation reviews"
+            >
+                <i class="fas fa-bell" aria-hidden="true"></i>
 
+                <span
+                    id="adminReviewBellCount"
+                    {% if pending_review_count|default(0) == 0 %}
+                        hidden
+                    {% endif %}
+                >
+                    {{ pending_review_count|default(0) }}
+                </span>
+            </a>
 
         </header>
 
-
-        <!-- =================================================
-             PAGE CONTENT
-        ================================================== -->
-
-        {% block content %}
-        {% endblock %}
-
+        {% block content %}{% endblock %}
 
     </main>
-
-
 </div>
-
-
-<!-- PAGE-SPECIFIC JAVASCRIPT -->
-
-{% block extra_js %}
-{% endblock %}
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -316,18 +707,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const main = document.querySelector(".admin-main");
     const mobile = window.matchMedia("(max-width: 768px)");
 
-    if (!sidebar || !openBtn || !closeBtn || !overlay || !main) {
-        return;
-    }
+    if (!sidebar || !openBtn || !closeBtn || !overlay || !main) return;
 
     function closeMenu(restoreFocus = true) {
         const wasOpen = sidebar.classList.contains("is-open");
 
         sidebar.classList.remove("is-open");
         document.body.classList.remove("admin-menu-open");
+
         overlay.hidden = true;
         main.inert = false;
         sidebar.inert = mobile.matches;
+
         openBtn.setAttribute("aria-expanded", "false");
 
         if (wasOpen && restoreFocus && mobile.matches) {
@@ -340,9 +731,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         sidebar.inert = false;
         sidebar.classList.add("is-open");
+        document.body.classList.add("admin-menu-open");
+
         overlay.hidden = false;
         main.inert = true;
-        document.body.classList.add("admin-menu-open");
+
         openBtn.setAttribute("aria-expanded", "true");
         closeBtn.focus();
     }
@@ -359,35 +752,38 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!sidebar.classList.contains("is-open")) return;
 
         if (event.key === "Escape") {
+            event.preventDefault();
             closeMenu();
+            return;
         }
 
-        if (event.key === "Tab") {
-            const items = [...sidebar.querySelectorAll(
-                'a[href], button:not([disabled]), [tabindex="0"]'
-            )].filter(element => element.getClientRects().length);
+        if (event.key !== "Tab") return;
 
-            if (!items.length) {
-                event.preventDefault();
-                sidebar.focus();
-                return;
-            }
+        const items = [...sidebar.querySelectorAll(
+            'a[href], button:not([disabled]), [tabindex="0"]'
+        )].filter(element => element.getClientRects().length);
 
-            const first = items[0];
-            const last = items[items.length - 1];
+        if (!items.length) {
+            event.preventDefault();
+            sidebar.focus();
+            return;
+        }
 
-            if (event.shiftKey && document.activeElement === first) {
-                event.preventDefault();
-                last.focus();
-            } else if (!event.shiftKey && document.activeElement === last) {
-                event.preventDefault();
-                first.focus();
-            }
+        const first = items[0];
+        const last = items[items.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
         }
     });
 
     mobile.addEventListener("change", () => {
         const focusWasInside = sidebar.contains(document.activeElement);
+
         closeMenu(false);
 
         if (mobile.matches && focusWasInside) {
@@ -398,6 +794,78 @@ document.addEventListener("DOMContentLoaded", () => {
     closeMenu(false);
 });
 </script>
-</body>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const bell = document.getElementById("adminReviewBell");
+
+    const badges = [
+        document.getElementById("adminReviewBellCount"),
+        document.getElementById("adminReviewNavCount")
+    ].filter(Boolean);
+
+    if (!bell || !badges.length) return;
+
+    let loading = false;
+
+    async function refreshReviewCount() {
+        if (loading) return;
+        loading = true;
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+
+        try {
+            const response = await fetch(bell.dataset.countUrl, {
+                credentials: "same-origin",
+                cache: "no-store",
+                headers: {
+                    Accept: "application/json"
+                },
+                signal: controller.signal
+            });
+
+            if (!response.ok) return;
+
+            const result = await response.json();
+
+            if (!result.success) return;
+
+            const count = Math.max(
+                0,
+                Math.floor(Number(result.pending_count) || 0)
+            );
+
+            badges.forEach(badge => {
+                badge.textContent = count > 99 ? "99+" : String(count);
+                badge.hidden = count === 0;
+            });
+
+            bell.setAttribute(
+                "aria-label",
+                `Open moderation reviews: ${count} pending`
+            );
+        } catch (error) {
+            console.warn("Review count refresh failed:", error);
+        } finally {
+            clearTimeout(timeout);
+            loading = false;
+        }
+    }
+
+    refreshReviewCount();
+
+    setInterval(() => {
+        if (!document.hidden) refreshReviewCount();
+    }, 30000);
+
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) refreshReviewCount();
+    });
+});
+</script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
 </html>

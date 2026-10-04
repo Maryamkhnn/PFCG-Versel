@@ -6,7 +6,12 @@ import warnings
 from flask import send_file
 from sqlalchemy import text
 from PIL import Image, ImageOps, UnidentifiedImageError
+from secrets import compare_digest, token_urlsafe
 
+from app.user.services.account_deletion_service import (
+    request_account_deletion_code,
+    confirm_account_deletion,
+)
 from flask import (
     render_template,
     redirect,
@@ -228,6 +233,135 @@ def get_account_picture_api(user_email):
         download_name="profile.jpg",
         max_age=0
     )
+
+    response.headers["Cache-Control"] = "private, no-store"
+
+    return response
+def deletion_session_user(user_email):
+    user = require_user(user_email)
+
+    if session.get("user_id") != user.id:
+        raise AccountError(
+            "Please sign in again.",
+            401,
+        )
+
+    if (user.role or "user").strip().lower() == "admin":
+        raise AccountError(
+            "Administrator accounts cannot be deleted here.",
+            403,
+        )
+
+    return user
+
+
+@account_api
+def get_account_deletion_context_api(user_email):
+    deletion_session_user(user_email)
+
+    token = session.get("account_deletion_csrf")
+
+    if not isinstance(token, str) or not token:
+        token = token_urlsafe(32)
+        session["account_deletion_csrf"] = token
+
+    response = jsonify({
+        "success": True,
+        "data": {
+            "csrf_token": token,
+        },
+    })
+
+    response.headers["Cache-Control"] = "private, no-store"
+
+    return response
+
+
+@account_api
+def request_account_deletion_api(user_email):
+    user = deletion_session_user(user_email)
+
+    expected = session.get("account_deletion_csrf")
+    provided = request.headers.get("X-Account-Deletion-CSRF")
+
+    if (
+        not isinstance(expected, str)
+        or not isinstance(provided, str)
+        or not expected
+        or not compare_digest(expected, provided)
+    ):
+        raise AccountError(
+            "Please reload My Account and try again.",
+            403,
+        )
+
+    data = json_payload()
+
+    result = request_account_deletion_code(
+        user.id,
+        data.get("current_password"),
+    )
+
+    # Store the challenge in this signed-in browser session.
+    session["account_deletion_challenge"] = result["challenge"]
+    session["account_deletion_user_id"] = user.id
+
+    response = jsonify({
+        "success": True,
+        "message": (
+            "A confirmation code has been sent to your account email. "
+            "Your account has not been deleted."
+        ),
+        "data": {
+            "expires_at": result["expires_at"],
+            "resend_after_seconds": result["resend_after_seconds"],
+        },
+    })
+
+    response.headers["Cache-Control"] = "private, no-store"
+
+    return response
+@account_api
+def confirm_account_deletion_api(user_email):
+    user = deletion_session_user(user_email)
+
+    expected = session.get("account_deletion_csrf")
+    provided = request.headers.get("X-Account-Deletion-CSRF")
+
+    if (
+        not isinstance(expected, str)
+        or not isinstance(provided, str)
+        or not expected
+        or not compare_digest(expected, provided)
+    ):
+        raise AccountError(
+            "Please reload My Account and try again.",
+            403,
+        )
+
+    if session.get("account_deletion_user_id") != user.id:
+        raise AccountError(
+            "Please request a new confirmation code.",
+            403,
+        )
+
+    data = json_payload()
+
+    result = confirm_account_deletion(
+        user.id,
+        session.get("account_deletion_challenge"),
+        data.get("code"),
+        data.get("confirmation"),
+    )
+
+    session.clear()
+
+    response = jsonify({
+        "success": True,
+        "message": "Your account has been permanently deleted.",
+        "data": result,
+        "redirect_url": "/",
+    })
 
     response.headers["Cache-Control"] = "private, no-store"
 

@@ -7,7 +7,11 @@ from flask import (
     url_for,
     current_app
 )
+from math import ceil
 
+from app.user.services.account_suspension_service import (
+    sync_account_suspension,
+)
 from app.database import db
 from app.models import User
 from app import mail
@@ -34,10 +38,7 @@ def index():
         feedbacks=feedbacks
     )
 # LOGIN
-@auth.route(
-    "/login",
-    methods=["GET", "POST"]
-)
+
 @auth.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -138,65 +139,7 @@ def login():
         user.failed_login_attempts = 0
         db.session.commit()
         session.pop("login_lock_email", None)
-    # Timed suspension khatam ho chuki ho to account active karo.
-    if (
-        (user.status or "").lower() == "suspended"
-        and user.suspended_until is not None
-        and user.suspended_until <= datetime.utcnow()
-    ):
-        user.status = "active"
-        user.suspended_until = None
-        user.status_reason = None
-        user.status_changed_at = datetime.utcnow()
-        db.session.commit()
-    # Check existing account moderation status.
-    user_role = (
-        user.role or "user"
-    ).strip().lower()
-
-    user_status = (
-        user.status or "active"
-    ).strip().lower()
-
-    if (
-        user_role != "admin"
-        and user_status in {
-            "blocked",
-            "suspended",
-            "pending_deletion",
-            "deleted"
-        }
-    ):
-        status_messages = {
-            "blocked": (
-                "Your account has been blocked by the administrator. "
-                "Please contact support."
-            ),
-            "suspended": (
-    f"Your account is temporarily suspended. "
-    f"Try again in {max(1, int((user.suspended_until - datetime.utcnow()).total_seconds() / 60) + 1)} minute(s)."
-    if user.suspended_until and user.suspended_until > datetime.utcnow()
-    else "Your account is suspended. Please contact support."
-),
-            "pending_deletion": (
-                "Your account is scheduled for deletion."
-            ),
-            "deleted": (
-                "This account is no longer available."
-            )
-        }
-
-        session.clear()
-
-        return render_template(
-            "auth/login.html",
-            error=status_messages.get(
-                user_status,
-                "Your account is unavailable."
-            ),
-            entered_email=email
-        ), 403
-
+ 
     # Wrong password: increment attempts in the database.
     if not user.check_password(password):
         user.failed_login_attempts = (
@@ -242,7 +185,74 @@ def login():
         "login_lock_email",
         None
     )
+    # Password has been verified at this point.
+    # Restore an expired suspension through the shared service.
+    try:
+        sync_account_suspension(user.id)
+        db.session.refresh(user)
 
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception(
+            "Unable to check suspension during login"
+        )
+
+        return render_template(
+            "auth/login.html",
+            error="Unable to check account status. Please try again.",
+            entered_email=email,
+        ), 503
+
+    now = datetime.utcnow()
+
+    user_role = (
+        user.role or "user"
+    ).strip().lower()
+
+    user_status = (
+        user.status or "active"
+    ).strip().lower()
+
+    if user_status != "active":
+        if (
+            user_status == "suspended"
+            and user.suspended_until is not None
+            and user.suspended_until > now
+        ):
+            seconds = (
+                user.suspended_until - now
+            ).total_seconds()
+
+            minutes = max(1, ceil(seconds / 60))
+
+            message = (
+                "Your account is temporarily suspended. "
+                f"Try again in {minutes} minute(s)."
+            )
+
+        else:
+            message = {
+                "suspended": "Your account is suspended.",
+                "blocked": "Your account is blocked.",
+                "pending_deletion": (
+                    "Your account is scheduled for deletion."
+                ),
+                "deleted": "This account is no longer available.",
+            }.get(
+                user_status,
+                "Your account is unavailable.",
+            )
+
+        if user.status_reason:
+            message += f" Reason: {user.status_reason}"
+
+        session.clear()
+
+        return render_template(
+            "auth/login.html",
+            error=message,
+            entered_email=email,
+        ), 403
     # Existing verification flow.
     if (
         user_role != "admin"

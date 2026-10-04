@@ -2,21 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>{% block title %}PFCG AI{% endblock %}</title>
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    >
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/user/common.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/user/common.css') }}"
+    >
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/user/layout.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/user/layout.css') }}"
+    >
+
+    {% block css %}{% endblock %}
 
     <style>
-        /* LOGO */
+        /* BRAND */
+
         .sidebar .logo {
             display: flex;
             align-items: center;
@@ -51,72 +64,194 @@
             color: #765cff;
         }
 
-        /* HEADER ACTIONS */
-        .user-header-actions {
+        /* COMMON HEADER */
+
+        #userSharedHeader[hidden] {
+            display: none !important;
+        }
+
+        body.user-layout #userSharedHeader,
+        body.user-layout .pfcg-integrated-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            overflow: visible;
+            min-width: 0;
+        }
+
+        body.user-layout #userSharedHeader {
+            margin: 0 0 20px;
+            padding: 18px 20px;
+            border: 1px solid #e8e1f5;
+            border-radius: 16px;
+            background: #ffffff;
+        }
+
+        body.user-layout .pfcg-integrated-header {
+            position: relative;
+        }
+
+        body.user-layout .pfcg-header-title {
+            flex: 1 1 200px;
+            min-width: 0;
+        }
+
+        body.user-layout .pfcg-header-title h1,
+        body.user-layout .pfcg-header-title h2 {
+            margin: 0;
+            color: #28165e;
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        body.user-layout .pfcg-header-title p {
+            margin: 7px 0 0;
+            color: #817994;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        body.user-layout #userSharedHeader .pfcg-header-title h1 {
+            font-size: 23px;
+        }
+
+        body.user-layout #userHeaderActions {
             display: flex;
             align-items: center;
             gap: 10px;
+            flex: 0 0 auto;
             margin-left: auto;
-            flex-shrink: 0;
         }
 
-        .user-notification-area {
+        /* PROFILE */
+
+        body.user-layout #userHeaderActions .user-header-profile {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 10px 14px;
+            border: 1px solid #e5dcff;
+            border-radius: 15px;
+            background: #ffffff;
+            color: #28165e;
+            text-decoration: none;
+            box-shadow: 0 5px 18px rgba(70, 50, 110, 0.04);
+        }
+
+        body.user-layout #userHeaderActions .user-header-profile:hover {
+            background: #faf8ff;
+        }
+
+        body.user-layout #userHeaderActions .user-header-avatar {
+            display: grid;
+            place-items: center;
+            width: 43px;
+            height: 43px;
+            flex: 0 0 43px;
+            overflow: hidden;
+            border-radius: 50%;
+            background: #eee8ff;
+            color: #7048ee;
+            font-size: 20px;
+        }
+
+        body.user-layout #userHeaderActions .user-header-photo {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        body.user-layout #userHeaderActions .user-header-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        body.user-layout #userHeaderActions .user-header-details small {
+            color: #8c829e;
+            font-size: 12px;
+        }
+
+        body.user-layout #userHeaderActions .user-header-details strong {
+            display: block;
+            max-width: 150px;
+            overflow: hidden;
+            color: #28165e;
+            font-size: 14px;
+            font-weight: 600;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        body.user-layout #userHeaderActions .profile-arrow {
+            color: #a28abd;
+            font-size: 12px;
+        }
+
+        /* NOTIFICATIONS */
+
+        #userHeaderActions .user-notification-area {
             position: relative;
             flex: 0 0 auto;
             z-index: 5000;
         }
 
-        .notification-bell {
+        #userHeaderActions .notification-bell {
             position: relative;
-            width: 43px;
-            height: 43px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            width: 43px;
+            height: 43px;
+            padding: 0;
             border: 1px solid #e7e0f4;
             border-radius: 12px;
             background: #ffffff;
             color: #7251d2;
-            font-size: 16px;
+            font-size: 17px;
             cursor: pointer;
-            box-shadow: 0 5px 18px rgba(70, 50, 110, 0.08);
-            transition: transform 0.2s ease, background 0.2s ease;
+            box-shadow: 0 5px 18px rgba(70, 50, 110, 0.06);
         }
 
-        .notification-bell:hover {
+        #userHeaderActions .notification-bell:hover {
             background: #f6f2ff;
-            transform: translateY(-1px);
         }
 
-        .notification-count {
+        #userHeaderActions .notification-count {
             position: absolute;
             top: -6px;
             right: -6px;
-            min-width: 19px;
-            height: 19px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            min-width: 20px;
+            height: 20px;
             padding: 0 5px;
+            box-sizing: border-box;
             border: 2px solid #ffffff;
             border-radius: 20px;
             background: #dc4f5d;
             color: #ffffff;
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 700;
-            box-sizing: border-box;
         }
 
-        .notification-count[hidden] {
-            display: none;
+        #userHeaderActions .notification-count[hidden],
+        #userHeaderActions .notification-dropdown[hidden] {
+            display: none !important;
         }
 
-        .notification-dropdown {
+        #userHeaderActions .notification-dropdown {
             position: absolute;
-            top: 52px;
+            top: calc(100% + 12px);
             right: 0;
-            width: min(390px, calc(100vw - 35px));
-            max-height: 520px;
+            width: min(390px, calc(100vw - 32px));
+            max-height: min(520px, 75vh);
             overflow: hidden;
             border: 1px solid #e9e3f2;
             border-radius: 15px;
@@ -124,45 +259,38 @@
             box-shadow: 0 18px 50px rgba(45, 31, 70, 0.18);
         }
 
-        .notification-dropdown[hidden] {
-            display: none;
-        }
-
-        .notification-dropdown-header {
+        #userHeaderActions .notification-dropdown-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 15px;
-            padding: 16px 17px;
+            gap: 12px;
+            padding: 16px;
             border-bottom: 1px solid #eee9f5;
             background: #fbf9ff;
         }
 
-        .notification-dropdown-header h3 {
-            margin: 0 0 3px;
+        #userHeaderActions .notification-dropdown-header h3 {
+            margin: 0 0 4px;
             color: #302641;
             font-size: 15px;
         }
 
-        .notification-dropdown-header p {
+        #userHeaderActions .notification-dropdown-header p {
             margin: 0;
             color: #92899e;
-            font-size: 10px;
+            font-size: 11px;
         }
 
         #markAllNotificationsRead {
+            flex-shrink: 0;
             padding: 7px 10px;
             border: 1px solid #dfd5f3;
             border-radius: 8px;
             background: #ffffff;
             color: #7251d2;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
-        }
-
-        #markAllNotificationsRead:hover {
-            background: #f3edff;
         }
 
         #markAllNotificationsRead:disabled {
@@ -170,12 +298,12 @@
             cursor: not-allowed;
         }
 
-        .notification-list {
-            max-height: 435px;
+        #userHeaderActions .notification-list {
+            max-height: min(435px, 58vh);
             overflow-y: auto;
         }
 
-        .notification-item {
+        #userHeaderActions .notification-item {
             display: flex;
             align-items: flex-start;
             gap: 11px;
@@ -183,143 +311,256 @@
             border-bottom: 1px solid #f0ecf5;
             background: #ffffff;
             cursor: pointer;
-            transition: background 0.2s ease;
         }
 
-        .notification-item:hover {
+        #userHeaderActions .notification-item:hover {
             background: #faf8ff;
         }
 
-        .notification-item.unread {
+        #userHeaderActions .notification-item.unread {
             background: #f7f3ff;
         }
 
-        .notification-item-icon {
+        #userHeaderActions .notification-item-icon {
+            display: grid;
+            place-items: center;
             width: 36px;
-            min-width: 36px;
             height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            flex: 0 0 36px;
             border-radius: 10px;
             background: #eee8ff;
             color: #7251d2;
             font-size: 13px;
         }
 
-        .notification-item.warning .notification-item-icon {
+        #userHeaderActions .notification-item.warning .notification-item-icon {
             background: #fff4dd;
             color: #b87517;
         }
 
-        .notification-item.suspended .notification-item-icon {
+        #userHeaderActions .notification-item.suspended .notification-item-icon {
             background: #ffe8eb;
             color: #cc4d5c;
         }
 
-        .notification-item.reactivated .notification-item-icon {
+        #userHeaderActions .notification-item.reactivated .notification-item-icon {
             background: #e7f8ed;
             color: #2c9155;
         }
 
-        .notification-item-content {
-            min-width: 0;
+        #userHeaderActions .notification-item-content {
             flex: 1;
+            min-width: 0;
         }
 
-        .notification-item-content strong {
+        #userHeaderActions .notification-item-content strong {
             display: block;
             margin-bottom: 4px;
             color: #342b43;
             font-size: 12px;
         }
 
-        .notification-item-content p {
+        #userHeaderActions .notification-item-content p {
             margin: 0 0 6px;
             color: #746c7e;
-            font-size: 10px;
-            line-height: 1.5;
-            word-break: break-word;
+            font-size: 12px;
+            line-height: 1.6;
+            white-space: pre-line;
+            overflow-wrap: anywhere;
         }
 
-        .notification-item-content time {
+        #userHeaderActions .notification-item-content time {
             color: #a098aa;
-            font-size: 9px;
+            font-size: 10px;
         }
 
-        .notification-unread-dot {
+        #userHeaderActions .notification-unread-dot {
             width: 8px;
-            min-width: 8px;
             height: 8px;
+            flex: 0 0 8px;
             margin-top: 5px;
             border-radius: 50%;
             background: #7251d2;
         }
 
-        .notification-loading,
-        .notification-empty,
-        .notification-error {
-            padding: 40px 20px;
+        #userHeaderActions .notification-loading,
+        #userHeaderActions .notification-empty,
+        #userHeaderActions .notification-error {
+            padding: 35px 20px;
             text-align: center;
             color: #8f869a;
-            font-size: 11px;
+            font-size: 12px;
             line-height: 1.6;
         }
 
-        .notification-empty i,
-        .notification-error i {
+        #userHeaderActions .notification-empty i,
+        #userHeaderActions .notification-error i {
             display: block;
             margin-bottom: 10px;
-            color: #b4a8c8;
             font-size: 25px;
         }
 
-        .notification-error {
+        #userHeaderActions .notification-error {
             color: #c74e5a;
         }
 
-        @media (max-width: 700px) {
-            .user-header-actions {
+        /* RESTRICTION BANNER */
+
+        #userRestrictionBanner[hidden] {
+            display: none !important;
+        }
+
+        #userRestrictionBanner {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin: 0 0 20px;
+            padding: 18px 20px;
+            border: 1px solid #f2cf89;
+            border-left: 4px solid #d99a23;
+            border-radius: 14px;
+            background: #fff8e8;
+            color: #744c12;
+        }
+
+        #userRestrictionBanner > i {
+            flex-shrink: 0;
+            margin-top: 3px;
+            font-size: 21px;
+        }
+
+        .user-restriction-details {
+            min-width: 0;
+        }
+
+        .user-restriction-details > strong {
+            display: block;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .user-restriction-details p {
+            margin: 7px 0;
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        .user-restriction-details small {
+            display: block;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        #userRestrictionCountdown {
+            display: inline-block;
+            margin-left: 6px;
+            font-weight: 600;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 768px) {
+            body.user-layout #userSharedHeader {
+                padding: 13px;
+                margin-bottom: 16px;
+            }
+
+            body.user-layout .pfcg-header-title {
+                flex-basis: 120px;
+            }
+
+            body.user-layout .pfcg-header-title h1,
+            body.user-layout .pfcg-header-title h2,
+            body.user-layout #userSharedHeader .pfcg-header-title h1 {
+                font-size: 20px;
+            }
+
+            body.user-layout .pfcg-header-title p {
+                font-size: 12px;
+            }
+
+            body.user-layout #userHeaderActions {
                 gap: 8px;
             }
 
-            .notification-bell {
+            body.user-layout #userHeaderActions .user-header-profile {
+                padding: 5px;
+                border-radius: 12px;
+            }
+
+            body.user-layout #userHeaderActions .user-header-avatar {
+                width: 36px;
+                height: 36px;
+                flex-basis: 36px;
+                font-size: 17px;
+            }
+
+            body.user-layout #userHeaderActions .user-header-details,
+            body.user-layout #userHeaderActions .profile-arrow {
+                display: none;
+            }
+
+            #userHeaderActions .notification-bell {
                 width: 39px;
                 height: 39px;
             }
 
-            .notification-dropdown {
+            #userHeaderActions .notification-dropdown {
                 position: fixed;
-                top: 62px;
-                right: 12px;
+                top: 80px;
                 left: 12px;
+                right: 12px;
                 width: auto;
+            }
+
+            #userRestrictionBanner {
+                gap: 10px;
+                padding: 14px;
+            }
+
+            #userRestrictionCountdown {
+                display: block;
+                margin: 4px 0 0;
             }
         }
     </style>
-
-    {% block css %}{% endblock %}
 </head>
 
-{% set pages_without_header = [
-    'user.generator',
-    'user.seo_analysis',
-    'user.my_content',
-    'user.edit_content',
-    'user.saved_documents',
-    'user.reports',
-    'user.feedback'
-] %}
+{% set page_names = {
+    'user.dashboard': 'Dashboard',
+    'user.generator': 'Content Generator',
+    'user.seo_analysis': 'SEO Analysis',
+    'user.seo_history': 'SEO History',
+    'user.my_content': 'My Content',
+    'user.edit_content': 'Content Editor',
+    'user.saved_documents': 'Saved Documents',
+    'user.reports': 'Reports',
+    'user.feedback': 'Feedback',
+    'user.feedback_history': 'Feedback History',
+    'user.profile': 'My Account',
+    'user.account': 'My Account',
+    'user.settings': 'Settings'
+} %}
 
-{% set hide_page_header = request.endpoint in pages_without_header %}
+{% set custom_page_title %}
+    {% block page_title %}{% endblock %}
+{% endset %}
 
-<body class="user-layout {% if hide_page_header %}user-layout-no-header{% endif %}">
+<body
+    class="user-layout"
+    data-page-endpoint="{{ request.endpoint or '' }}"
+    data-page-name="{{ page_names.get(request.endpoint, 'PFCG AI') }}"
+>
 
 <div class="wrapper">
 
     <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar" aria-label="Sidebar navigation">
 
+    <aside
+        class="sidebar"
+        id="sidebar"
+        aria-label="Sidebar navigation"
+    >
         <button
             type="button"
             id="closeSidebar"
@@ -329,7 +570,6 @@
             <i class="fas fa-xmark" aria-hidden="true"></i>
         </button>
 
-        <!-- LOGO -->
         <div class="logo">
             <span class="pfcg-spark-icon" aria-hidden="true">
                 <svg
@@ -353,9 +593,7 @@
             </span>
         </div>
 
-        <!-- NAVIGATION -->
         <nav aria-label="Main navigation">
-
             {% set navigation = [
                 ('user.dashboard', 'fa-house', 'Dashboard'),
                 ('user.generator', 'fa-wand-magic-sparkles', 'Generator'),
@@ -371,7 +609,6 @@
                 <a
                     href="{{ url_for(endpoint) }}"
                     class="{% if request.endpoint == endpoint %}active{% endif %}"
-                    aria-label="{{ label }}"
                     title="{{ label }}"
                     {% if request.endpoint == endpoint %}
                         aria-current="page"
@@ -381,19 +618,13 @@
                     <span>{{ label }}</span>
                 </a>
             {% endfor %}
-
         </nav>
 
-        <!-- BOTTOM MENU -->
         <div class="sidebar-bottom">
-
             <a
                 href="{{ url_for('user.profile') }}"
-                class="{% if request.endpoint in ['user.profile', 'user.settings'] %}active{% endif %}"
+                class="{% if request.endpoint in ['user.profile', 'user.settings', 'user.account'] %}active{% endif %}"
                 title="My Account"
-                {% if request.endpoint in ['user.profile', 'user.settings'] %}
-                    aria-current="page"
-                {% endif %}
             >
                 <i class="fas fa-user-gear" aria-hidden="true"></i>
                 <span>My Account</span>
@@ -407,7 +638,6 @@
                 <i class="fas fa-right-from-bracket" aria-hidden="true"></i>
                 <span>Logout</span>
             </a>
-
         </div>
     </aside>
 
@@ -417,7 +647,8 @@
         hidden
     ></div>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN -->
+
     <main class="main">
 
         <div class="mobile-menu-bar">
@@ -435,124 +666,143 @@
             <span>Menu</span>
         </div>
 
-        {% if not hide_page_header %}
-            <header class="user-page-header">
+        <!-- FALLBACK HEADER -->
 
-                <div class="user-header-heading">
+        <header id="userSharedHeader" class="user-page-header">
 
-                    {% if request.endpoint == 'user.dashboard' %}
-                        <h1>
-                            Welcome Back,
-                            <span>{{ session.get('user_name') or 'User' }}</span>
-                        </h1>
-
-                        <p>
-                            Generate, humanize and analyze your content
-                            in one workspace.
-                        </p>
+            <div class="pfcg-header-title">
+                <h1>
+                    {% if custom_page_title|trim %}
+                        {{ custom_page_title }}
                     {% else %}
-                        <h1>{% block page_title %}{% endblock %}</h1>
+                        {{ page_names.get(request.endpoint, 'PFCG AI') }}
                     {% endif %}
+                </h1>
+            </div>
 
-                </div>
+            <!-- SINGLE SHARED ACTIONS AREA -->
 
-                <!-- NOTIFICATIONS AND PROFILE -->
-                <div class="user-header-actions">
+            <div id="userHeaderActions" class="user-header-actions">
 
-                    <div class="user-notification-area">
+                <div class="user-notification-area">
+                    <button
+                        type="button"
+                        id="notificationBell"
+                        class="notification-bell"
+                        aria-label="Open notifications"
+                        aria-controls="notificationDropdown"
+                        aria-expanded="false"
+                    >
+                        <i class="fas fa-bell" aria-hidden="true"></i>
 
-                        <button
-                            type="button"
-                            id="notificationBell"
-                            class="notification-bell"
-                            aria-label="Open notifications"
-                            aria-expanded="false"
-                        >
-                            <i class="fas fa-bell" aria-hidden="true"></i>
+                        <span
+                            id="notificationCount"
+                            class="notification-count"
+                            hidden
+                        >0</span>
+                    </button>
 
-                            <span
-                                id="notificationCount"
-                                class="notification-count"
-                                hidden
-                            >0</span>
-                        </button>
+                    <div
+                        id="notificationDropdown"
+                        class="notification-dropdown"
+                        hidden
+                    >
+                        <div class="notification-dropdown-header">
+                            <div>
+                                <h3>Notifications</h3>
+                                <p>Account updates and messages</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                id="markAllNotificationsRead"
+                            >
+                                Mark all read
+                            </button>
+                        </div>
 
                         <div
-                            id="notificationDropdown"
-                            class="notification-dropdown"
-                            hidden
+                            id="notificationList"
+                            class="notification-list"
+                            aria-live="polite"
+                            aria-busy="true"
                         >
-                            <div class="notification-dropdown-header">
-
-                                <div>
-                                    <h3>Notifications</h3>
-                                    <p>Account updates and messages</p>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    id="markAllNotificationsRead"
-                                >
-                                    Mark all read
-                                </button>
-
+                            <div class="notification-loading">
+                                Loading notifications...
                             </div>
-
-                            <div
-                                id="notificationList"
-                                class="notification-list"
-                                aria-live="polite"
-                                aria-busy="true"
-                            >
-                                <div class="notification-loading">
-                                    Loading notifications...
-                                </div>
-                            </div>
-
                         </div>
                     </div>
-
-                    <a
-                        href="{{ url_for('user.profile') }}"
-                        class="user-header-profile"
-                        aria-label="Open My Profile"
-                        title="My Profile"
-                    >
-                        <span class="user-header-avatar">
-
-                            {% if account_header_photo|default('') %}
-                                <img
-                                    src="{{ account_header_photo }}"
-                                    alt="Your profile photo"
-                                    class="user-header-photo"
-                                >
-                            {% else %}
-                                <i class="fas fa-user" aria-hidden="true"></i>
-                            {% endif %}
-
-                        </span>
-
-                        <span class="user-header-details">
-                            <small>
-                                {{ (session.get('role') or 'User')|title }}
-                            </small>
-
-                            <strong>
-                                {{ session.get('user_name') or 'User' }}
-                            </strong>
-                        </span>
-
-                        <i
-                            class="fas fa-chevron-right profile-arrow"
-                            aria-hidden="true"
-                        ></i>
-                    </a>
-
                 </div>
-            </header>
-        {% endif %}
 
-        <section class="content-wrapper">
+                <a
+                    href="{{ url_for('user.profile') }}"
+                    class="user-header-profile"
+                    aria-label="Open My Account"
+                    title="My Account"
+                >
+                    <span class="user-header-avatar">
+                        {% if account_header_photo|default('') %}
+                            <img
+                                src="{{ account_header_photo }}"
+                                alt="Your profile photo"
+                                class="user-header-photo"
+                            >
+                        {% else %}
+                            <i class="fas fa-user" aria-hidden="true"></i>
+                        {% endif %}
+                    </span>
+
+                    <span class="user-header-details">
+                        <small>{{ (session.get('role') or 'User')|title }}</small>
+                        <strong>{{ session.get('user_name') or 'User' }}</strong>
+                    </span>
+
+                    <i
+                        class="fas fa-chevron-right profile-arrow"
+                        aria-hidden="true"
+                    ></i>
+                </a>
+
+            </div>
+        </header>
+
+        <!-- RESTRICTION NOTICE: DASHBOARD ONLY -->
+
+{% if request.endpoint in ['user.dashboard', 'user.generator'] %}
+
+<div
+    id="userRestrictionBanner"
+    class="user-restriction-banner"
+    role="status"
+    hidden
+>
+    <i class="fas fa-shield-halved" aria-hidden="true"></i>
+
+    <div class="user-restriction-details">
+        <strong>
+            Generation and humanization temporarily restricted
+        </strong>
+
+        <p>
+            Reason: Three blocked-topic attempts within 24 hours.
+            Generate, Regenerate and Humanize are temporarily unavailable.
+        </p>
+
+        <p>
+            Available again:
+            <strong id="userRestrictionEnd"></strong>
+            <span id="userRestrictionCountdown"></span>
+        </p>
+
+        <small>
+            My Content, editor, SEO and saved-content export remain available.
+        </small>
+    </div>
+</div>
+
+{% endif %}
+
+        <section id="userPageContent" class="content-wrapper">
             {% block content %}{% endblock %}
         </section>
 
@@ -560,9 +810,358 @@
 </div>
 
 <div id="toast" role="status" aria-live="polite"></div>
+<!-- SHARED HEADER PLACEMENT -->
 
-<script src="{{ url_for('static', filename='js/user/ui.js') }}"></script>
-<script src="{{ url_for('static', filename='js/user/notifications.js') }}"></script>
+<style>
+    body.user-layout .pfcg-fixed-page-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: wrap;
+        gap: 16px;
+        width: 100% !important;
+        max-width: none !important;
+        box-sizing: border-box;
+        overflow: visible !important;
+        margin-bottom: 24px;
+    }
+
+    body.user-layout .pfcg-fixed-page-header > .pfcg-page-heading-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex: 1 1 250px;
+        min-width: 0;
+    }
+
+    body.user-layout .pfcg-fixed-page-header > #userHeaderActions {
+        flex: 0 0 auto;
+        margin-left: auto !important;
+    }
+
+    body.user-layout .pfcg-page-heading-left h1 {
+        margin: 0;
+    }
+
+    body.user-layout .pfcg-page-heading-left p {
+        margin: 7px 0 0;
+        line-height: 1.6;
+    }
+
+    /* My Account: notification bell only */
+
+    body[data-page-endpoint="user.account"] #userHeaderActions .user-header-profile,
+    body[data-page-endpoint="user.profile"] #userHeaderActions .user-header-profile,
+    body[data-page-endpoint="user.settings"] #userHeaderActions .user-header-profile {
+        display: none !important;
+    }
+
+    /* Dashboard assistant spacing */
+
+    body[data-page-endpoint="user.dashboard"] .dashboard-header {
+        height: auto !important;
+        min-height: 0 !important;
+    }
+
+    body[data-page-endpoint="user.dashboard"] .today-card {
+        height: auto !important;
+        min-height: 0 !important;
+        padding: 20px 24px !important;
+    }
+
+    body[data-page-endpoint="user.dashboard"] .today-card h3 {
+        margin: 0 0 6px;
+    }
+
+    body[data-page-endpoint="user.dashboard"] .today-card p {
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+        body.user-layout .pfcg-fixed-page-header {
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        body.user-layout .pfcg-fixed-page-header > .pfcg-page-heading-left {
+            gap: 10px;
+            flex-basis: 160px;
+        }
+
+        body.user-layout .pfcg-page-heading-left h1 {
+            font-size: 22px;
+        }
+
+        body[data-page-endpoint="user.dashboard"] .today-card {
+            padding: 16px !important;
+        }
+    }
+</style>
+
+<script>
+(function () {
+    const content = document.getElementById("userPageContent");
+    const sharedHeader = document.getElementById("userSharedHeader");
+    const actions = document.getElementById("userHeaderActions");
+
+    if (!content || !sharedHeader || !actions) return;
+
+    const endpoint = document.body.dataset.pageEndpoint || "";
+
+    // These selectors match the HTML files you provided.
+   const headerSelectors = {
+    "user.seo_analysis": ".seo-page-heading",
+    "user.my_content": ".content-top",
+    "user.edit_content": ".editor-header",
+    "user.saved_documents": ".saved-page-header",
+    "user.feedback": ".feedback-heading",
+    "user.reports": ".reports-header",
+    "user.account": ".account-heading",
+    "user.profile": ".account-heading",
+    "user.settings": ".account-heading"
+};
+    const selector = headerSelectors[endpoint];
+    const pageHeader = selector
+        ? content.querySelector(selector)
+        : null;
+
+    if (pageHeader) {
+        const left = document.createElement("div");
+        left.className = "pfcg-page-heading-left";
+
+        // Keep existing tools/counts on the right.
+        const preserveOnRight = new Set([
+            "content-total",
+            "editor-header-tools"
+        ]);
+
+        const originalChildren = [...pageHeader.children];
+
+        originalChildren.forEach(child => {
+            const staysOnRight = [...preserveOnRight].some(
+                className => child.classList.contains(className)
+            );
+
+            if (!staysOnRight) {
+                left.appendChild(child);
+            }
+        });
+
+        pageHeader.prepend(left);
+        pageHeader.appendChild(actions);
+        pageHeader.classList.add("pfcg-fixed-page-header");
+
+        sharedHeader.hidden = true;
+    }
+
+    // Generator has no page heading in its HTML.
+    // Its common "Content Generator" header remains visible.
+
+    const profileLink = actions.querySelector(".user-header-profile");
+    const avatar = actions.querySelector(".user-header-avatar");
+
+    const accountPages = new Set([
+        "user.account",
+        "user.profile",
+        "user.settings"
+    ]);
+
+    if (!profileLink || !avatar || accountPages.has(endpoint)) return;
+
+    // Fetch the saved photo consistently on every user page.
+    async function loadHeaderPhoto() {
+        try {
+            const response = await fetch("/user/api/account", {
+                credentials: "same-origin",
+                cache: "no-store",
+                headers: {
+                    Accept: "application/json"
+                }
+            });
+
+            if (!response.ok) return;
+
+            const result = await response.json();
+
+            if (!result.success || !result.data) return;
+
+            const picture = result.data.profile_picture;
+
+            if (typeof picture !== "string" || !picture.trim()) return;
+
+        const path = picture.trim();
+
+const staticRoot = "{{ url_for('static', filename='') }}";
+
+let photoUrl;
+
+if (
+    path.startsWith("https://")
+    || path.startsWith("http://")
+) {
+    photoUrl = path;
+} else if (path.startsWith("/")) {
+    photoUrl = path;
+} else {
+    const relativePath = path.startsWith("static/")
+        ? path.slice(7)
+        : path;
+
+    photoUrl = staticRoot + relativePath;
+}
+            const image = new Image();
+            image.className = "user-header-photo";
+            image.alt = "Your profile photo";
+
+            image.onload = () => {
+                avatar.replaceChildren(image);
+            };
+
+            // Keep the existing avatar if the image cannot load.
+            image.src = photoUrl;
+        } catch (error) {
+            console.warn("Header profile photo could not load:", error);
+        }
+    }
+
+    loadHeaderPhoto();
+})();
+</script>
+<script
+    src="{{ url_for('static', filename='js/user/ui.js') }}"
+></script>
+
+<script
+    src="{{ url_for('static', filename='js/user/notifications.js') }}"
+></script>
+
+<!-- RESTRICTION STATUS AND COUNTDOWN -->
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const banner = document.getElementById("userRestrictionBanner");
+    const endLabel = document.getElementById("userRestrictionEnd");
+    const countdown = document.getElementById("userRestrictionCountdown");
+
+    if (!banner || !endLabel || !countdown) return;
+
+    let restrictedUntil = null;
+    let serverTime = Date.now();
+    let measuredAt = performance.now();
+    let requestRunning = false;
+
+    const pktFormatter = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Karachi",
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+    });
+
+    function estimatedServerTime() {
+        return serverTime + (performance.now() - measuredAt);
+    }
+
+    function updateBanner() {
+        if (restrictedUntil === null) {
+            banner.hidden = true;
+            return;
+        }
+
+        const remaining = restrictedUntil - estimatedServerTime();
+
+        if (remaining <= 0) {
+            restrictedUntil = null;
+            banner.hidden = true;
+            loadRestriction();
+            return;
+        }
+
+        banner.hidden = false;
+
+        endLabel.textContent =
+            pktFormatter.format(new Date(restrictedUntil)) + " PKT";
+
+        const totalSeconds = Math.ceil(remaining / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        const remainingText = hours > 0
+            ? `${hours}h ${minutes}m ${seconds}s`
+            : `${minutes}m ${seconds}s`;
+
+        countdown.textContent = `(${remainingText} remaining)`;
+    }
+
+    async function loadRestriction() {
+        if (requestRunning) return;
+        requestRunning = true;
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+
+        try {
+            const response = await fetch("/user/api/notifications", {
+                method: "GET",
+                credentials: "same-origin",
+                cache: "no-store",
+                headers: {
+                    Accept: "application/json"
+                },
+                signal: controller.signal
+            });
+
+            if (!response.ok) return;
+
+            const result = await response.json();
+
+            if (!result.success) return;
+
+            const receivedServerTime = Date.parse(result.server_now);
+
+            if (!Number.isFinite(receivedServerTime)) return;
+
+            serverTime = receivedServerTime;
+            measuredAt = performance.now();
+
+            if (result.generator_restricted_until) {
+                const expiry = Date.parse(
+                    result.generator_restricted_until
+                );
+
+                if (!Number.isFinite(expiry)) return;
+
+                restrictedUntil = expiry;
+            } else {
+                restrictedUntil = null;
+            }
+
+            updateBanner();
+        } catch (error) {
+            console.warn("Restriction status refresh failed:", error);
+        } finally {
+            clearTimeout(timeout);
+            requestRunning = false;
+        }
+    }
+
+    loadRestriction();
+
+    setInterval(updateBanner, 1000);
+
+    setInterval(() => {
+        if (!document.hidden) loadRestriction();
+    }, 30000);
+
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) loadRestriction();
+    });
+});
+</script>
 
 {% block js %}{% endblock %}
 

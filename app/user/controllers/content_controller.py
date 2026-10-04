@@ -175,11 +175,27 @@ def my_content_api():
                     NULL AS original_content_id,
 
                     'humanized' AS source_type,
-
-                    COALESCE(
-                        gc.topic,
-                        'Humanized Content'
-                    ) AS topic,
+COALESCE(
+    NULLIF(TRIM(gc.topic), ''),
+    NULLIF(
+        LEFT(
+            TRIM(
+                SUBSTRING_INDEX(
+                    REPLACE(
+                        TRIM(hh.original_content),
+                        CHAR(13),
+                        ''
+                    ),
+                    CHAR(10),
+                    1
+                )
+            ),
+            140
+        ),
+        ''
+    ),
+    CONCAT('Humanized Content #', hh.id)
+) AS topic,
 
                     hh.humanized_content AS content,
 
@@ -193,19 +209,20 @@ def my_content_api():
                     hh.created_at AS created_at
 
                 FROM humanized_history hh
-
                 LEFT JOIN generated_content gc
-                    ON gc.id = (
-                        SELECT gc2.id
-                        FROM generated_content gc2
-                        WHERE
-                            (
-                                gc2.user_email = :email
-                                OR gc2.user_id = :user_id
-                            )
-                        ORDER BY gc2.created_at DESC
-                        LIMIT 1
-                    )
+                ON gc.id = (
+        SELECT gc2.id
+        FROM generated_content gc2
+        WHERE
+            (
+                gc2.user_email = :email
+                OR gc2.user_id = :user_id
+            )
+            AND CAST(gc2.content AS BINARY)
+                = CAST(hh.original_content AS BINARY)
+        ORDER BY gc2.created_at DESC, gc2.id DESC
+        LIMIT 1
+    )
 
                 WHERE
                     hh.user_email = :email

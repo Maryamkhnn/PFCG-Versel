@@ -34,7 +34,10 @@ from app.user.controllers.content_controller import (
     save_document_api,
     delete_document_api
 )
-
+from app.user.controllers.account_controller import (
+    get_account_deletion_context_api,
+    request_account_deletion_api,
+)
 # Editor
 from app.user.controllers.edit_controller import (
     get_edit_content_api,
@@ -97,6 +100,9 @@ from app.user.controllers.account_controller import (
     change_account_password_api,
     get_account_settings_api,
     save_account_preferences_api
+)
+from app.user.controllers.account_controller import (
+    confirm_account_deletion_api,
 )
 # ============================================================
 # BLUEPRINT
@@ -668,3 +674,17 @@ def account_photo():
     )
 
     return get_account_picture_api()
+@user.route("/api/account/deletion", methods=["GET"])
+@login_required
+def api_account_deletion_context():
+    return get_account_deletion_context_api()
+
+
+@user.route("/api/account/deletion/request", methods=["POST"])
+@login_required
+def api_request_account_deletion():
+    return request_account_deletion_api()
+@user.route("/api/account/deletion/confirm", methods=["POST"])
+@login_required
+def api_confirm_account_deletion():
+    return confirm_account_deletion_api()

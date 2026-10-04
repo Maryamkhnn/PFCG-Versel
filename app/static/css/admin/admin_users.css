@@ -2021,3 +2021,248 @@
         transform: none;
     }
 }
+@media (max-width: 1000px) {
+    .admin-users-page .content-table tr {
+        position: relative;
+        padding: 10px 14px;
+    }
+
+    /* Number at the top-right of each card */
+    .admin-users-page .content-table td.id-cell {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: auto;
+        padding: 0;
+        border: 0;
+        color: var(--users-muted);
+        font-size: 12px;
+    }
+
+    .admin-users-page .content-table td.id-cell::before {
+        display: inline;
+        content: "#";
+        margin: 0;
+    }
+
+    /* Name and avatar become the card heading */
+    .admin-users-page .content-table td:nth-child(2) {
+        padding: 8px 30px 12px 0;
+    }
+
+    .admin-users-page .content-table td:nth-child(2)::before {
+        display: none;
+    }
+
+    /* Labels and values share a row */
+    .admin-users-page .content-table td:nth-child(3),
+    .admin-users-page .content-table td:nth-child(4),
+    .admin-users-page .content-table td:nth-child(5) {
+        display: grid;
+        grid-template-columns: 60px minmax(0, 1fr);
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+    }
+
+    .admin-users-page .content-table td:nth-child(3)::before,
+    .admin-users-page .content-table td:nth-child(4)::before,
+    .admin-users-page .content-table td:nth-child(5)::before {
+        margin: 0;
+    }
+
+    .admin-users-page .status-badge,
+    .admin-users-page .activity-badge {
+        justify-self: start;
+    }
+
+    .admin-users-page .content-table td:last-child::before {
+        display: none;
+    }
+
+    .admin-users-page .action-buttons {
+        gap: 7px;
+    }
+
+    .admin-users-page .action-btn {
+        flex: 1 1 90px;
+        padding: 9px 7px;
+        font-size: 11px;
+    }
+}
+/* Page spacing on desktop and mobile */
+.admin-page.admin-users-page {
+    width: 100%;
+    min-width: 0;
+    margin: 0 !important;
+    padding: 24px !important;
+    box-sizing: border-box;
+}
+
+/* Tablet / mobile cards */
+@media (max-width: 1000px) {
+    .admin-users-page .content-table,
+    .admin-users-page .content-table tbody {
+        display: block !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .admin-users-page .content-table thead {
+        display: none !important;
+    }
+
+    .admin-users-page .content-table tbody tr {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 0 10px;
+        position: relative;
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 14px !important;
+        margin-bottom: 12px;
+        box-sizing: border-box;
+    }
+
+    .admin-users-page .content-table tbody tr > td {
+        display: block !important;
+        position: static;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 100%;
+        padding: 10px 0 !important;
+        text-align: left !important;
+        white-space: normal !important;
+        box-sizing: border-box;
+    }
+
+    .admin-users-page .content-table tbody tr > td::before {
+        display: none !important;
+    }
+
+    /* Number */
+    .admin-users-page .content-table tbody tr > td.id-cell {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        padding: 0 !important;
+        border: 0 !important;
+        color: var(--users-muted);
+        font-size: 11px;
+    }
+
+    .admin-users-page .content-table tbody tr > td.id-cell::before {
+        display: inline !important;
+        content: "#";
+        margin: 0;
+    }
+
+    /* Avatar and name */
+    .admin-users-page .content-table tbody tr > td:nth-child(2) {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        padding: 0 30px 12px 0 !important;
+    }
+
+    /* Email gets the full card width */
+    .admin-users-page .content-table tbody tr > td.email-cell {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        font-size: 13px;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+        word-break: normal !important;
+    }
+
+    /* Status */
+    .admin-users-page .content-table tbody tr > td:nth-child(4) {
+        grid-column: 1;
+        grid-row: 3;
+    }
+
+    /* Activity */
+    .admin-users-page .content-table tbody tr > td:nth-child(5) {
+        grid-column: 2;
+        grid-row: 3;
+        text-align: right !important;
+    }
+
+    .admin-users-page .activity-badge {
+        display: inline-flex !important;
+        width: auto !important;
+        max-width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+        white-space: normal;
+    }
+
+    /* Actions */
+    .admin-users-page .content-table tbody tr > td:last-child {
+        grid-column: 1 / -1;
+        grid-row: 4;
+        padding-bottom: 0 !important;
+        border-bottom: 0 !important;
+    }
+
+    .admin-users-page .action-buttons {
+        display: flex !important;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .admin-users-page .action-buttons .action-btn {
+        display: inline-flex !important;
+        flex: 1 1 0 !important;
+        width: auto !important;
+        min-width: 0;
+        min-height: 44px;
+        height: auto;
+        padding: 9px 5px;
+        gap: 6px;
+        border: 1px solid var(--users-border);
+        border-radius: 9px;
+        background: var(--users-soft);
+        color: var(--users-purple);
+        font-size: 12px;
+    }
+
+    .admin-users-page .view-btn::after {
+        content: "View" !important;
+    }
+
+    .admin-users-page .edit-btn::after {
+        content: "Edit" !important;
+    }
+
+    .admin-users-page .history-btn::after {
+        content: "History" !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-page.admin-users-page {
+        padding: 14px !important;
+    }
+}
+.admin-users-page .action-buttons .history-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    min-height: 44px;
+    padding: 9px;
+    border: 1px solid var(--users-border, #e6dff2);
+    border-radius: 9px;
+    background: var(--users-soft, #f8f5ff);
+    color: var(--users-purple, #6944ed);
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1000px) {
+    .admin-users-page .action-buttons .history-btn {
+        width: auto;
+        flex: 1 1 0;
+        gap: 6px;
+    }
+}

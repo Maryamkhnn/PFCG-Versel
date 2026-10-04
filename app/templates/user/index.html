@@ -40,10 +40,11 @@
     </span>
 </a>
             <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#how-it-works">How It Works</a>
-                <a href="#faq">FAQ</a>
-            </div>
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="#faq">FAQ</a>
+    <a href="#contact">Contact</a>
+</div>
 
             <div class="nav-actions">
                 <a class="login-link" href="/login">Log In</a>
@@ -327,6 +328,107 @@
 
     </main>
 
-  
+  <footer class="support-footer" id="contact">
+    <div class="container support-footer-inner">
+
+        <div class="support-footer-brand">
+            <span class="support-eyebrow">LET’S CONNECT</span>
+
+            <h2>
+                Need a little help?
+                <span>We’re here.</span>
+            </h2>
+
+            <p>
+                Have a question, found an issue, or want to share an idea?
+                Contact the PFCG AI team.
+            </p>
+
+            <a class="support-faq-link" href="#faq">
+                Explore frequently asked questions
+                <span aria-hidden="true">↗</span>
+            </a>
+        </div>
+
+        <div class="support-contact-card">
+            <div class="support-contact-heading">
+                <span class="support-mail-icon" aria-hidden="true">
+                    <svg
+                        width="25"
+                        height="25"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <rect x="3" y="5" width="18" height="14" rx="3"/>
+                        <path d="m3 7 9 6 9-6"/>
+                    </svg>
+                </span>
+
+                <div>
+                    <h3>Help &amp; Support</h3>
+                    <p>Send us your question or feedback.</p>
+                </div>
+            </div>
+
+            <p class="support-email-address">
+                itsm56796@gmail.com
+            </p>
+
+            <div class="support-contact-actions">
+                <a
+                    class="support-gmail-button"
+                    href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=itsm56796%40gmail.com&amp;su=PFCG%20AI%20Support"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Open Gmail
+                    <span aria-hidden="true">↗</span>
+                </a>
+
+                <button
+                    type="button"
+                    class="support-copy-button"
+                    id="copySupportEmail"
+                >
+                    Copy Email
+                </button>
+            </div>
+
+            <p
+                id="supportCopyStatus"
+                class="support-copy-status"
+                role="status"
+                aria-live="polite"
+            ></p>
+
+            <small class="support-contact-note">
+                Include a screenshot if helpful.
+                Never share your password or verification code.
+            </small>
+        </div>
+
+    </div>
+</footer>
+<script>
+document.getElementById("copySupportEmail")
+    .addEventListener("click", async () => {
+        const status = document.getElementById("supportCopyStatus");
+
+        try {
+            await navigator.clipboard.writeText(
+                "itsm56796@gmail.com"
+            );
+
+            status.textContent = "Email copied. Paste it into your email app.";
+        } catch {
+            status.textContent =
+                "Select and copy the email address shown above.";
+        }
+    });
+</script>
 </body>
 </html>

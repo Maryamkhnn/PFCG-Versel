@@ -943,3 +943,269 @@ a {
         font-size: 20px;
     }
 }
+/* Contact footer */
+
+#contact {
+    scroll-margin-top: 100px;
+}
+
+.support-footer {
+    padding: 56px 0;
+    color: #fff;
+    background:
+        radial-gradient(
+            ellipse at top left,
+            rgba(105, 68, 237, 0.28),
+            transparent 65%
+        ),
+        #120a32;
+}
+
+.support-footer-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 48px;
+}
+
+.support-footer-brand,
+.support-contact-card {
+    min-width: 0;
+}
+
+.support-eyebrow {
+    display: inline-block;
+    margin-bottom: 14px;
+    color: #bda6ff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.support-footer-brand h2 {
+    margin: 0 0 16px;
+    color: #fff;
+    font-size: clamp(26px, 3vw, 38px);
+    line-height: 1.25;
+}
+
+.support-footer-brand h2 span {
+    display: block;
+    color: #bda6ff;
+}
+
+.support-footer-brand > p {
+    max-width: 440px;
+    margin: 0;
+    color: #c4bdd8;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.support-faq-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    margin-top: 16px;
+    color: #e2d6ff;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.support-faq-link:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.support-contact-card {
+    padding: 28px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid #493568;
+    border-radius: 20px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+}
+
+.support-contact-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.support-contact-heading > div {
+    min-width: 0;
+}
+
+.support-mail-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 50px;
+    width: 50px;
+    height: 50px;
+    color: #eee6ff;
+    background: #6944ed;
+    border-radius: 14px;
+}
+
+.support-contact-heading h3 {
+    margin: 0 0 4px;
+    color: #fff;
+    font-size: 18px;
+}
+
+.support-contact-heading p {
+    margin: 0;
+    color: #c4bdd8;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.support-email-address {
+    margin: 22px 0;
+    color: #eee6ff;
+    font-size: clamp(15px, 2vw, 20px);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    user-select: all;
+}
+
+.support-contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.support-gmail-button,
+.support-copy-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex: 1 1 140px;
+    min-height: 46px;
+    padding: 11px 16px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.support-gmail-button {
+    color: #fff;
+    background: #6944ed;
+}
+
+.support-gmail-button:hover {
+    color: #fff;
+    background: #7a57f4;
+    transform: translateY(-2px);
+}
+
+.support-copy-button {
+    color: #e2d6ff;
+    background: transparent;
+    border-color: #685187;
+}
+
+.support-copy-button:hover {
+    background: #35215f;
+}
+
+.support-copy-status {
+    margin: 0;
+    color: #c9b5ff;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.support-copy-status:not(:empty) {
+    margin-top: 12px;
+}
+
+.support-contact-note {
+    display: block;
+    margin-top: 16px;
+    color: #b7aecb;
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+.support-footer a:focus-visible,
+.support-footer button:focus-visible {
+    outline: 2px solid #c9b5ff;
+    outline-offset: 4px;
+}
+
+/* Landing page interactions */
+
+.feature-card {
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s,
+        border-color 0.2s;
+}
+
+@media (hover: hover) {
+    .feature-card:hover {
+        transform: translateY(-5px);
+        border-color: #6944ed;
+        box-shadow: 0 14px 30px rgba(105, 68, 237, 0.12);
+    }
+}
+
+.nav-links a {
+    text-underline-offset: 6px;
+}
+
+.nav-links a:hover,
+.nav-links a:focus-visible {
+    text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+    .support-footer {
+        padding: 36px 0;
+    }
+
+    .support-footer-inner {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 28px;
+    }
+
+    .support-contact-card {
+        padding: 22px;
+    }
+}
+
+@media (max-width: 380px) {
+    .support-contact-card {
+        padding: 18px;
+    }
+
+    .support-contact-actions {
+        flex-direction: column;
+    }
+
+    .support-gmail-button,
+    .support-copy-button {
+        flex: auto;
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .feature-card,
+    .support-gmail-button,
+    .support-copy-button {
+        transition: none;
+    }
+
+    .feature-card:hover,
+    .support-gmail-button:hover {
+        transform: none;
+    }
+}

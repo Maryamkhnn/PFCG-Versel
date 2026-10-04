@@ -1,0 +1,1109 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Content Moderation | PFCG AI{% endblock %}
+
+{% block page_header %}
+<div>
+    <h1>Content Moderation</h1>
+    <p>Review flagged accounts and blocked-topic activity.</p>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .moderation-page {
+        --mod-bg: #ffffff;
+        --mod-soft: #faf8ff;
+        --mod-text: #28165e;
+        --mod-muted: #756b86;
+        --mod-border: #e7dff4;
+        --mod-purple: #6944ed;
+
+        padding: 24px;
+        color: var(--mod-text);
+        min-width: 0;
+    }
+
+    [data-admin-theme="dark"] .moderation-page {
+        --mod-bg: #241b35;
+        --mod-soft: #2d2242;
+        --mod-text: #f0eaff;
+        --mod-muted: #b8accb;
+        --mod-border: #443556;
+        --mod-purple: #ac92ff;
+    }
+
+    .moderation-page *,
+    .moderation-page *::before,
+    .moderation-page *::after {
+        box-sizing: border-box;
+    }
+
+    .mod-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .mod-tab,
+    .mod-button,
+    .mod-pagination a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 42px;
+        padding: 10px 15px;
+        border: 1px solid var(--mod-border);
+        border-radius: 10px;
+        background: var(--mod-bg);
+        color: var(--mod-purple);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .mod-tab.active,
+    .mod-button-primary {
+        background: #6944ed;
+        border-color: #6944ed;
+        color: #ffffff;
+    }
+
+    .mod-tab-count {
+        padding: 2px 7px;
+        border-radius: 20px;
+        background: #eee8ff;
+        color: #6944ed;
+        font-size: 11px;
+    }
+
+    .mod-card {
+        overflow: hidden;
+        border: 1px solid var(--mod-border);
+        border-radius: 15px;
+        background: var(--mod-bg);
+    }
+
+    .mod-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding: 20px;
+        border-bottom: 1px solid var(--mod-border);
+    }
+
+    .mod-card-top h2 {
+        margin: 0 0 6px;
+        font-size: 19px;
+    }
+
+    .mod-card-top p,
+    .mod-summary,
+    .mod-filter,
+    .mod-reason {
+        color: var(--mod-muted);
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .mod-card-top p {
+        margin: 0;
+    }
+
+    .mod-search {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        max-width: 100%;
+    }
+
+    .mod-search input {
+        width: 230px;
+        max-width: 100%;
+        min-width: 0;
+        min-height: 42px;
+        padding: 10px 12px;
+        border: 1px solid var(--mod-border);
+        border-radius: 10px;
+        background: var(--mod-soft);
+        color: var(--mod-text);
+        font: inherit;
+        font-size: 13px;
+    }
+
+    .mod-summary,
+    .mod-filter {
+        margin: 0;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--mod-border);
+        overflow-wrap: anywhere;
+    }
+
+    .mod-filter {
+        background: var(--mod-soft);
+    }
+
+    .mod-filter a,
+    .mod-record-link {
+        color: var(--mod-purple);
+        font-weight: 600;
+    }
+
+    .mod-table-scroll {
+        overflow-x: auto;
+    }
+
+    .mod-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .mod-table th,
+    .mod-table td {
+        padding: 16px;
+        border-bottom: 1px solid var(--mod-border);
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .mod-table th {
+        background: var(--mod-soft);
+        white-space: nowrap;
+    }
+
+    .mod-table td strong,
+    .mod-table td small {
+        display: block;
+    }
+
+    .mod-table td small {
+        margin-top: 5px;
+        color: var(--mod-muted);
+        overflow-wrap: anywhere;
+    }
+
+    .mod-reason {
+        max-width: 300px;
+        margin: 6px 0 0;
+        overflow-wrap: anywhere;
+    }
+
+    .mod-pending {
+        display: inline-block;
+        padding: 6px 9px;
+        border-radius: 8px;
+        background: #fff2d9;
+        color: #805511;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .mod-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .mod-empty {
+        padding: 45px 20px;
+        text-align: center;
+    }
+
+    .mod-empty i {
+        color: var(--mod-purple);
+        font-size: 30px;
+    }
+
+    .mod-empty p {
+        color: var(--mod-muted);
+    }
+
+    .mod-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 18px;
+        font-size: 13px;
+    }
+
+    .mod-dialog {
+        width: min(620px, calc(100% - 28px));
+        max-height: calc(100dvh - 28px);
+        margin: auto;
+        padding: 0;
+        overflow-y: auto;
+        border: 1px solid var(--mod-border);
+        border-radius: 16px;
+        background: var(--mod-bg);
+        color: var(--mod-text);
+    }
+
+    .mod-dialog::backdrop {
+        background: rgb(12 6 28 / 65%);
+    }
+
+    .mod-dialog-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--mod-border);
+    }
+
+    .mod-dialog-header h2 {
+        margin: 0;
+        font-size: 19px;
+    }
+
+    .mod-dialog-body {
+        padding: 20px;
+    }
+
+    .mod-close {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        padding: 0;
+        font-size: 23px;
+    }
+
+    .mod-case-name {
+        margin: 0 0 5px;
+        font-size: 17px;
+    }
+
+    .mod-case-email {
+        margin: 0 0 16px;
+        color: var(--mod-muted);
+        overflow-wrap: anywhere;
+    }
+
+    .mod-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 0 0 18px;
+    }
+
+    .mod-details div {
+        padding: 12px;
+        border-radius: 10px;
+        background: var(--mod-soft);
+    }
+
+    .mod-details dt {
+        margin-bottom: 5px;
+        color: var(--mod-muted);
+        font-size: 12px;
+    }
+
+    .mod-details dd {
+        margin: 0;
+        font-size: 13px;
+        overflow-wrap: anywhere;
+    }
+
+    .mod-evidence {
+        display: grid;
+        gap: 9px;
+        margin: 12px 0 18px;
+        padding: 0;
+        list-style: none;
+    }
+
+    .mod-evidence li {
+        padding: 12px;
+        border: 1px solid var(--mod-border);
+        border-radius: 10px;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .mod-note {
+        color: var(--mod-muted);
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .mod-field {
+        display: grid;
+        gap: 8px;
+        margin-top: 16px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .mod-field select,
+    .mod-field textarea {
+        width: 100%;
+        min-width: 0;
+        padding: 12px;
+        border: 1px solid var(--mod-border);
+        border-radius: 10px;
+        background: var(--mod-soft);
+        color: var(--mod-text);
+        font: inherit;
+        font-weight: 400;
+    }
+
+    .mod-field textarea {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .mod-form-actions {
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .mod-status {
+        margin: 0 0 16px;
+        font-size: 13px;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+
+    .mod-status.error {
+        color: #d24141;
+    }
+
+    .mod-status.success {
+        color: #25834d;
+    }
+
+    .moderation-page [hidden] {
+        display: none !important;
+    }
+
+    .mod-button:disabled {
+        opacity: .6;
+        cursor: wait;
+    }
+
+    .moderation-page :focus-visible {
+        outline: 3px solid #ac92ff;
+        outline-offset: 3px;
+    }
+
+    @media (max-width: 768px) {
+        .moderation-page {
+            padding: 16px;
+        }
+
+        .mod-tabs {
+            gap: 8px;
+        }
+
+        .mod-tab {
+            flex: 1 1 140px;
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .mod-card-top {
+            align-items: stretch;
+            flex-direction: column;
+            padding: 16px;
+        }
+
+        .mod-search input {
+            width: auto;
+            flex: 1 1 160px;
+        }
+
+        .mod-summary,
+        .mod-filter {
+            padding: 12px 16px;
+        }
+
+        .mod-table-scroll {
+            padding: 12px;
+            overflow: visible;
+        }
+
+        .mod-table,
+        .mod-table tbody,
+        .mod-table tr,
+        .mod-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .mod-table thead {
+            display: none;
+        }
+
+        .mod-table tr {
+            margin-bottom: 12px;
+            padding: 6px 14px;
+            border: 1px solid var(--mod-border);
+            border-radius: 12px;
+            background: var(--mod-soft);
+        }
+
+        .mod-table tr:last-child {
+            margin-bottom: 0;
+        }
+
+        .mod-table td {
+            padding: 11px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .mod-table td:last-child {
+            border-bottom: 0;
+        }
+
+        .mod-table td::before {
+            display: block;
+            margin-bottom: 6px;
+            content: attr(data-label);
+            color: var(--mod-muted);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .mod-reason {
+            max-width: none;
+        }
+
+        .mod-actions {
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mod-dialog-header,
+        .mod-dialog-body {
+            padding: 16px;
+        }
+
+        .mod-details {
+            grid-template-columns: 1fr;
+        }
+
+        .mod-form-actions .mod-button {
+            flex: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="moderation-page">
+
+    <nav class="mod-tabs" aria-label="Moderation sections">
+        <a
+            href="{{ url_for('admin.content_moderation', tab='reviews') }}"
+            class="mod-tab {% if tab == 'reviews' %}active{% endif %}"
+            {% if tab == 'reviews' %}aria-current="page"{% endif %}
+        >
+            <i class="fas fa-clipboard-check" aria-hidden="true"></i>
+            Needs Review
+            <span class="mod-tab-count">
+                {{ pending_review_count|default(0) }}
+            </span>
+        </a>
+
+        <a
+            href="{{ url_for('admin.content_moderation', tab='attempts') }}"
+            class="mod-tab {% if tab == 'attempts' %}active{% endif %}"
+            {% if tab == 'attempts' %}aria-current="page"{% endif %}
+        >
+            <i class="fas fa-shield-halved" aria-hidden="true"></i>
+            Blocked Attempts
+        </a>
+    </nav>
+
+    <section class="mod-card">
+        <div class="mod-card-top">
+            <div>
+                <h2>
+                    {% if tab == 'reviews' %}
+                        Accounts Awaiting Review
+                    {% else %}
+                        Blocked Topic History
+                    {% endif %}
+                </h2>
+
+                <p>
+                    {% if tab == 'reviews' %}
+                        Review automatic suspensions and their records.
+                    {% else %}
+                        Browse blocked attempts by user and category.
+                    {% endif %}
+                </p>
+            </div>
+
+            <form
+                class="mod-search"
+                method="get"
+                action="{{ url_for('admin.content_moderation') }}"
+            >
+                <input type="hidden" name="tab" value="{{ tab }}">
+
+                {% if selected_email %}
+                <input
+                    type="hidden"
+                    name="email"
+                    value="{{ selected_email }}"
+                >
+                {% endif %}
+
+                <input
+                    type="search"
+                    name="search"
+                    value="{{ search or '' }}"
+                    placeholder="Search records..."
+                    aria-label="Search moderation records"
+                >
+
+                <button type="submit" class="mod-button">
+                    Search
+                </button>
+
+                {% if search %}
+                <a
+                    class="mod-button"
+                    href="{{ url_for(
+                        'admin.content_moderation',
+                        tab=tab,
+                        email=selected_email or ''
+                    ) }}"
+                >Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        {% if selected_email %}
+        <p class="mod-filter">
+            Showing records for <strong>{{ selected_email }}</strong>
+            <a href="{{ url_for('admin.content_moderation', tab=tab) }}">
+                View all users
+            </a>
+        </p>
+        {% endif %}
+
+        {% if tab == 'reviews' %}
+
+        <p class="mod-summary">
+            {{ total_records }} pending case(s) matching this view.
+        </p>
+
+        {% if cases %}
+        <div class="mod-table-scroll">
+            <table class="mod-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Restrictions</th>
+                        <th>Account Status</th>
+                        <th>Review Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in cases %}
+                    <tr>
+                        <td data-label="User">
+                            <strong>{{ item.name or 'User' }}</strong>
+                            <small>{{ item.email or '—' }}</small>
+                            <small>User #{{ item.user_id }}</small>
+                        </td>
+
+                        <td data-label="Restrictions">
+                            {{ item.restriction_count }}
+                        </td>
+
+                        <td data-label="Account Status">
+                            <strong>{{ item.status|title }}</strong>
+                            <p class="mod-reason">
+                                {{ item.status_reason or
+                                   'Open the review to see the original reason.' }}
+                            </p>
+                        </td>
+
+                        <td data-label="Review Status">
+                            <span class="mod-pending">Needs Review</span>
+                        </td>
+
+                        <td data-label="Actions">
+                            <div class="mod-actions">
+                                <button
+                                    type="button"
+                                    class="mod-button mod-button-primary"
+                                    data-review-url="{{ url_for(
+                                        'admin.moderation_case_details_api',
+                                        case_id=item.case_id
+                                    ) }}"
+                                    data-save-url="{{ url_for(
+                                        'admin.moderation_case_review_api',
+                                        case_id=item.case_id
+                                    ) }}"
+                                >
+                                    Review Case
+                                </button>
+
+                                {% if item.email %}
+                                <a
+                                    class="mod-record-link"
+                                    href="{{ url_for(
+                                        'admin.content_moderation',
+                                        tab='attempts',
+                                        email=item.email
+                                    ) }}"
+                                >View attempts</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="mod-empty">
+            <i class="fas fa-circle-check" aria-hidden="true"></i>
+            <h3>No pending cases found</h3>
+            <p>No pending reviews match this view.</p>
+        </div>
+        {% endif %}
+
+        {% else %}
+
+        <p class="mod-summary">
+            {{ total_attempts }} blocked attempts ·
+            {{ total_users }} users ·
+            {{ total_records }} user/category records
+        </p>
+
+        {% if attempts %}
+        <div class="mod-table-scroll">
+            <table class="mod-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>User ID</th>
+                        <th>Category</th>
+                        <th>Attempts</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in attempts %}
+                    <tr>
+                        <td data-label="User">
+                            <strong>{{ item.name }}</strong>
+                            <small>{{ item.email or '—' }}</small>
+                        </td>
+                        <td data-label="User ID">#{{ item.user_id }}</td>
+                        <td data-label="Category">{{ item.category }}</td>
+                        <td data-label="Attempts">
+                            <strong>{{ item.attempt_count }}</strong>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="mod-empty">
+            <i class="fas fa-shield-halved" aria-hidden="true"></i>
+            <h3>No blocked attempts found</h3>
+            <p>No records match this view.</p>
+        </div>
+        {% endif %}
+
+        {% endif %}
+
+        {% if total_pages > 1 %}
+        <nav class="mod-pagination" aria-label="Moderation pages">
+            {% if page > 1 %}
+            <a href="{{ url_for(
+                'admin.content_moderation',
+                tab=tab,
+                page=page - 1,
+                search=search or '',
+                email=selected_email or ''
+            ) }}">Previous</a>
+            {% endif %}
+
+            <span>Page {{ page }} of {{ total_pages }}</span>
+
+            {% if page < total_pages %}
+            <a href="{{ url_for(
+                'admin.content_moderation',
+                tab=tab,
+                page=page + 1,
+                search=search or '',
+                email=selected_email or ''
+            ) }}">Next</a>
+            {% endif %}
+        </nav>
+        {% endif %}
+    </section>
+
+    <dialog
+        id="moderationReviewDialog"
+        class="mod-dialog"
+        aria-labelledby="moderationReviewTitle"
+    >
+        <div class="mod-dialog-header">
+            <h2 id="moderationReviewTitle">Review Case</h2>
+
+            <button
+                type="button"
+                id="closeModerationReview"
+                class="mod-button mod-close"
+                aria-label="Close review"
+            >&times;</button>
+        </div>
+
+        <div class="mod-dialog-body">
+            <p
+                id="moderationReviewStatus"
+                class="mod-status"
+                role="status"
+                aria-live="polite"
+            ></p>
+
+            <div id="moderationReviewDetails" hidden>
+                <h3 id="moderationReviewName" class="mod-case-name"></h3>
+                <p id="moderationReviewEmail" class="mod-case-email"></p>
+
+                <dl class="mod-details">
+                    <div>
+                        <dt>Current account status</dt>
+                        <dd id="moderationReviewAccountStatus"></dd>
+                    </div>
+                    <div>
+                        <dt>Original suspension expiry</dt>
+                        <dd id="moderationReviewExpiry"></dd>
+                    </div>
+                </dl>
+
+                <p id="moderationReviewReason" class="mod-reason"></p>
+
+                <h3>Restriction records</h3>
+                <ul id="moderationReviewEvidence" class="mod-evidence"></ul>
+
+                <p class="mod-note">
+                    These records show categories and times.
+                    The original topic text was not stored.
+                    Confirm a violation only when the available evidence
+                    supports your decision.
+                </p>
+
+                <form id="moderationReviewForm">
+                    {% if csrf_token is defined %}
+                    <input
+                        type="hidden"
+                        id="moderationFrameworkCsrf"
+                        value="{{ csrf_token() }}"
+                    >
+                    {% endif %}
+
+                    <label class="mod-field" for="moderationReviewAction">
+                        Review decision
+                        <select id="moderationReviewAction" required>
+                            <option value="">Select a decision</option>
+                            <option value="confirm">Confirm Violation</option>
+                            <option value="incorrect">Incorrect Detection</option>
+                        </select>
+                    </label>
+
+                    <p class="mod-note">
+                        Confirming closes the review without extending the
+                        suspension. Incorrect Detection cancels the matching
+                        automatic suspension if it is still present.
+                    </p>
+
+                    <label class="mod-field" for="moderationReviewComment">
+                        Review reason
+                        <textarea
+                            id="moderationReviewComment"
+                            minlength="10"
+                            maxlength="1000"
+                            rows="4"
+                            placeholder="Explain your decision..."
+                            required
+                        ></textarea>
+                    </label>
+
+                    <div class="mod-form-actions">
+                        <button
+                            type="button"
+                            id="cancelModerationReview"
+                            class="mod-button"
+                        >Cancel</button>
+
+                        <button
+                            type="submit"
+                            id="saveModerationReview"
+                            class="mod-button mod-button-primary"
+                        >Save Review</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </dialog>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const dialog = document.getElementById("moderationReviewDialog");
+    const form = document.getElementById("moderationReviewForm");
+    const status = document.getElementById("moderationReviewStatus");
+    const details = document.getElementById("moderationReviewDetails");
+    const saveButton = document.getElementById("saveModerationReview");
+    const closeButton = document.getElementById("closeModerationReview");
+    const cancelButton = document.getElementById("cancelModerationReview");
+
+    if (!dialog || !form) return;
+
+    let currentCase = null;
+    let saveUrl = "";
+    let reviewToken = "";
+    let loadingController = null;
+    let saving = false;
+    let refreshAfterClose = false;
+
+    function showStatus(message, type = "") {
+        status.textContent = message;
+        status.className = "mod-status" + (type ? " " + type : "");
+    }
+
+    function formatDate(value) {
+        if (!value) return "—";
+
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "—";
+
+        return new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Asia/Karachi",
+            dateStyle: "medium",
+            timeStyle: "short"
+        }).format(date) + " PKT";
+    }
+
+    async function readResponse(response) {
+        const data = await response.json().catch(() => null);
+
+        if (!response.ok || !data || !data.success) {
+            throw new Error(
+                data?.message || "Unable to complete the request."
+            );
+        }
+
+        return data;
+    }
+
+    function closeReview() {
+        if (!saving) dialog.close();
+    }
+
+    closeButton.addEventListener("click", closeReview);
+    cancelButton.addEventListener("click", closeReview);
+
+    dialog.addEventListener("cancel", event => {
+        if (saving) event.preventDefault();
+    });
+
+    dialog.addEventListener("close", () => {
+        if (loadingController) loadingController.abort();
+        currentCase = null;
+
+        if (refreshAfterClose) window.location.reload();
+    });
+
+    document.querySelectorAll("[data-review-url]").forEach(button => {
+        button.addEventListener("click", async () => {
+            if (loadingController) loadingController.abort();
+
+            const controller = new AbortController();
+            loadingController = controller;
+
+            currentCase = null;
+            reviewToken = "";
+            saveUrl = button.dataset.saveUrl;
+            refreshAfterClose = false;
+
+            form.reset();
+            form.hidden = false;
+            details.hidden = true;
+            saveButton.disabled = false;
+            closeButton.disabled = false;
+            cancelButton.disabled = false;
+
+            showStatus("Loading case...");
+            dialog.showModal();
+
+            try {
+                const response = await fetch(button.dataset.reviewUrl, {
+                    credentials: "same-origin",
+                    cache: "no-store",
+                    headers: { "Accept": "application/json" },
+                    signal: controller.signal
+                });
+
+                const result = await readResponse(response);
+
+                if (controller.signal.aborted || !dialog.open) return;
+
+                currentCase = result.data;
+                reviewToken = result.csrf_token;
+
+                document.getElementById("moderationReviewName").textContent =
+                    currentCase.name;
+
+                document.getElementById("moderationReviewEmail").textContent =
+                    currentCase.email;
+
+                document.getElementById(
+                    "moderationReviewAccountStatus"
+                ).textContent = currentCase.account_status;
+
+                document.getElementById("moderationReviewExpiry").textContent =
+                    formatDate(currentCase.suspended_until);
+
+                document.getElementById("moderationReviewReason").textContent =
+                    "Original reason: " + currentCase.reason;
+
+                const evidence = document.getElementById(
+                    "moderationReviewEvidence"
+                );
+
+                evidence.replaceChildren();
+
+                for (const item of currentCase.restrictions || []) {
+                    const row = document.createElement("li");
+
+                    row.textContent =
+                        "Restriction #" + item.id +
+                        " · " + item.category +
+                        " · Started: " + formatDate(item.started_at) +
+                        " · Recorded expiry: " +
+                        formatDate(item.restricted_until);
+
+                    evidence.appendChild(row);
+                }
+
+                if (!evidence.children.length) {
+                    const row = document.createElement("li");
+                    row.textContent = "No matching restriction records found.";
+                    evidence.appendChild(row);
+                }
+
+                details.hidden = false;
+                showStatus("");
+            } catch (error) {
+                if (error.name !== "AbortError") {
+                    showStatus(error.message, "error");
+                }
+            }
+        });
+    });
+
+    form.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        if (!currentCase || saving) return;
+
+        const action = document.getElementById(
+            "moderationReviewAction"
+        ).value;
+
+        const reason = document.getElementById(
+            "moderationReviewComment"
+        ).value.trim();
+
+        if (!["confirm", "incorrect"].includes(action)) {
+            showStatus("Please select a review decision.", "error");
+            return;
+        }
+
+        if (reason.length < 10 || reason.length > 1000) {
+            showStatus(
+                "Review reason must contain 10 to 1000 characters.",
+                "error"
+            );
+            return;
+        }
+
+        saving = true;
+        saveButton.disabled = true;
+        closeButton.disabled = true;
+        cancelButton.disabled = true;
+        showStatus("Saving review...");
+
+        try {
+            const headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "X-Moderation-CSRF": reviewToken
+            };
+
+            const frameworkToken = document.getElementById(
+                "moderationFrameworkCsrf"
+            );
+
+            if (frameworkToken) {
+                headers["X-CSRFToken"] = frameworkToken.value;
+            }
+
+            const response = await fetch(saveUrl, {
+                method: "POST",
+                credentials: "same-origin",
+                headers,
+                body: JSON.stringify({
+                    action,
+                    reason,
+                    suspension_id: currentCase.suspension_id
+                })
+            });
+
+            const result = await readResponse(response);
+
+            refreshAfterClose = true;
+            form.hidden = true;
+
+            const emailMessage = result.data.email_sent
+                ? " The notification was saved and email sent."
+                : " The notification was saved, but email sending failed.";
+
+            showStatus(
+                "Review saved successfully." + emailMessage +
+                " Close this window to refresh the list.",
+                "success"
+            );
+        } catch (error) {
+            showStatus(error.message, "error");
+        } finally {
+            saving = false;
+            saveButton.disabled = false;
+            closeButton.disabled = false;
+            cancelButton.disabled = false;
+        }
+    });
+});
+</script>
+{% endblock %}

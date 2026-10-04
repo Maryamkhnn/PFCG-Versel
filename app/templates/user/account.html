@@ -158,6 +158,35 @@
                         </div>
                     </fieldset>
                 </form>
+                {% if session.get('role') != 'admin' %}
+<section class="account-card account-delete-card">
+    <div class="account-card-heading">
+        <span class="account-section-icon account-delete-icon">
+            <i class="fas fa-trash-can" aria-hidden="true"></i>
+        </span>
+
+        <div>
+            <h2>Delete Account</h2>
+            <p>Permanently remove your account and content.</p>
+        </div>
+    </div>
+
+    <p class="account-delete-description">
+        Your profile photo, generated content, saved documents
+        and associated reports will be permanently removed.
+        This action cannot be undone.
+    </p>
+
+    <button
+        type="button"
+        id="openAccountDeletion"
+        class="account-danger-button"
+    >
+        <i class="fas fa-trash-can" aria-hidden="true"></i>
+        Delete My Account
+    </button>
+</section>
+{% endif %}
             </section>
 
             <!-- SECURITY -->
@@ -278,9 +307,123 @@
         aria-label="Dismiss notification"
     >&times;</button>
 </div>
+<dialog
+    id="accountDeletionDialog"
+    class="account-deletion-dialog"
+    aria-labelledby="accountDeletionTitle"
+    aria-describedby="accountDeletionDescription"
+>
+    <div class="account-deletion-heading">
+        <h2 id="accountDeletionTitle">Delete your account?</h2>
 
+        <button
+            type="button"
+            id="closeAccountDeletion"
+            class="account-deletion-close"
+            aria-label="Close account deletion"
+        >&times;</button>
+    </div>
+
+    <p id="accountDeletionDescription">
+        This permanently removes your account, profile photo,
+        content and associated reports. You cannot undo deletion.
+    </p>
+
+    <p
+        id="accountDeletionMessage"
+        class="account-deletion-message"
+        role="status"
+        aria-live="polite"
+        hidden
+    ></p>
+
+    <form id="accountDeletionRequestForm">
+        <fieldset id="accountDeletionRequestFields" disabled>
+            <label for="deletionPassword">Current password</label>
+
+            <input
+                type="password"
+                id="deletionPassword"
+                autocomplete="current-password"
+                placeholder="Enter your current password"
+                required
+            >
+
+            <p class="account-deletion-help">
+                We will send a confirmation code to your account email.
+            </p>
+
+            <button
+                type="submit"
+                id="requestAccountDeletionCode"
+                class="account-danger-button"
+            >Send Confirmation Code</button>
+        </fieldset>
+    </form>
+
+    <form id="accountDeletionConfirmForm" hidden>
+        <fieldset id="accountDeletionConfirmFields">
+            <label for="deletionCode">Email confirmation code</label>
+
+            <input
+                type="text"
+                id="deletionCode"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                pattern="[0-9]{6}"
+                minlength="6"
+                maxlength="6"
+                placeholder="6-digit code"
+                required
+            >
+
+            <label for="deletionConfirmation">
+                Type DELETE to confirm
+            </label>
+
+            <input
+                type="text"
+                id="deletionConfirmation"
+                autocomplete="off"
+                spellcheck="false"
+                autocapitalize="characters"
+                pattern="DELETE"
+                placeholder="DELETE"
+                required
+            >
+
+            <p class="account-deletion-help">
+                The code expires after 10 minutes.
+                Deletion will happen immediately after confirmation.
+            </p>
+
+            <button
+                type="submit"
+                id="confirmAccountDeletion"
+                class="account-danger-button"
+            >Permanently Delete Account</button>
+
+            <button
+                type="button"
+                id="restartAccountDeletion"
+                class="account-deletion-secondary"
+            >Request a New Code</button>
+        </fieldset>
+    </form>
+
+    <button
+        type="button"
+        id="cancelAccountDeletion"
+        class="account-deletion-secondary"
+    >Keep My Account</button>
+</dialog>
 {% endblock %}
-
 {% block js %}
-<script src="{{ url_for('static', filename='js/user/account.js') }}"></script>
+<script
+    src="{{ url_for('static', filename='js/user/account.js', v='2') }}"
+></script>
+
+<script
+    src="{{ url_for('static', filename='js/user/account_deletion.js', v='1') }}"
+></script>
 {% endblock %}

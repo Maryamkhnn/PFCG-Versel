@@ -1,71 +1,34 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from sqlalchemy import text
 
 from app.database import db
 
-
-def add_restriction_notification(user_id, until):
-    """Called while the user's database row is locked."""
-
-    local_end = until + timedelta(hours=5)
-
-    message = (
-        "Content generation is restricted after repeated blocked "
-        "topic attempts. "
-        f"Available again on {local_end:%d %b %Y at %I:%M:%S %p} PKT. "
-        "SEO and Humanize remain available."
-    )
-
-    existing = db.session.execute(
-        text("""
-            SELECT id
-            FROM user_notifications
-            WHERE user_id = :uid
-              AND notification_type = 'generator_restricted'
-              AND message = :message
-            LIMIT 1
-        """),
-        {"uid": user_id, "message": message},
-    ).scalar_one_or_none()
-
-    if existing is None:
-        db.session.execute(
-            text("""
-                INSERT INTO user_notifications
-                    (
-                        user_id,
-                        notification_type,
-                        title,
-                        message,
-                        is_read,
-                        created_at
-                    )
-                VALUES
-                    (
-                        :uid,
-                        'generator_restricted',
-                        'Content generation restricted',
-                        :message,
-                        0,
-                        :created
-                    )
-            """),
-            {
-                "uid": user_id,
-                "message": message,
-                "created": datetime.utcnow(),
-            },
-        )
+from app.user.services.automatic_moderation_service import (
+    _add_notification,
+    _send_moderation_email,
+)
 
 
 def sync_generator_restriction(user_id):
-    """Check expiry and create each restoration notification once."""
+    """
+    Clear an expired generator restriction.
+
+    Save the restoration notification in the same transaction.
+    Send the email after committing and releasing the user lock.
+    """
+
+    email_details = None
 
     try:
-        row = db.session.execute(
+        user = db.session.execute(
             text("""
-                SELECT generator_restricted_until
+                SELECT
+                    id,
+                    name,
+                    email,
+                    status,
+                    generator_restricted_until
                 FROM users
                 WHERE id = :uid
                 FOR UPDATE
@@ -73,63 +36,74 @@ def sync_generator_restriction(user_id):
             {"uid": user_id},
         ).mappings().first()
 
-        if row is None:
+        if user is None:
             db.session.rollback()
             return None
 
-        until = row["generator_restricted_until"]
+        until = user["generator_restricted_until"]
         now = datetime.utcnow()
 
-        if until is not None and until > now:
-            # Also handles restrictions created before this feature.
-            add_restriction_notification(user_id, until)
+        # No restriction, or its timer is still running.
+        if until is None or until > now:
+            db.session.commit()
+            return until
 
-        elif until is not None:
-            db.session.execute(
-                text("""
-                    UPDATE users
-                    SET generator_restricted_until = NULL
-                    WHERE id = :uid
-                """),
-                {"uid": user_id},
+        # The locked row ensures concurrent requests cannot
+        # create multiple restoration notifications.
+        db.session.execute(
+            text("""
+                UPDATE users
+                SET generator_restricted_until = NULL
+                WHERE id = :uid
+            """),
+            {"uid": user_id},
+        )
+
+        account_status = (
+            user["status"] or "active"
+        ).strip().lower()
+
+        title = "Generation restriction ended"
+
+        if account_status == "active":
+            message = (
+                "Your temporary content generation and humanization "
+                "restriction has ended. "
+                "Generate, Regenerate and Humanize are available again. "
+                "Please follow the content guidelines."
+            )
+        else:
+            message = (
+                "Your temporary content generation and humanization "
+                "restriction has ended. "
+                "A separate account restriction is still in effect. "
+                "Please check the account-status message for details."
             )
 
-            db.session.execute(
-                text("""
-                    INSERT INTO user_notifications
-                        (
-                            user_id,
-                            notification_type,
-                            title,
-                            message,
-                            is_read,
-                            created_at
-                        )
-                    VALUES
-                        (
-                            :uid,
-                            'generator_restored',
-                            'Generator restriction ended',
-                            :message,
-                            0,
-                            :created
-                        )
-                """),
-                {
-                    "uid": user_id,
-                    "message": (
-                        "Your temporary content generation restriction "
-                        "has ended."
-                    ),
-                    "created": now,
-                },
-            )
+        _add_notification(
+            user["id"],
+            "generator_restored",
+            title,
+            message,
+            now,
+        )
 
-            until = None
+        email_details = (
+            user["email"],
+            user["name"],
+            title,
+            message,
+        )
 
+        # Clear the timer and save the notification together.
         db.session.commit()
-        return until
 
     except Exception:
         db.session.rollback()
         raise
+
+    # Email sending does not hold the database lock.
+    if email_details is not None:
+        _send_moderation_email(*email_details)
+
+    return None

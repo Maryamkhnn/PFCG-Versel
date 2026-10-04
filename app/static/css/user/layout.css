@@ -1,6 +1,6 @@
-/* =====================================================
-   BASE LAYOUT
-===================================================== */
+/* =========================================
+   PFCG AI — USER LAYOUT
+========================================= */
 
 body.user-layout {
     margin: 0;
@@ -17,9 +17,9 @@ body.user-layout {
     background: #f1efff;
 }
 
-/* =====================================================
+/* =========================================
    SIDEBAR
-===================================================== */
+========================================= */
 
 .user-layout .sidebar {
     box-sizing: border-box;
@@ -27,20 +27,18 @@ body.user-layout {
     top: 0;
     left: 0;
     bottom: auto;
-
     width: 250px;
     height: 100vh;
     height: 100dvh;
+    margin: 0;
     padding: 25px 18px;
-
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: 0;
-
     background: #211747;
     border: none;
     box-shadow: 4px 0 18px rgba(25, 15, 60, 0.18);
-
     overflow-y: auto;
     z-index: 1000;
 }
@@ -54,28 +52,69 @@ body.user-layout {
     border-radius: 10px;
 }
 
-/* LOGO */
+/* =========================================
+   LOGO
+========================================= */
 
 .user-layout .sidebar .logo {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 11px;
-
+    min-height: 40px;
     margin: 0 0 38px;
     padding: 0 10px;
-
+    flex-shrink: 0;
     color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 23px;
     font-weight: 700;
-    line-height: 1.4;
+    letter-spacing: -0.3px;
+    line-height: 1;
 }
+
+.user-layout .sidebar .logo .pfcg-spark-icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #35206b, #5637f5);
+}
+
+.user-layout .sidebar .logo .pfcg-spark-icon svg {
+    display: block;
+    width: 30px;
+    height: 30px;
+}
+
+.user-layout .sidebar .logo .pfcg-brand-name {
+    display: inline;
+    color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: inherit;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.user-layout .sidebar .logo .pfcg-brand-ai {
+    display: inline;
+    color: #765cff;
+    font: inherit;
+}
+
+/* Legacy logo icon */
 
 .user-layout .sidebar .logo i {
     color: #765cff;
     font-size: 27px;
 }
 
-/* NAVIGATION */
+/* =========================================
+   NAVIGATION
+========================================= */
 
 .user-layout .sidebar nav,
 .user-layout .sidebar-bottom {
@@ -102,23 +141,18 @@ body.user-layout {
     align-items: center;
     justify-content: flex-start;
     gap: 13px;
-
     min-height: 48px;
     margin: 0;
     padding: 12px 15px;
-
     background: transparent;
     color: #d1cbe5;
-
     border: none;
     border-left: 5px solid transparent;
     border-radius: 12px;
-
     font-size: 15px;
     font-weight: 500;
     line-height: 1.4;
     text-decoration: none;
-
     transition:
         background 0.2s ease,
         color 0.2s ease;
@@ -128,7 +162,6 @@ body.user-layout {
     width: 21px;
     flex: 0 0 21px;
     margin: 0;
-
     color: inherit;
     font-size: 16px;
     text-align: center;
@@ -143,7 +176,6 @@ body.user-layout {
     background: #5637f5;
     color: #ffffff;
     border-left-color: #ffffff;
-
     font-weight: 600;
     box-shadow: 0 7px 18px rgba(86, 55, 245, 0.25);
 }
@@ -157,51 +189,44 @@ body.user-layout {
     color: #ffb8c6;
 }
 
-/* =====================================================
+/* =========================================
    MAIN AREA
-===================================================== */
+========================================= */
 
 .user-layout .main {
     box-sizing: border-box;
     display: block;
     position: relative;
-
     width: auto;
     min-width: 0;
     max-width: none;
     min-height: 100vh;
-
     margin: 0 0 0 250px;
     padding: 30px 35px;
-
     background: #f1efff;
 }
 
 .user-layout .content-wrapper {
     box-sizing: border-box;
     display: block;
-
     width: 100%;
     min-width: 0;
     max-width: none;
-
     margin: 0;
     padding: 0;
 }
 
-/* =====================================================
+/* =========================================
    PAGE HEADER
-===================================================== */
+========================================= */
 
 .user-layout .user-page-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
-
     margin: 0 0 26px;
     padding: 0;
-
     background: transparent;
     border: none;
     box-shadow: none;
@@ -214,13 +239,11 @@ body.user-layout {
 
 .user-layout .user-header-heading h1 {
     margin: 0 0 7px;
-
     color: #25194d;
     font-size: 28px;
     font-weight: 700;
     line-height: 1.4;
     letter-spacing: -0.5px;
-
     overflow-wrap: anywhere;
 }
 
@@ -239,9 +262,9 @@ body.user-layout {
     line-height: 1.7;
 }
 
-/* =====================================================
-   CLICKABLE PROFILE
-===================================================== */
+/* =========================================
+   HEADER PROFILE
+========================================= */
 
 .user-layout .user-header-profile {
     box-sizing: border-box;
@@ -249,15 +272,12 @@ body.user-layout {
     align-items: center;
     gap: 11px;
     flex-shrink: 0;
-
     max-width: 250px;
     padding: 10px 15px;
-
     background: #ffffff;
     color: #30234e;
     border: 1px solid #e5def7;
     border-radius: 14px;
-
     text-decoration: none;
     box-shadow: 0 5px 18px rgba(47, 31, 91, 0.07);
 }
@@ -271,15 +291,21 @@ body.user-layout {
     display: flex;
     align-items: center;
     justify-content: center;
-
     width: 39px;
     height: 39px;
     flex: 0 0 39px;
-
+    overflow: hidden;
     background: #eeeaff;
     color: #6d45f5;
     border-radius: 50%;
     font-size: 18px;
+}
+
+.user-layout .user-header-avatar .user-header-photo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .user-layout .user-header-details {
@@ -300,7 +326,6 @@ body.user-layout {
     font-size: 13px;
     font-weight: 600;
     line-height: 1.4;
-
     overflow-wrap: anywhere;
 }
 
@@ -309,11 +334,9 @@ body.user-layout {
     font-size: 10px;
 }
 
-/* =====================================================
-   DASHBOARD ALIGNMENT
-===================================================== */
-
-/* The welcome message is already in the base header. */
+/* =========================================
+   DASHBOARD
+========================================= */
 
 .user-layout .dashboard-header .welcome-box {
     display: none;
@@ -337,7 +360,6 @@ body.user-layout {
 
 .user-layout .dashboard-header .today-card {
     padding: 18px 21px;
-
     background: #ffffff;
     border: 1px solid #ebe7f5;
     border-radius: 16px;
@@ -361,19 +383,43 @@ body.user-layout {
     line-height: 1.7;
 }
 
-/* =====================================================
+/* =========================================
    KEYBOARD FOCUS
-===================================================== */
+========================================= */
 
 .user-layout .sidebar a:focus-visible,
-.user-layout .user-header-profile:focus-visible {
+.user-layout .user-header-profile:focus-visible,
+.user-layout .mobile-menu-button:focus-visible,
+.user-layout .sidebar-close:focus-visible {
     outline: 3px solid #a58aff;
     outline-offset: 3px;
 }
 
-/* =====================================================
+/* =========================================
+   MOBILE CONTROLS — DESKTOP DEFAULT
+========================================= */
+
+.user-layout .mobile-menu-bar,
+.user-layout .sidebar-close,
+.user-layout .sidebar-overlay {
+    display: none;
+}
+
+.user-layout .sidebar-overlay[hidden] {
+    display: none !important;
+}
+
+/* Toast fits narrow screens */
+
+#toast {
+    right: auto;
+    min-width: 0;
+    width: min(500px, calc(100vw - 32px));
+}
+
+/* =========================================
    TABLET
-===================================================== */
+========================================= */
 
 @media (max-width: 1100px) {
     .user-layout .sidebar {
@@ -394,161 +440,25 @@ body.user-layout {
     }
 }
 
-/* =====================================================
+/* =========================================
    MOBILE
-===================================================== */
+========================================= */
 
 @media (max-width: 768px) {
-    .user-layout .sidebar {
-        width: 70px;
-        padding: 20px 9px;
-    }
-
-    .user-layout .sidebar .logo {
-        justify-content: center;
-        padding: 0;
-        margin-bottom: 25px;
-    }
-
-    .user-layout .sidebar .logo span,
-    .user-layout .sidebar nav a span,
-    .user-layout .sidebar-bottom a span {
-        display: none;
-    }
-
-    .user-layout .sidebar .logo i {
-        font-size: 24px;
-    }
-
-    .user-layout .sidebar nav a,
-    .user-layout .sidebar-bottom a {
-        justify-content: center;
-        gap: 0;
-        padding: 12px 8px;
-        border-left: none;
-    }
-
-    .user-layout .sidebar a i {
-        font-size: 18px;
-    }
-
-    .user-layout .main {
-        margin-left: 70px;
-        padding: 22px 16px;
-    }
-
-    .user-layout .user-page-header {
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .user-layout .user-header-heading h1 {
-        font-size: 21px;
-    }
-
-    .user-layout .user-header-heading p {
-        font-size: 12px;
-    }
-
-    .user-layout .user-header-profile {
-        padding: 8px;
-    }
-
-    .user-layout .user-header-details,
-    .user-layout .profile-arrow {
-        display: none;
-    }
-}
-
-@media (max-width: 480px) {
-    .user-layout .sidebar {
-        width: 60px;
-        padding: 18px 6px;
-    }
-
-    .user-layout .main {
-        margin-left: 60px;
-        padding: 18px 12px;
-    }
-
-    .user-layout .user-header-heading h1 {
-        font-size: 19px;
-    }
-
-    .user-layout .user-header-avatar {
-        width: 34px;
-        height: 34px;
-        flex-basis: 34px;
-        font-size: 15px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .user-layout .sidebar a {
-        transition: none;
-        transform: none;
-    }
-}
-.user-header-avatar {
-    width: 48px;
-    height: 48px;
-    flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    overflow: hidden;
-    border-radius: 50%;
-}
-
-.user-header-avatar .user-header-photo {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-/* Mobile navigation */
-.mobile-menu-bar,
-.sidebar-close,
-.sidebar-overlay {
-    display: none;
-}
-
-.main,
-.content-wrapper,
-.user-header-heading {
-    min-width: 0;
-}
-
-/* Keep toast inside narrow screens */
-#toast {
-    right: auto;
-    min-width: 0;
-    width: min(500px, calc(100vw - 32px));
-}
-
-@media (max-width: 768px) {
-    body.sidebar-open {
+    body.user-layout.sidebar-open {
         overflow: hidden;
     }
 
-    .user-layout .wrapper {
-        display: block;
-    }
-
     .user-layout .main {
-        position: relative;
         width: 100%;
         max-width: 100%;
         margin-left: 0;
         padding: 16px;
     }
 
-    .user-layout .content-wrapper {
-        width: 100%;
-        margin: 0;
-        padding: 0;
-    }
+    /* Top menu row */
 
-    .mobile-menu-bar {
+    .user-layout .mobile-menu-bar {
         display: flex;
         align-items: center;
         gap: 10px;
@@ -560,7 +470,7 @@ body.user-layout {
         font-weight: 700;
     }
 
-    .mobile-menu-button {
+    .user-layout .mobile-menu-button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -569,32 +479,25 @@ body.user-layout {
         height: 44px;
         border: 1px solid #e7e0f4;
         border-radius: 12px;
-        background: #fff;
+        background: #ffffff;
         color: #6944ed;
         font-size: 20px;
         cursor: pointer;
     }
 
-    .mobile-menu-button:hover,
-    .sidebar-close:hover {
+    .user-layout .mobile-menu-button:hover {
         transform: none;
     }
 
-    .user-layout .sidebar {
-        position: fixed;
+    /* Sliding sidebar */
+
+    .user-layout #sidebar.sidebar {
         inset: 0 auto 0 0;
-        z-index: 10000;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
         width: min(280px, 85vw);
         max-width: none;
-        height: 100vh;
-        height: 100dvh;
-        margin: 0;
-        padding: 24px 16px;
-        overflow-y: auto;
-        background: #201740;
+        padding: 18px 14px;
+        background: #211747;
+        z-index: 10000;
         transform: translateX(-100%);
         visibility: hidden;
         pointer-events: none;
@@ -603,98 +506,129 @@ body.user-layout {
             visibility 0.25s ease;
     }
 
-    .user-layout .sidebar.is-open {
+    .user-layout #sidebar.sidebar.is-open {
         transform: translateX(0);
         visibility: visible;
         pointer-events: auto;
         box-shadow: 12px 0 35px rgba(0, 0, 0, 0.2);
     }
 
-    .sidebar-close {
+    /* Logo left, close button right */
+
+    .user-layout #sidebar .logo {
+        gap: 9px;
+        min-height: 40px;
+        margin: 0 0 24px;
+        padding: 0 48px 0 12px;
+        font-size: 21px;
+    }
+
+    .user-layout #sidebar .logo .pfcg-spark-icon {
+        width: 32px;
+        height: 32px;
+        flex-basis: 32px;
+        border-radius: 9px;
+    }
+
+    .user-layout #sidebar .logo .pfcg-spark-icon svg {
+        width: 25px;
+        height: 25px;
+    }
+
+    .user-layout #sidebar .logo .pfcg-brand-name {
+        font-family: Arial, Helvetica, sans-serif !important;
+    }
+
+    .user-layout #sidebar .sidebar-close {
         position: absolute;
-        top: 18px;
+        top: 20px;
         right: 14px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 40px;
-        height: 40px;
-        border: 0;
+        width: 36px;
+        height: 36px;
+        margin: 0;
+        padding: 0;
+        border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 10px;
-        background: rgba(255, 255, 255, 0.1);
-        color: #fff;
-        font-size: 20px;
+        background: rgba(255, 255, 255, 0.06);
+        color: #ffffff;
+        font-size: 18px;
+        line-height: 1;
         cursor: pointer;
+        z-index: 2;
     }
 
-    .user-layout .sidebar .logo {
-        display: flex;
-        align-items: center;
-        min-height: 44px;
-        margin-bottom: 24px;
-        padding: 0 48px 0 10px;
-        color: #fff;
-        font-size: 21px;
+    .user-layout #sidebar .sidebar-close:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: none;
     }
 
-    .user-layout .sidebar .logo span,
-    .user-layout .sidebar a span {
-        display: inline;
-        visibility: visible;
-        opacity: 1;
-    }
+    /* Navigation */
 
-    .user-layout .sidebar nav {
-        display: flex;
-        flex-direction: column;
+    .user-layout #sidebar nav {
+        align-items: stretch;
         gap: 6px;
         width: 100%;
     }
 
-    .user-layout .sidebar a {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 14px;
+    .user-layout #sidebar nav a,
+    .user-layout #sidebar .sidebar-bottom a {
+        gap: 12px;
         width: 100%;
         height: auto;
-        min-height: 48px;
-        margin: 0;
         padding: 12px 14px;
-        border-radius: 12px;
+        border-left: none;
         color: #e9e3f7;
         font-size: 14px;
         text-align: left;
-        text-decoration: none;
     }
 
-    .user-layout .sidebar a i {
-        flex: 0 0 22px;
+    .user-layout #sidebar nav a span,
+    .user-layout #sidebar .sidebar-bottom a span {
+        display: block;
+        width: auto;
+        max-width: none;
+        height: auto;
+        opacity: 1;
+        visibility: visible;
+        font-size: 14px;
+        line-height: 1.4;
+        white-space: normal;
+        overflow: visible;
+        transform: none;
+    }
+
+    .user-layout #sidebar a i {
         width: 22px;
+        flex-basis: 22px;
         font-size: 18px;
-        text-align: center;
     }
 
-    .user-layout .sidebar a.active {
+    .user-layout #sidebar a.active {
         background: #6944ed;
-        color: #fff;
+        color: #ffffff;
     }
 
-    .user-layout .sidebar-bottom {
-        position: static;
-        display: flex;
-        flex-direction: column;
+    .user-layout #sidebar .sidebar-bottom {
         gap: 6px;
         width: 100%;
-        margin-top: auto;
         padding-top: 24px;
     }
 
-    .user-layout .sidebar .logout {
+    .user-layout #sidebar .sidebar-bottom a.logout {
         color: #ff9cae;
     }
 
-    .sidebar-overlay:not([hidden]) {
+    .user-layout #sidebar .sidebar-bottom a.logout:hover {
+        background: rgba(255, 75, 90, 0.14);
+        color: #ffb8c6;
+    }
+
+    /* Background overlay */
+
+    .user-layout .sidebar-overlay:not([hidden]) {
         position: fixed;
         inset: 0;
         z-index: 9999;
@@ -702,18 +636,17 @@ body.user-layout {
         background: rgba(18, 10, 50, 0.45);
     }
 
-    /* Welcome text gets its own full-width row */
+    /* Welcome message */
+
     .user-layout .user-page-header {
         display: block;
-        margin: 0 0 22px;
-        padding: 0;
+        margin-bottom: 22px;
     }
 
     .user-layout .user-header-heading h1 {
         margin: 0;
         font-size: 24px;
         line-height: 1.35;
-        overflow-wrap: anywhere;
     }
 
     .user-layout .user-header-heading p {
@@ -722,7 +655,8 @@ body.user-layout {
         line-height: 1.6;
     }
 
-    /* Bell and avatar share the menu's top row */
+    /* Bell and avatar share the top row */
+
     .user-layout .user-header-actions {
         position: absolute;
         top: 16px;
@@ -738,35 +672,23 @@ body.user-layout {
     }
 
     .user-layout .user-header-profile {
-        display: flex;
-        align-items: center;
         justify-content: center;
         width: 44px;
         height: 44px;
         min-width: 0;
         margin: 0;
         padding: 4px;
-        border: 1px solid #e7e0f4;
+        border-color: #e7e0f4;
         border-radius: 12px;
-        background: #fff;
     }
 
     .user-layout .user-header-avatar {
-        display: flex;
-        align-items: center;
-        justify-content: center;
         width: 34px;
         height: 34px;
-        overflow: hidden;
-        border-radius: 50%;
+        flex-basis: 34px;
         background: #eee8ff;
         color: #6944ed;
-    }
-
-    .user-layout .user-header-photo {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+        font-size: 15px;
     }
 
     .user-layout .user-header-details,
@@ -780,84 +702,23 @@ body.user-layout {
         right: 12px;
         left: 12px;
         width: auto;
+        max-height: calc(100vh - 90px);
         max-height: calc(100dvh - 90px);
         overflow-y: auto;
     }
 }
 
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
 @media (prefers-reduced-motion: reduce) {
-    .user-layout .sidebar {
+    .user-layout #sidebar.sidebar,
+    .user-layout .sidebar a {
         transition: none;
     }
-}
-@media (max-width: 768px) {
-    #sidebar.sidebar nav {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        width: 100%;
-    }
 
-    #sidebar.sidebar nav a,
-    #sidebar.sidebar .sidebar-bottom a {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        gap: 12px;
-        width: 100% !important;
-        height: auto !important;
-        min-height: 48px;
-        padding: 12px 14px !important;
-        font-size: 14px !important;
-        text-align: left !important;
-    }
-
-    #sidebar.sidebar nav a span,
-    #sidebar.sidebar .sidebar-bottom a span {
-        display: block !important;
-        width: auto !important;
-        max-width: none !important;
-        height: auto !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        font-size: 14px !important;
-        line-height: 1.4;
-        white-space: normal !important;
-        overflow: visible !important;
-        transform: none !important;
-    }
-
-    #sidebar.sidebar a i {
-        flex: 0 0 22px;
-        width: 22px;
-        font-size: 18px !important;
-        text-align: center;
-    }
-}
-@media (max-width: 768px) {
-    #sidebar .logo {
-        display: flex !important;
-        align-items: center !important;
-        gap: 10px !important;
-    }
-
-    #sidebar .logo .pfcg-spark-icon {
-        display: grid !important;
-        place-items: center;
-        width: 38px !important;
-        height: 38px !important;
-        flex: 0 0 38px !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        border-radius: 11px;
-        background: linear-gradient(135deg, #35206b, #5637f5);
-    }
-
-    #sidebar .logo .pfcg-spark-icon svg {
-        display: block !important;
-        width: 30px !important;
-        height: 30px !important;
-        visibility: visible !important;
-        opacity: 1 !important;
+    .user-layout .sidebar a {
+        transform: none;
     }
 }

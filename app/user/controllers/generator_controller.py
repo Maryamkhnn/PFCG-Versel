@@ -2,7 +2,12 @@ import json
 import time
 from contextlib import closing
 from datetime import datetime, timedelta
-
+from app.user.services.automatic_moderation_service import (
+    record_blocked_attempt,
+)
+from app.user.services.account_suspension_service import (
+    sync_account_suspension,
+)
 from flask import (
     Response,
     current_app,
@@ -14,7 +19,6 @@ from flask import (
 )
 from sqlalchemy import text
 from app.user.services.generator_restriction_service import (
-    add_restriction_notification,
     sync_generator_restriction,
 )
 from app.database import db
@@ -31,106 +35,15 @@ from app.user.services.streaming_generation_service import (
 def generator_page():
     return render_template("user/generator.html")
 
-
-def record_blocked_attempt(user_id, category):
-    """Record an attempt and suspend a normal user on the fourth in 24 hours."""
-    try:
-        # Lock this user's row so simultaneous requests cannot both miss
-        # the fourth-attempt threshold.
-        locked_user_id = db.session.execute(
-            text("SELECT id FROM users WHERE id = :user_id FOR UPDATE"),
-            {"user_id": user_id},
-        ).scalar_one_or_none()
-
-        if locked_user_id is None:
-            raise RuntimeError("User not found while recording blocked attempt.")
-
-        user = db.session.get(User, user_id, populate_existing=True)
-        now = datetime.utcnow()
-
-        db.session.execute(
-            text("""
-                INSERT INTO blocked_topic_attempts
-                    (user_id, category, created_at)
-                VALUES
-                    (:user_id, :category, :created_at)
-            """),
-            {
-                "user_id": user_id,
-                "category": category,
-                "created_at": now,
-            },
-        )
-
-        attempts = db.session.execute(
-            text("""
-                SELECT COUNT(*)
-                FROM blocked_topic_attempts
-                WHERE user_id = :user_id
-                  AND created_at >= :since
-            """),
-            {
-                "user_id": user_id,
-                "since": now - timedelta(hours=24),
-            },
-        ).scalar_one()
-
-        if (
-            attempts >= 4
-            and (user.role or "user").lower() != "admin"
-            and (
-                user.generator_restricted_until is None
-                or user.generator_restricted_until <= now
-            )
-        ):
-            user.generator_restricted_until = (
-                now + timedelta(hours=1)
-            )
-
-            add_restriction_notification(
-                user_id,
-                user.generator_restricted_until,
-            )
-        db.session.commit()
-        
-        return (
-            user.generator_restricted_until is not None
-            and user.generator_restricted_until > now
-        )
-
-    except Exception:
-        db.session.rollback()
-        current_app.logger.exception("Unable to record blocked topic attempt")
-        raise
 def _get_active_user(user_id):
+    sync_account_suspension(user_id)
     sync_generator_restriction(user_id)
 
-    user = db.session.get(
+    return db.session.get(
         User,
         user_id,
         populate_existing=True,
     )
-
-    if user is None:
-        return None
-
-    now = datetime.utcnow()
-
-    if (
-        (user.status or "").lower() == "suspended"
-        and user.suspended_until is not None
-        and user.suspended_until <= now
-    ):
-        user.status = "active"
-        user.suspended_until = None
-        user.status_reason = None
-        user.status_changed_at = now
-        db.session.commit()
-
-    return user
-
-
-
 def generate_content():
     user_id = session.get("user_id")
     
@@ -167,34 +80,66 @@ def generate_content():
         settings = validate_stream_request(request.get_json(silent=True))
 
     except BlockedTopicError as error:
-        current_app.logger.warning(
-            "BLOCKED HANDLER HIT: user_id=%s category=%s",
-            user_id,
-            error.category,
-        )
-
         try:
-            suspended = record_blocked_attempt(user_id, error.category)
+            moderation = record_blocked_attempt(
+                user_id,
+                error.category,
+            )
+
         except Exception:
+            current_app.logger.exception(
+                "Unable to process blocked-topic moderation"
+            )
+
             return jsonify(
                 success=False,
-                message="Unable to process this request. Please try again later.",
+                message="Unable to process this request. Please try again.",
             ), 500
 
-        if suspended:
-            return jsonify(
-                success=False,
-                message=(
-                    "Content generation is restricted for 1 hour "
-                    "after repeated blocked topic attempts."
-                ),
-            ), 403
+        action = moderation["action"]
+        until = moderation.get("until")
+
+        response = {
+            "success": False,
+            "message": moderation["message"],
+            "moderation_action": action,
+        }
+
+        if action == "warning":
+            response["attempt_count"] = moderation.get(
+                "attempt_count",
+                0,
+            )
+
+            return jsonify(response), 400
+
+        if action == "restricted":
+            response["generator_restricted_until"] = (
+                until.isoformat() + "Z"
+                if until
+                else None
+            )
+
+            return jsonify(response), 403
+
+        if action in {"suspended", "unavailable"}:
+            response["account_status"] = moderation.get(
+                "account_status",
+                "suspended",
+            )
+
+            response["suspended_until"] = (
+                until.isoformat() + "Z"
+                if until
+                else None
+            )
+
+            return jsonify(response), 403
 
         return jsonify(
             success=False,
             message="This topic is not allowed.",
         ), 400
-
     except ValueError as error:
         current_app.logger.warning(
             "VALUE ERROR HANDLER HIT: %s",
@@ -347,12 +292,7 @@ def generate_content():
         },
     )
 
-    current_app.logger.warning(
-        "GENERATE SESSION user_id=%s email_present=%s",
-        session.get("user_id"),
-        bool(session.get("user_email")),
-    )
-
+ 
 def humanize_content():
     user_id = session.get("user_id")
     email = session.get("user_email")
@@ -374,12 +314,46 @@ def humanize_content():
     if (user.status or "active").lower() != "active":
         return jsonify(
             success=False,
-            message="Your account is suspended. Please try again later.",
+            message="Your account is unavailable. Please check your notifications.",
         ), 403
 
+    # Restriction applies to both generation and humanization.
+    now = datetime.utcnow()
+
+    if (
+        user.generator_restricted_until is not None
+        and user.generator_restricted_until > now
+    ):
+        remaining_seconds = max(
+            1,
+            int(
+                (
+                    user.generator_restricted_until - now
+                ).total_seconds()
+            ),
+        )
+
+        remaining_minutes = (remaining_seconds + 59) // 60
+
+        return jsonify(
+            success=False,
+            message=(
+                "Content generation and humanization are temporarily "
+                "restricted after repeated blocked-topic attempts. "
+                f"Try again in {remaining_minutes} minute(s)."
+            ),
+            generator_restricted_until=(
+                user.generator_restricted_until.isoformat() + "Z"
+            ),
+        ), 403
+
+    # Process content only when the user is allowed to humanize.
     data = request.get_json(silent=True)
 
-    if not isinstance(data, dict) or not isinstance(data.get("content"), str):
+    if (
+        not isinstance(data, dict)
+        or not isinstance(data.get("content"), str)
+    ):
         return jsonify(
             success=False,
             message="Please provide valid content.",
@@ -397,41 +371,43 @@ def humanize_content():
         result = humanize_text(original)
 
         if result.get("success"):
-            rewritten = result.get("content", "").strip()
+            rewritten = result.get("content", "")
 
-            if not rewritten:
+            if not isinstance(rewritten, str) or not rewritten.strip():
                 raise RuntimeError("Humanized content is empty.")
 
+            rewritten = rewritten.strip()
             words = len(rewritten.split())
 
             db.session.execute(
                 text("""
-                    INSERT INTO humanized_history
-                        (
-                            user_id,
-                            user_email,
-                            original_content,
-                            humanized_content,
-                            word_count
-                        )
-                    VALUES
-                        (
-                            :uid,
-                            :email,
-                            :original,
-                            :rewritten,
-                            :words
-                        )
+                    INSERT INTO humanized_history (
+                        user_id,
+                        user_email,
+                        original_content,
+                        humanized_content,
+                        word_count
+                    )
+                    VALUES (
+                        :uid,
+                        :email,
+                        :original,
+                        :rewritten,
+                        :words
+                    )
                 """),
                 {
-                    "uid": user_id,
-                    "email": email,
+                    "uid": user.id,
+                    "email": user.email,
                     "original": original,
                     "rewritten": rewritten,
                     "words": words,
                 },
             )
+
             db.session.commit()
+
+            result["content"] = rewritten
             result["word_count"] = words
 
         return jsonify(result)
@@ -439,12 +415,11 @@ def humanize_content():
     except Exception:
         db.session.rollback()
         current_app.logger.exception("Humanization failed")
+
         return jsonify(
             success=False,
             message="Unable to complete humanization. Please try again.",
         ), 500
-
-
 def _save_generated(settings, result, user_id, email, update_stats=False):
     inserted = db.session.execute(
         text("""
