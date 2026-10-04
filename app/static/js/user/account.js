@@ -146,57 +146,74 @@
                 clearTimeout(timeout);
             }
         }
+function showPhoto(path) {
+    const image = el("accountPhoto");
+    const initials = el("accountInitials");
 
-        function showPhoto(path) {
-            const image = el("accountPhoto");
-            const initials = el("accountInitials");
+    image.onload = null;
+    image.onerror = null;
+    image.hidden = true;
+    initials.hidden = false;
+    image.removeAttribute("src");
 
-            image.onload = null;
-            image.onerror = null;
-            image.hidden = true;
-            initials.hidden = false;
-            image.removeAttribute("src");
+    if (typeof path !== "string" || !path.trim()) {
+        return;
+    }
 
-            if (typeof path !== "string" || !path.trim()) return;
+    try {
+        const origin = window.location.origin;
+        const photoRoute = "/user/api/account/photo";
 
-            try {
-                const root = new URL(
-                    page.dataset.staticRoot,
-                    window.location.origin
-                );
+        const staticRoot = new URL(
+            page.dataset.staticRoot,
+            origin
+        );
 
-                const relativePath = path
-                    .replace(/^\/+/, "")
-                    .replace(/^static\//, "");
+        let url;
 
-                const url = new URL(relativePath, root);
+        if (
+            path === photoRoute ||
+            path.startsWith(photoRoute + "?")
+        ) {
+            url = new URL(path, origin);
+        } else {
+            const relativePath = path
+                .replace(/^\/+/, "")
+                .replace(/^static\//, "");
 
-                if (
-                    url.origin !== root.origin ||
-                    !url.pathname.startsWith(root.pathname)
-                ) {
-                    return;
-                }
+            url = new URL(relativePath, staticRoot);
 
-                url.searchParams.set("v", Date.now());
-
-                image.onload = () => {
-                    image.hidden = false;
-                    initials.hidden = true;
-                };
-
-                image.onerror = () => {
-                    image.hidden = true;
-                    initials.hidden = false;
-                };
-
-                image.src = url.href;
-            } catch {
-                image.hidden = true;
-                initials.hidden = false;
+            if (
+                url.origin !== origin ||
+                !url.pathname.startsWith(staticRoot.pathname)
+            ) {
+                return;
             }
         }
 
+        if (url.origin !== origin) {
+            return;
+        }
+
+        url.searchParams.set("v", Date.now());
+
+        image.onload = () => {
+            image.hidden = false;
+            initials.hidden = true;
+        };
+
+        image.onerror = () => {
+            image.hidden = true;
+            initials.hidden = false;
+        };
+
+        image.src = url.href;
+
+    } catch {
+        image.hidden = true;
+        initials.hidden = false;
+    }
+}
         function displayProfile(data) {
             profile = { ...profile, ...data };
 

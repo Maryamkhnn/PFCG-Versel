@@ -3,7 +3,8 @@ from io import BytesIO
 from pathlib import Path
 from uuid import uuid4
 import warnings
-
+from flask import send_file
+from sqlalchemy import text
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 from flask import (
@@ -114,7 +115,7 @@ def change_account_password_api(user_email):
 
 @account_api
 def upload_account_picture_api(user_email):
-    user = require_user(user_email)
+    require_user(user_email)
 
     file = request.files.get("profile_picture")
 
@@ -129,11 +130,16 @@ def upload_account_picture_api(user_email):
 
     try:
         with warnings.catch_warnings():
-            warnings.simplefilter("error", Image.DecompressionBombWarning)
+            warnings.simplefilter(
+                "error",
+                Image.DecompressionBombWarning
+            )
 
             with Image.open(BytesIO(raw)) as source:
                 if source.format not in {"PNG", "JPEG", "WEBP"}:
-                    raise AccountError("Choose a JPG, PNG or WEBP image.")
+                    raise AccountError(
+                        "Choose a JPG, PNG or WEBP image."
+                    )
 
                 width, height = source.size
 
@@ -148,7 +154,11 @@ def upload_account_picture_api(user_email):
                 picture.thumbnail((512, 512))
 
                 output = BytesIO()
-                picture.save(output, format="JPEG", quality=90)
+                picture.save(
+                    output,
+                    format="JPEG",
+                    quality=90
+                )
 
     except AccountError:
         raise
@@ -160,36 +170,26 @@ def upload_account_picture_api(user_email):
         Image.DecompressionBombError,
         Image.DecompressionBombWarning
     ):
-        raise AccountError("Please select a valid JPG, PNG or WEBP image.")
+        raise AccountError(
+            "Please select a valid JPG, PNG or WEBP image."
+        )
 
-    folder = (
-        Path(current_app.static_folder)
-        / "uploads"
-        / "profile_pictures"
+    picture_url = url_for(
+        "user.account_photo",
+        v=uuid4().hex
     )
 
-    folder.mkdir(parents=True, exist_ok=True)
-
-    filename = f"user_{user.id}_{uuid4().hex}.jpg"
-    target = folder / filename
-    relative_path = f"uploads/profile_pictures/{filename}"
-
-    try:
-        target.write_bytes(output.getvalue())
-        result = update_account_picture(user_email, relative_path)
-
-    except Exception:
-        # Remove a new upload if its database update failed.
-        target.unlink(missing_ok=True)
-        raise
+    result = update_account_picture(
+        user_email,
+        picture_url,
+        output.getvalue()
+    )
 
     return jsonify({
         "success": True,
         "message": "Your profile photo has been updated.",
         "data": result
     })
-
-
 @account_api
 def get_account_settings_api(user_email):
     return jsonify({
@@ -206,3 +206,29 @@ def save_account_preferences_api(user_email):
         "success": True,
         "message": "Preferences saved successfully."
     })
+@account_api
+def get_account_picture_api(user_email):
+    user = require_user(user_email)
+
+    picture_bytes = db.session.execute(
+        text("""
+            SELECT profile_picture_data
+            FROM users
+            WHERE id = :user_id
+        """),
+        {"user_id": user.id}
+    ).scalar_one_or_none()
+
+    if not picture_bytes:
+        raise AccountError("Profile photo not found.", 404)
+
+    response = send_file(
+        BytesIO(bytes(picture_bytes)),
+        mimetype="image/jpeg",
+        download_name="profile.jpg",
+        max_age=0
+    )
+
+    response.headers["Cache-Control"] = "private, no-store"
+
+    return response

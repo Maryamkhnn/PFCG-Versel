@@ -138,15 +138,30 @@ def change_account_password(user_email, data):
     user.set_password(new)
     db.session.commit()
 
-
-def update_account_picture(user_email, picture_path):
+def update_account_picture(user_email, picture_path, picture_bytes):
     user = require_user(user_email)
-    user.profile_picture = picture_path
+
+    db.session.execute(
+        text("""
+            UPDATE users
+            SET
+                profile_picture = :picture_path,
+                profile_picture_data = :picture_bytes
+            WHERE id = :user_id
+        """),
+        {
+            "picture_path": picture_path,
+            "picture_bytes": picture_bytes,
+            "user_id": user.id
+        }
+    )
 
     db.session.commit()
+    db.session.refresh(user)
 
-    return {"profile_picture": picture_path}
-
+    return {
+        "profile_picture": user.profile_picture
+    }
 
 # Keep existing preferences APIs functional.
 # These are not displayed as unused switches in My Account.

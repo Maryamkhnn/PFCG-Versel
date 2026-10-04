@@ -552,6 +552,7 @@ def api_settings_update_profile():
 def api_save_preferences():
     return save_account_preferences_api()
 @user.context_processor
+@user.context_processor
 def account_header_context():
     from flask import request, url_for
     from app.user.services.account_service import get_account
@@ -568,20 +569,28 @@ def account_header_context():
         account_data = get_account(user_email)
         picture = account_data.get("profile_picture") or ""
 
-        # Only use the application's stored profile picture paths.
-        if (
-            not picture.startswith("uploads/profile_pictures/")
-            or ".." in picture.split("/")
-            or "\\" in picture
-        ):
-            picture = ""
+        photo_url = url_for("user.account_photo")
 
-        return {
-            "account_header_photo": (
-                url_for("static", filename=picture)
-                if picture else ""
-            )
-        }
+        if (
+            picture == photo_url
+            or picture.startswith(photo_url + "?")
+        ):
+            return {"account_header_photo": picture}
+
+        # Support photos previously saved locally.
+        if (
+            picture.startswith("uploads/profile_pictures/")
+            and ".." not in picture.split("/")
+            and "\\" not in picture
+        ):
+            return {
+                "account_header_photo": url_for(
+                    "static",
+                    filename=picture
+                )
+            }
+
+        return {"account_header_photo": ""}
 
     except Exception:
         db.session.rollback()
@@ -650,3 +659,12 @@ def update_humanized_content(content_id):
             "success": False,
             "message": "Unable to save humanized content."
         }), 500
+        
+@user.route("/api/account/photo", methods=["GET"])
+@login_required
+def account_photo():
+    from app.user.controllers.account_controller import (
+        get_account_picture_api
+    )
+
+    return get_account_picture_api()
