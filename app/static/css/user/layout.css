@@ -834,3 +834,30 @@ body.user-layout {
         text-align: center;
     }
 }
+@media (max-width: 768px) {
+    #sidebar .logo {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+    }
+
+    #sidebar .logo .pfcg-spark-icon {
+        display: grid !important;
+        place-items: center;
+        width: 38px !important;
+        height: 38px !important;
+        flex: 0 0 38px !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        border-radius: 11px;
+        background: linear-gradient(135deg, #35206b, #5637f5);
+    }
+
+    #sidebar .logo .pfcg-spark-icon svg {
+        display: block !important;
+        width: 30px !important;
+        height: 30px !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}

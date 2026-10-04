@@ -1622,3 +1622,71 @@ html[data-admin-theme="dark"] .admin-main tbody tr:hover td {
         display: none !important;
     }
 }
+
+    .admin-sidebar .admin-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .admin-sidebar .admin-logo .admin-brand-icon {
+        display: grid !important;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        flex: 0 0 38px;
+        border-radius: 11px;
+        background: linear-gradient(135deg, #35206b, #5637f5);
+    }
+
+    .admin-sidebar .admin-logo .admin-brand-icon svg {
+        display: block;
+        width: 30px;
+        height: 30px;
+    }
+
+    .admin-sidebar .admin-logo .admin-brand-name {
+        color: #ffffff;
+        font-size: 23px;
+        font-weight: 700;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .admin-sidebar .admin-logo .admin-brand-ai {
+        color: #765cff;
+    }
+
+    @media (max-width: 768px) {
+        .admin-sidebar .admin-logo .admin-brand-name {
+            font-size: 22px;
+        }
+    }
+
+@media (max-width: 768px) {
+    #adminSidebar .admin-logo {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+    }
+
+    #adminSidebar .admin-logo .admin-brand-icon {
+        display: grid !important;
+        place-items: center;
+        width: 38px !important;
+        height: 38px !important;
+        flex: 0 0 38px !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        border-radius: 11px;
+        background: linear-gradient(135deg, #35206b, #5637f5);
+    }
+
+    #adminSidebar .admin-logo .admin-brand-icon svg {
+        display: block !important;
+        width: 30px !important;
+        height: 30px !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
