@@ -91,39 +91,7 @@ class User(db.Model):
     )
 
 
-    # ========================================================
-    # USER SETTINGS
-    # ========================================================
-
-    default_content_type = db.Column(
-        db.String(50),
-        nullable=True,
-        default="Blog"
-    )
-
-    default_word_count = db.Column(
-        db.Integer,
-        nullable=True,
-        default=500
-    )
-
-    email_notifications = db.Column(
-        db.Boolean,
-        nullable=True,
-        default=True
-    )
-
-    system_notifications = db.Column(
-        db.Boolean,
-        nullable=True,
-        default=True
-    )
-
-    preferences = db.Column(
-        db.Text,
-        nullable=True
-    )
-
+  
 
     # ========================================================
     # ACCOUNT MODERATION
@@ -149,11 +117,7 @@ class User(db.Model):
     db.DateTime,
     nullable=True
     )
-    admin_note = db.Column(
-        db.Text,
-        nullable=True
-    )
-
+  
     status_reason = db.Column(
         db.Text,
         nullable=True
@@ -164,10 +128,7 @@ class User(db.Model):
         nullable=True
     )
 
-    deletion_scheduled_at = db.Column(
-        db.DateTime,
-        nullable=True
-    )
+  
 
 
     # ========================================================

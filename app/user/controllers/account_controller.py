@@ -31,8 +31,7 @@ from app.user.services.account_service import (
     update_account,
     change_account_password,
     update_account_picture,
-    get_account_settings,
-    update_account_preferences
+    
 )
 
 
@@ -195,22 +194,8 @@ def upload_account_picture_api(user_email):
         "message": "Your profile photo has been updated.",
         "data": result
     })
-@account_api
-def get_account_settings_api(user_email):
-    return jsonify({
-        "success": True,
-        "data": get_account_settings(user_email)
-    })
 
 
-@account_api
-def save_account_preferences_api(user_email):
-    update_account_preferences(user_email, json_payload())
-
-    return jsonify({
-        "success": True,
-        "message": "Preferences saved successfully."
-    })
 @account_api
 def get_account_picture_api(user_email):
     user = require_user(user_email)

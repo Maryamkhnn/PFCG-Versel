@@ -41,7 +41,7 @@ from app.admin.services import (
     get_admin_settings,
     mark_feedback_reviewed,
     update_admin_settings,
-    moderate_user_account
+   
 )
 # =====================================================
 # ADMIN BLUEPRINT
@@ -147,7 +147,7 @@ def view_user(user_id):
             "name": user.name or "",
             "username": user.username or "",
             "email": user.email or "",
-            "phone": user.phone or "",
+            
             "role": user.role or "",
             "status": user.status or "active"
         }

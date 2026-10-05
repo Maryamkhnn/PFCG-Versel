@@ -78,8 +78,7 @@ from app.user.controllers.account_controller import (
     update_account_api,
     upload_account_picture_api,
     change_account_password_api,
-    get_account_settings_api,
-    save_account_preferences_api,
+  
 )
 
 
@@ -97,9 +96,8 @@ from app.user.controllers.account_controller import (
     get_account_api,
     update_account_api,
     upload_account_picture_api,
-    change_account_password_api,
-    get_account_settings_api,
-    save_account_preferences_api
+    change_account_password_api
+    
 )
 from app.user.controllers.account_controller import (
     confirm_account_deletion_api,
@@ -541,11 +539,6 @@ def api_change_password():
 
 # Compatibility for existing settings clients
 
-@user.route("/api/settings", methods=["GET"])
-@login_required
-def api_settings():
-    return get_account_settings_api()
-
 
 @user.route("/api/settings/profile", methods=["POST"])
 @login_required
@@ -553,10 +546,7 @@ def api_settings_update_profile():
     return update_account_api()
 
 
-@user.route("/api/settings/preferences", methods=["POST"])
-@login_required
-def api_save_preferences():
-    return save_account_preferences_api()
+
 @user.context_processor
 @user.context_processor
 def account_header_context():
