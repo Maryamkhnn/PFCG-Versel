@@ -5,7 +5,7 @@ import logging
 import math
 import re
 import time
-
+from threading import Lock
 from . import generation_service as generation
 
 from .prompt_service import (
@@ -27,8 +27,51 @@ class InvalidTopicError(ValueError):
 # ============================================================
 # TOPIC AND INTENT VALIDATION
 # ============================================================
+_topic_validation_cache = {}
+_topic_validation_lock = Lock()
+_TOPIC_CACHE_SECONDS = 300
+_TOPIC_CACHE_MAX_ITEMS = 200
+
 
 def _validate_topic_intent(topic):
+
+    topic = topic.strip()
+
+    # Keep exact wording: different requests need separate checks.
+    cache_key = topic
+
+    with _topic_validation_lock:
+        now = time.monotonic()
+
+        expired_keys = [
+            key
+            for key, (expires_at, _) in _topic_validation_cache.items()
+            if expires_at <= now
+        ]
+
+        for key in expired_keys:
+            del _topic_validation_cache[key]
+
+        cached = _topic_validation_cache.get(cache_key)
+
+        if cached is not None:
+            return list(cached[1])
+
+        # Only successful validation is cached.
+        # Blocked/invalid requests and API errors still raise.
+        suggestions = _validate_topic_intent_uncached(topic)
+
+        if len(_topic_validation_cache) >= _TOPIC_CACHE_MAX_ITEMS:
+            oldest_key = next(iter(_topic_validation_cache))
+            del _topic_validation_cache[oldest_key]
+
+        _topic_validation_cache[cache_key] = (
+            time.monotonic() + _TOPIC_CACHE_SECONDS,
+            tuple(suggestions)
+        )
+
+        return list(suggestions)
+def _validate_topic_intent_uncached(topic):
     keyword_matches = [
         word.lower()
         for word in BLOCKED_KEYWORDS

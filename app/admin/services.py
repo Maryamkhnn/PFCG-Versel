@@ -394,7 +394,7 @@ def get_seo_reports():
                 keyword_density,
                 keyword_count,
                 seo_status,
-                content_id,
+        
                 created_at
             FROM seo_history
             ORDER BY created_at DESC
@@ -977,21 +977,10 @@ def add_admin_log(
 # ADMIN SETTINGS
 # =====================================================
 
-# =====================================================
-# ADMIN SETTINGS
-# =====================================================
-
 def get_admin_settings():
-
     return db.session.execute(
         text("""
-            SELECT
-                id,
-                site_name,
-                plagiarism_threshold,
-                seo_target_score,
-                default_word_limit,
-                updated_at
+            SELECT id, site_name, default_word_limit, updated_at
             FROM admin_settings
             ORDER BY id ASC
             LIMIT 1
@@ -999,82 +988,43 @@ def get_admin_settings():
     ).mappings().first()
 
 
-# =====================================================
-# UPDATE ADMIN SETTINGS
-# =====================================================
-
 def update_admin_settings(data):
-
     try:
-
         settings = get_admin_settings()
 
+        params = {
+            "site_name": data["site_name"],
+            "default_word_limit": data["default_word_limit"]
+        }
+
         if settings:
+            params["id"] = settings["id"]
 
             db.session.execute(
                 text("""
                     UPDATE admin_settings
-                    SET
-                        site_name = :site_name,
-                        plagiarism_threshold = :plagiarism_threshold,
-                        seo_target_score = :seo_target_score,
+                    SET site_name = :site_name,
                         default_word_limit = :default_word_limit
                     WHERE id = :id
                 """),
-                {
-                    "id": settings["id"],
-                    "site_name": data["site_name"],
-                    "plagiarism_threshold":
-                        data["plagiarism_threshold"],
-                    "seo_target_score":
-                        data["seo_target_score"],
-                    "default_word_limit":
-                        data["default_word_limit"]
-                }
+                params
             )
-
         else:
-
             db.session.execute(
                 text("""
-                    INSERT INTO admin_settings
-                    (
-                        site_name,
-                        plagiarism_threshold,
-                        seo_target_score,
-                        default_word_limit
+                    INSERT INTO admin_settings (
+                        site_name, default_word_limit
                     )
-                    VALUES
-                    (
-                        :site_name,
-                        :plagiarism_threshold,
-                        :seo_target_score,
-                        :default_word_limit
+                    VALUES (
+                        :site_name, :default_word_limit
                     )
                 """),
-                {
-                    "site_name": data["site_name"],
-                    "plagiarism_threshold":
-                        data["plagiarism_threshold"],
-                    "seo_target_score":
-                        data["seo_target_score"],
-                    "default_word_limit":
-                        data["default_word_limit"]
-                }
+                params
             )
 
         db.session.commit()
-
         return True
 
-    except Exception as e:
-
+    except Exception:
         db.session.rollback()
-
-        print(
-            "UPDATE ADMIN SETTINGS ERROR:",
-            e
-        )
-
         raise
-

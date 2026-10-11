@@ -188,8 +188,12 @@ def get_user_reports(user_email):
                     seo_status,
                     created_at,
                     user_email,
-                    content_id
-                FROM seo_history
+                    CASE
+    WHEN LOWER(TRIM(source_type)) = 'ai'
+    THEN source_id
+    ELSE NULL
+END AS content_id
+FROM seo_history
                 WHERE user_email = :email
                 ORDER BY id DESC
             """),
@@ -512,8 +516,13 @@ def get_report_by_id(
                         keyword_count,
                         seo_status,
                         created_at,
-                        content_id
-                    FROM seo_history
+                       CASE
+    WHEN LOWER(TRIM(source_type)) = 'ai'
+    THEN source_id
+    ELSE NULL
+END AS content_id
+FROM seo_history
+                
                     WHERE id = :id
                     AND user_email = :email
                     LIMIT 1

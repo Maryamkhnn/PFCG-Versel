@@ -742,227 +742,90 @@ def account():
         admin_user=admin_user,
         settings=settings_data
     )
-# =====================================================
-# UPDATE SETTINGS
-# =====================================================
-
-@admin.route(
-    "/settings/update",
-    methods=["POST"]
-)
+@admin.route("/settings/update", methods=["POST"])
 def update_settings():
-
-    # =================================================
-    # ADMIN AUTHENTICATION
-    # =================================================
-
     if not admin_required():
-
         return jsonify({
             "success": False,
             "message": "Unauthorized access."
         }), 401
 
+    data = request.get_json(silent=True)
 
-    # =================================================
-    # GET JSON DATA
-    # =================================================
+    if not isinstance(data, dict):
+        return jsonify({
+            "success": False,
+            "message": "Valid JSON data is required."
+        }), 400
 
-    data = request.get_json(
-        silent=True
-    ) or {}
+    site_name = data.get("site_name")
 
-
-    # =================================================
-    # SITE NAME
-    # =================================================
-
-    site_name = str(
-        data.get(
-            "site_name",
-            ""
-        )
-    ).strip()
-
-    if not site_name:
-
+    if not isinstance(site_name, str) or not site_name.strip():
         return jsonify({
             "success": False,
             "message": "Site name is required."
         }), 400
 
+    site_name = site_name.strip()
 
-    # =================================================
-    # CONVERT NUMBER VALUES
-    # =================================================
+    if len(site_name) > 100:
+        return jsonify({
+            "success": False,
+            "message": "Site name must not exceed 100 characters."
+        }), 400
+
+    raw_limit = data.get("default_word_limit")
+
+    if (
+        isinstance(raw_limit, bool)
+        or not isinstance(raw_limit, (int, str))
+    ):
+        return jsonify({
+            "success": False,
+            "message": "Default word limit must be a whole number."
+        }), 400
 
     try:
-
-        plagiarism_threshold = int(
-            data.get(
-                "plagiarism_threshold",
-                20
-            )
-        )
-
-        seo_target_score = int(
-            data.get(
-                "seo_target_score",
-                70
-            )
-        )
-
-        default_word_limit = int(
-            data.get(
-                "default_word_limit",
-                500
-            )
-        )
-
+        default_word_limit = int(raw_limit)
     except (TypeError, ValueError):
-
         return jsonify({
             "success": False,
-            "message":
-                "Settings contain invalid number values."
+            "message": "Default word limit must be a whole number."
         }), 400
 
-
-    # =================================================
-    # PLAGIARISM VALIDATION
-    # =================================================
-
-    if (
-        plagiarism_threshold < 0
-        or
-        plagiarism_threshold > 100
-    ):
-
+    if not 100 <= default_word_limit <= 5000:
         return jsonify({
             "success": False,
-            "message":
-                "Plagiarism threshold must be between 0 and 100."
+            "message": "Default word limit must be between 100 and 5000."
         }), 400
-
-
-    # =================================================
-    # SEO VALIDATION
-    # =================================================
-
-    if (
-        seo_target_score < 0
-        or
-        seo_target_score > 100
-    ):
-
-        return jsonify({
-            "success": False,
-            "message":
-                "SEO target score must be between 0 and 100."
-        }), 400
-
-
-    # =================================================
-    # WORD LIMIT VALIDATION
-    # =================================================
-
-    if (
-        default_word_limit < 100
-        or
-        default_word_limit > 5000
-    ):
-
-        return jsonify({
-            "success": False,
-            "message":
-                "Default word limit must be between 100 and 5000."
-        }), 400
-
-
-
-    # =================================================
-    # FINAL SETTINGS DATA
-    # =================================================
-
-    settings_data = {
-
-        "site_name":
-            site_name,
-
-        "plagiarism_threshold":
-            plagiarism_threshold,
-
-        "seo_target_score":
-            seo_target_score,
-
-        "default_word_limit":
-            default_word_limit,
-
-    }
-
-
-    # =================================================
-    # SAVE SETTINGS
-    # =================================================
 
     try:
-
-        update_admin_settings(
-            settings_data
-        )
-
-
-        # =================================================
-        # ACTIVITY LOG
-        # =================================================
+        update_admin_settings({
+            "site_name": site_name,
+            "default_word_limit": default_word_limit
+        })
 
         add_admin_log(
-
-            admin_id=session.get(
-                "user_id"
-            ),
-
-            admin_email=session.get(
-                "user_email"
-            ),
-
+            admin_id=session.get("user_id"),
+            admin_email=session.get("user_email"),
             action="Updated Settings",
-
             target_type="System Settings",
-
-            target_details=(
-                "Administrator updated "
-                "system settings."
-            )
+            target_details="Administrator updated system settings."
         )
-
-
-        # =================================================
-        # SUCCESS RESPONSE
-        # =================================================
 
         return jsonify({
             "success": True,
-            "message":
-                "Settings saved successfully."
+            "message": "Settings saved successfully."
         })
 
-
-    except Exception as e:
-
+    except Exception:
         db.session.rollback()
-
-        print(
-            "UPDATE SETTINGS ERROR:",
-            e
-        )
+        current_app.logger.exception("Unable to save admin settings")
 
         return jsonify({
             "success": False,
-            "message":
-                "Unable to save settings."
+            "message": "Unable to save settings."
         }), 500
-
 # =====================================================
 # UPDATE ADMIN PROFILE
 # =====================================================

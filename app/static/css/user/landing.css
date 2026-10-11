@@ -1209,3 +1209,40 @@ a {
         transform: none;
     }
 }
+/* Mobile: feature icon and heading together */
+@media (max-width: 520px) {
+    .features-section .feature-card {
+        display: grid;
+        grid-template-columns: 40px minmax(0, 1fr);
+        align-items: center;
+        gap: 12px;
+        min-height: auto;
+        padding: 20px;
+    }
+
+    .features-section .feature-card > .feature-icon {
+        grid-column: 1;
+        grid-row: 1;
+        width: 40px;
+        height: 40px;
+        margin: 0;
+        border-radius: 10px;
+        font-size: 21px;
+    }
+
+    .features-section .feature-card > h3 {
+        grid-column: 2;
+        grid-row: 1;
+        min-width: 0;
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.4;
+    }
+
+    .features-section .feature-card > p {
+        grid-column: 1 / -1;
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+}

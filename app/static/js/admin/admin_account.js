@@ -134,29 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const form = event.currentTarget;
 
-            const data = {
-                site_name: document
-                    .getElementById("siteName")
-                    .value.trim(),
 
-                plagiarism_threshold: Number(
-                    document.getElementById(
-                        "plagiarismThreshold"
-                    ).value
-                ),
-
-                seo_target_score: Number(
-                    document.getElementById(
-                        "seoTargetScore"
-                    ).value
-                ),
-
-                default_word_limit: Number(
-                    document.getElementById(
-                        "defaultWordLimit"
-                    ).value
-                )
-            };
 
             try {
                 const result = await sendForm(

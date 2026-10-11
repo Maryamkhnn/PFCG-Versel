@@ -502,9 +502,23 @@ def confirm_account_deletion(user_id, challenge, code, confirmation):
             text(f"""
                 DELETE FROM seo_history
                 WHERE user_email = :email
-                   OR content_id IN ({owned_content})
+                   OR (
+                       LOWER(TRIM(source_type)) = 'ai'
+                       AND source_id IN ({owned_content})
+                   )
+                   OR (
+                       LOWER(TRIM(source_type)) = 'humanized'
+                       AND source_id IN (
+                           SELECT id
+                           FROM humanized_history
+                           WHERE user_id = :user_id
+                       )
+                   )
             """),
-            parameters,
+            {
+                **parameters,
+                "user_id": user_id,
+            },
         )
 
         # Explicit cleanup is necessary because these foreign
@@ -526,13 +540,6 @@ def confirm_account_deletion(user_id, challenge, code, confirmation):
                 parameters,
             )
 
-        db.session.execute(
-            text("""
-                DELETE FROM dashboard_stats
-                WHERE user_email = :email
-            """),
-            {"email": email},
-        )
 
         db.session.execute(
             text("""

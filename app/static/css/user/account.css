@@ -1,4 +1,4 @@
-/* Hide the extra base header on this page. */
+/* PAGE */
 body.user-layout .main > .user-page-header {
     display: none !important;
 }
@@ -6,7 +6,9 @@ body.user-layout .main > .user-page-header {
 .account-page,
 .account-page *,
 .account-toast,
-.account-toast * {
+.account-toast *,
+.account-deletion-dialog,
+.account-deletion-dialog * {
     box-sizing: border-box;
 }
 
@@ -18,13 +20,15 @@ body.user-layout .main > .user-page-header {
 
     width: 100%;
     max-width: 1250px;
+    min-width: 0;
     margin: 0 auto;
-    padding: 0 0 28px;
+    padding-bottom: 28px;
     color: var(--account-dark);
 }
 
 .account-page [hidden],
-.account-toast[hidden] {
+.account-toast[hidden],
+.account-deletion-dialog [hidden] {
     display: none !important;
 }
 
@@ -32,27 +36,33 @@ body.user-layout .main > .user-page-header {
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-bottom: 28px;
+    margin-bottom: 26px;
+}
+
+.account-heading > div,
+.account-card-heading > div {
+    flex: 1;
+    min-width: 0;
 }
 
 .account-heading-icon {
-    width: 62px;
-    height: 62px;
-    flex-shrink: 0;
     display: grid;
     place-items: center;
-    border-radius: 18px;
+    flex: 0 0 58px;
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
     background: #ede5ff;
     color: var(--account-purple);
-    font-size: 25px;
+    font-size: 24px;
 }
 
 .account-heading h1 {
-    margin: 0 0 6px;
-    color: var(--account-dark);
-    font-size: clamp(26px, 3vw, 34px);
-    font-weight: 750;
-    letter-spacing: -.7px;
+    margin: 0 0 5px;
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.5px;
 }
 
 .account-heading p {
@@ -62,6 +72,7 @@ body.user-layout .main > .user-page-header {
     line-height: 1.6;
 }
 
+/* MAIN LAYOUT */
 .account-layout {
     display: grid;
     grid-template-columns: 285px minmax(0, 1fr);
@@ -72,12 +83,22 @@ body.user-layout .main > .user-page-header {
 .account-summary,
 .account-card {
     min-width: 0;
+    margin: 0;
     background: #fff;
     border: 1px solid var(--account-border);
-    border-radius: 22px;
-    box-shadow: 0 8px 26px rgba(40, 22, 72, .04);
+    border-radius: 20px;
+    box-shadow: 0 8px 26px rgba(40, 22, 72, 0.04);
 }
 
+.account-sections {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: 24px;
+    min-width: 0;
+}
+
+/* PROFILE SUMMARY */
 .account-summary {
     overflow: hidden;
 }
@@ -88,23 +109,23 @@ body.user-layout .main > .user-page-header {
 }
 
 .account-summary-body {
-    padding: 0 24px 26px;
+    padding: 0 24px 24px;
     text-align: center;
 }
 
 .account-avatar {
     position: relative;
-    width: 106px;
-    height: 106px;
-    margin: -48px auto 18px;
     display: grid;
     place-items: center;
+    width: 106px;
+    height: 106px;
+    margin: -48px auto 16px;
     overflow: hidden;
     border: 5px solid #fff;
     border-radius: 50%;
     background: #ede5ff;
     color: #6d28d9;
-    box-shadow: 0 6px 18px rgba(40, 22, 72, .1);
+    box-shadow: 0 6px 18px rgba(40, 22, 72, 0.1);
 }
 
 .account-avatar img {
@@ -116,31 +137,33 @@ body.user-layout .main > .user-page-header {
 
 #accountInitials {
     font-size: 34px;
-    font-weight: 750;
+    font-weight: 700;
 }
 
 .account-summary h2 {
     margin: 0 0 7px;
     font-size: 22px;
+    line-height: 1.4;
     overflow-wrap: anywhere;
 }
 
 #accountEmail {
     margin: 0;
-    font-size: 13px;
     color: var(--account-muted);
+    font-size: 13px;
+    line-height: 1.6;
     overflow-wrap: anywhere;
 }
 
 .account-role {
     display: inline-block;
-    margin: 14px 0 22px;
+    margin: 14px 0 20px;
     padding: 6px 13px;
     border-radius: 30px;
     color: #6d28d9;
     background: #f2edff;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
     text-transform: capitalize;
 }
 
@@ -150,19 +173,15 @@ body.user-layout .main > .user-page-header {
     align-items: center;
     justify-content: center;
     gap: 9px;
-    min-height: 44px;
+    min-height: 46px;
     overflow: hidden;
     border: 1px solid #ddd0f8;
-    border-radius: 12px;
+    border-radius: 11px;
     background: #faf7ff;
     color: #6d28d9;
     font-size: 14px;
-    font-weight: 650;
+    font-weight: 600;
     cursor: pointer;
-}
-
-.account-upload:hover {
-    background: #f0e8ff;
 }
 
 .account-upload input {
@@ -179,25 +198,20 @@ body.user-layout .main > .user-page-header {
     outline-offset: 3px;
 }
 
-.account-photo-help {
-    margin: 10px 0 22px;
-    font-size: 11px;
-    line-height: 1.6;
-    color: var(--account-muted);
-}
-
 .account-summary-note {
     display: flex;
     align-items: flex-start;
     gap: 9px;
-    padding: 15px;
-    border-radius: 12px;
+    margin-top: 18px;
+    padding: 13px;
+    border-radius: 11px;
     background: #f8f6fc;
     text-align: left;
 }
 
 .account-summary-note i {
-    margin-top: 3px;
+    flex-shrink: 0;
+    margin-top: 4px;
     color: #8553d6;
 }
 
@@ -208,12 +222,7 @@ body.user-layout .main > .user-page-header {
     line-height: 1.7;
 }
 
-.account-sections {
-    display: grid;
-    gap: 24px;
-    min-width: 0;
-}
-
+/* SECTION CARDS */
 .account-card {
     padding: 26px;
 }
@@ -222,18 +231,18 @@ body.user-layout .main > .user-page-header {
     display: flex;
     align-items: center;
     gap: 13px;
-    padding-bottom: 22px;
-    margin-bottom: 24px;
+    margin-bottom: 22px;
+    padding-bottom: 20px;
     border-bottom: 1px solid #f0ebf6;
 }
 
 .account-section-icon {
     display: grid;
     place-items: center;
-    flex-shrink: 0;
+    flex: 0 0 44px;
     width: 44px;
     height: 44px;
-    border-radius: 13px;
+    border-radius: 12px;
     background: #f0eaff;
     color: #6d28d9;
     font-size: 19px;
@@ -245,9 +254,11 @@ body.user-layout .main > .user-page-header {
 }
 
 .account-card-heading h2 {
-    margin: 0 0 5px;
-    font-size: 19px;
+    margin: 0 0 4px;
     color: var(--account-dark);
+    font-size: 19px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
 }
 
 .account-card-heading p {
@@ -257,7 +268,13 @@ body.user-layout .main > .user-page-header {
     line-height: 1.6;
 }
 
-.account-page fieldset {
+/* FORMS */
+.account-page form {
+    margin: 0;
+}
+
+.account-page fieldset,
+.account-deletion-dialog fieldset {
     min-width: 0;
     margin: 0;
     padding: 0;
@@ -267,7 +284,7 @@ body.user-layout .main > .user-page-header {
 .account-form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 21px;
+    gap: 20px;
 }
 
 .account-field {
@@ -283,7 +300,8 @@ body.user-layout .main > .user-page-header {
     margin-bottom: 8px;
     color: #413451;
     font-size: 13px;
-    font-weight: 650;
+    font-weight: 600;
+    line-height: 1.5;
 }
 
 .account-field input {
@@ -298,7 +316,6 @@ body.user-layout .main > .user-page-header {
     color: #2c2140;
     font: inherit;
     font-size: 14px;
-    transition: border-color .2s, box-shadow .2s;
 }
 
 .account-field input::placeholder {
@@ -308,7 +325,7 @@ body.user-layout .main > .user-page-header {
 .account-field input:focus {
     outline: none;
     border-color: #9364e7;
-    box-shadow: 0 0 0 3px rgba(109, 40, 217, .09);
+    box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.09);
 }
 
 .account-field input[readonly] {
@@ -321,7 +338,8 @@ body.user-layout .main > .user-page-header {
     margin-top: 8px;
     color: var(--account-muted);
     font-size: 12px;
-    line-height: 1.5;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
 }
 
 .account-password {
@@ -329,49 +347,49 @@ body.user-layout .main > .user-page-header {
 }
 
 .account-password input {
-    padding-right: 66px;
+    padding-right: 72px;
 }
 
 .account-password button {
     position: absolute;
-    right: 7px;
-    top: 7px;
-    height: 34px;
-    padding: 0 9px;
+    top: 2px;
+    right: 3px;
+    min-width: 58px;
+    height: 44px;
+    padding: 0 8px;
     border: 0;
-    border-radius: 7px;
+    border-radius: 8px;
     background: transparent;
     color: #6d28d9;
+    font: inherit;
     font-size: 12px;
-    font-weight: 650;
+    font-weight: 600;
     cursor: pointer;
-}
-
-.account-password button:hover {
-    background: #eee7fb;
 }
 
 .account-password-tip {
     display: flex;
+    align-items: flex-start;
     gap: 8px;
-    margin-top: 17px;
+    margin-top: 18px;
     color: var(--account-muted);
     font-size: 12px;
     line-height: 1.7;
 }
 
 .account-password-tip i {
+    flex-shrink: 0;
     margin-top: 4px;
     color: #8a60c6;
 }
 
 .account-form-footer {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     flex-wrap: wrap;
     gap: 14px;
-    margin-top: 25px;
+    margin-top: 24px;
     padding-top: 20px;
     border-top: 1px solid #f0ebf6;
 }
@@ -379,48 +397,85 @@ body.user-layout .main > .user-page-header {
 .account-form-footer > span {
     color: var(--account-muted);
     font-size: 12px;
+    line-height: 1.6;
 }
 
-.account-primary {
+/* BUTTONS */
+.account-primary,
+.account-danger-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 9px;
-    min-height: 44px;
-    padding: 11px 19px;
-    border: 0;
+    min-height: 46px;
+    max-width: 100%;
+    padding: 11px 18px;
+    border: 1px solid transparent;
     border-radius: 11px;
-    background: #6d28d9;
-    color: #fff;
+    font: inherit;
     font-size: 13px;
-    font-weight: 650;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: center;
     cursor: pointer;
-    box-shadow: 0 5px 12px rgba(109, 40, 217, .15);
 }
 
-.account-primary:hover:not(:disabled) {
-    background: #5920b7;
+.account-primary {
+    color: #fff;
+    background: #6d28d9;
+    box-shadow: 0 5px 12px rgba(109, 40, 217, 0.12);
 }
 
-.account-page button:focus-visible {
+.account-danger-button {
+    color: #fff;
+    background: #b42323;
+    border-color: #b42323;
+}
+
+.account-page button:focus-visible,
+.account-toast button:focus-visible,
+.account-deletion-dialog button:focus-visible {
     outline: 3px solid #bca2ee;
     outline-offset: 3px;
 }
 
-.account-page :disabled {
+.account-page :disabled,
+.account-deletion-dialog :disabled {
     cursor: not-allowed;
 }
 
+.account-page button:disabled,
 .account-page fieldset:disabled .account-primary,
-.account-page button:disabled {
-    opacity: .6;
+.account-deletion-dialog button:disabled {
+    opacity: 0.6;
 }
 
+/* DELETE ACCOUNT */
+.account-delete-card {
+    border-color: #f2caca;
+    box-shadow: none;
+}
+
+.account-delete-icon {
+    color: #b42323;
+    background: #fff1f1;
+}
+
+.account-delete-description {
+    max-width: 680px;
+    margin: 0 0 20px;
+    color: var(--account-muted);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* LOADING ERROR */
 .account-load-error {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 16px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
     margin-bottom: 22px;
     padding: 16px;
     border: 1px solid #fecaca;
@@ -430,19 +485,25 @@ body.user-layout .main > .user-page-header {
 }
 
 .account-load-error p {
+    min-width: 0;
     margin: 0;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
 }
 
 .account-load-error button {
-    flex-shrink: 0;
+    min-height: 44px;
     padding: 9px 14px;
     border: 1px solid #efb6bf;
     border-radius: 8px;
     background: #fff;
     color: #991b1b;
+    font: inherit;
+    font-size: 13px;
     cursor: pointer;
 }
 
+/* TOAST */
 .account-toast {
     position: fixed;
     top: 22px;
@@ -452,18 +513,18 @@ body.user-layout .main > .user-page-header {
     align-items: center;
     gap: 12px;
     width: min(410px, calc(100vw - 32px));
-    padding: 16px;
+    padding: 14px;
     border: 1px solid #e5ddee;
-    border-radius: 15px;
+    border-radius: 14px;
     background: #fff;
     color: #30233f;
-    box-shadow: 0 12px 40px rgba(35, 20, 55, .17);
+    box-shadow: 0 12px 40px rgba(35, 20, 55, 0.17);
 }
 
 .account-toast-icon {
     display: grid;
     place-items: center;
-    flex-shrink: 0;
+    flex: 0 0 33px;
     width: 33px;
     height: 33px;
     border-radius: 50%;
@@ -478,6 +539,7 @@ body.user-layout .main > .user-page-header {
 
 .account-toast p {
     flex: 1;
+    min-width: 0;
     margin: 0;
     font-size: 13px;
     line-height: 1.6;
@@ -485,365 +547,33 @@ body.user-layout .main > .user-page-header {
 }
 
 .account-toast button {
+    display: grid;
+    place-items: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
     border: 0;
+    border-radius: 8px;
     background: transparent;
     color: #746a80;
     font-size: 24px;
     cursor: pointer;
 }
 
-@media (max-width: 1050px) {
-    .account-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .account-summary-body {
-        max-width: 500px;
-        margin: 0 auto;
-    }
-}
-
-@media (max-width: 600px) {
-    .account-heading {
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .account-heading-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 21px;
-        border-radius: 14px;
-    }
-
-    .account-card {
-        padding: 20px 16px;
-    }
-
-    .account-form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .account-card-heading {
-        align-items: flex-start;
-    }
-
-    .account-form-footer {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .account-primary {
-        width: 100%;
-    }
-
-    .account-toast {
-        top: 16px;
-        right: 16px;
-    }
-}
-/* ACCOUNT — MOBILE LAYOUT */
-@media (max-width: 768px) {
-    .account-page {
-        min-width: 0;
-        padding-bottom: 16px;
-    }
-
-    .account-heading {
-        flex-direction: row;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 18px;
-    }
-
-    .account-heading-icon {
-        flex: 0 0 42px;
-        width: 42px;
-        height: 42px;
-        border-radius: 12px;
-        font-size: 19px;
-    }
-
-    .account-heading > div {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .account-heading h1 {
-        margin-bottom: 4px;
-        font-size: 24px;
-        line-height: 1.3;
-    }
-
-    .account-heading p {
-        font-size: 12px;
-        line-height: 1.6;
-    }
-
-    .account-layout {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 16px;
-    }
-
-    .account-sections {
-        gap: 16px;
-    }
-
-    .account-summary,
-    .account-card {
-        border-radius: 16px;
-    }
-
-    /* Compact profile card */
-    .account-cover {
-        height: 70px;
-    }
-
-    .account-summary-body {
-        padding: 0 18px 18px;
-    }
-
-    .account-avatar {
-        width: 84px;
-        height: 84px;
-        margin: -38px auto 12px;
-        border-width: 4px;
-    }
-
-    #accountInitials {
-        font-size: 28px;
-    }
-
-    .account-summary h2 {
-        font-size: 20px;
-        line-height: 1.4;
-    }
-
-    #accountEmail {
-        font-size: 12px;
-        line-height: 1.6;
-    }
-
-    .account-role {
-        margin: 10px 0 16px;
-    }
-
-    .account-upload {
-        min-height: 46px;
-        font-size: 13px;
-    }
-
-    .account-photo-help {
-        margin: 8px 0 16px;
-    }
-
-    .account-summary-note {
-        gap: 8px;
-        padding: 12px;
-    }
-
-    .account-summary-note i {
-        flex-shrink: 0;
-    }
-
-    /* Form headings */
-    .account-card {
-        padding: 18px 16px;
-    }
-
-    .account-card-heading {
-        flex-direction: row;
-        align-items: center;
-        gap: 10px;
-        padding-bottom: 16px;
-        margin-bottom: 18px;
-    }
-
-    .account-section-icon {
-        flex: 0 0 38px;
-        width: 38px;
-        height: 38px;
-        border-radius: 11px;
-        font-size: 17px;
-    }
-
-    .account-card-heading > div {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .account-card-heading h2 {
-        font-size: 17px;
-        line-height: 1.4;
-        overflow-wrap: anywhere;
-    }
-
-    .account-card-heading p {
-        font-size: 12px;
-        line-height: 1.6;
-    }
-
-    /* One field per row */
-    .account-form-grid {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 17px;
-    }
-
-    .account-field input {
-        height: 48px;
-        padding-left: 12px;
-        font-size: 16px;
-    }
-
-    .account-field small {
-        font-size: 11px;
-        overflow-wrap: anywhere;
-    }
-
-    /* Password Show button */
-    .account-password input {
-        padding-right: 70px;
-    }
-
-    .account-password button {
-        top: 2px;
-        right: 3px;
-        min-width: 58px;
-        height: 44px;
-        padding: 0 8px;
-        font-size: 12px;
-    }
-
-    .account-password-tip {
-        font-size: 11px;
-        gap: 8px;
-    }
-
-    .account-password-tip i {
-        flex-shrink: 0;
-    }
-
-    .account-form-footer {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        margin-top: 20px;
-        padding-top: 16px;
-    }
-
-    .account-form-footer > span {
-        font-size: 11px;
-        line-height: 1.6;
-    }
-
-    .account-primary {
-        width: 100%;
-        min-height: 48px;
-        font-size: 14px;
-    }
-
-    /* Loading error */
-    .account-load-error {
-        flex-wrap: wrap;
-        gap: 12px;
-        padding: 14px;
-        font-size: 13px;
-    }
-
-    .account-load-error p {
-        min-width: 0;
-        overflow-wrap: anywhere;
-    }
-
-    .account-load-error button {
-        min-height: 44px;
-    }
-
-    /* Notification */
-    .account-toast {
-        top: 12px;
-        right: 12px;
-        width: calc(100% - 24px);
-        gap: 8px;
-        padding: 12px;
-    }
-
-    .account-toast p {
-        min-width: 0;
-    }
-
-    .account-toast button {
-        display: grid;
-        place-items: center;
-        flex: 0 0 44px;
-        width: 44px;
-        height: 44px;
-    }
-}
-
-@media (hover: none) {
-    .account-page button:hover,
-    .account-toast button:hover {
-        transform: none;
-    }
-}
-.account-delete-card {
-    border: 1px solid #f2caca;
-}
-
-.account-delete-icon {
-    color: #b42323;
-    background: #fff1f1;
-}
-
-.account-delete-description {
-    margin: 0 0 18px;
-    color: #77718b;
-    font-size: 13px;
-    line-height: 1.7;
-}
-
-.account-danger-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 11px 16px;
-    color: #fff;
-    background: #b42323;
-    border: 1px solid #b42323;
-    border-radius: 9px;
-    font: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.account-danger-button:hover:not(:disabled) {
-    background: #961c1c;
-}
-
-.account-danger-button:disabled,
-.account-deletion-secondary:disabled,
-.account-deletion-close:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-}
-
+/* DELETION DIALOG */
 .account-deletion-dialog {
     width: min(480px, calc(100% - 28px));
     max-height: calc(100vh - 28px);
     max-height: calc(100dvh - 28px);
     margin: auto;
     padding: 24px;
-    color: #251b47;
-    background: #fff;
-    border: 1px solid #dfdbeb;
-    border-radius: 16px;
     overflow-y: auto;
     overscroll-behavior: contain;
-    box-sizing: border-box;
+    border: 1px solid #dfdbeb;
+    border-radius: 16px;
+    background: #fff;
+    color: #251b47;
     font-family: inherit;
 }
 
@@ -859,6 +589,7 @@ body.user-layout .main > .user-page-header {
 }
 
 .account-deletion-heading h2 {
+    min-width: 0;
     margin: 0;
     font-size: 21px;
     line-height: 1.4;
@@ -869,10 +600,10 @@ body.user-layout .main > .user-page-header {
     width: 44px;
     height: 44px;
     padding: 0;
-    color: #77718b;
-    background: #f7f6fc;
     border: 0;
     border-radius: 9px;
+    background: #f7f6fc;
+    color: #77718b;
     font-size: 26px;
     cursor: pointer;
 }
@@ -882,13 +613,6 @@ body.user-layout .main > .user-page-header {
     color: #77718b;
     font-size: 13px;
     line-height: 1.7;
-}
-
-.account-deletion-dialog fieldset {
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    border: 0;
 }
 
 .account-deletion-dialog label {
@@ -901,13 +625,12 @@ body.user-layout .main > .user-page-header {
 .account-deletion-dialog input {
     width: 100%;
     min-width: 0;
-    min-height: 46px;
+    min-height: 48px;
     padding: 10px 12px;
-    color: #251b47;
-    background: #fff;
     border: 1px solid #dfdbeb;
     border-radius: 9px;
-    box-sizing: border-box;
+    background: #fff;
+    color: #251b47;
     font: inherit;
     font-size: 16px;
 }
@@ -931,15 +654,16 @@ body.user-layout .main > .user-page-header {
 .account-deletion-secondary {
     display: block;
     width: 100%;
-    min-height: 44px;
-    margin-top: 10px;
+    min-height: 46px;
+    margin-top: 12px;
     padding: 10px 12px;
-    color: #28165e;
-    background: #f4f0ff;
     border: 1px solid #dfdbeb;
     border-radius: 9px;
+    background: #f4f0ff;
+    color: #28165e;
     font: inherit;
     font-size: 13px;
+    line-height: 1.5;
     cursor: pointer;
 }
 
@@ -961,15 +685,135 @@ body.user-layout .main > .user-page-header {
     background: #fff1f1;
 }
 
-.account-deletion-dialog [hidden] {
-    display: none !important;
+/* TABLET */
+@media (max-width: 1050px) {
+    .account-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .account-summary-body {
+        max-width: 500px;
+        margin-inline: auto;
+    }
 }
 
-.account-danger-button:focus-visible,
-.account-deletion-secondary:focus-visible,
-.account-deletion-close:focus-visible {
-    outline: 3px solid #b9a8f1;
-    outline-offset: 3px;
+/* MOBILE */
+@media (max-width: 768px) {
+    .account-heading {
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .account-heading-icon {
+        flex-basis: 42px;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        font-size: 19px;
+    }
+
+    .account-heading h1 {
+        font-size: 24px;
+    }
+
+    .account-heading p {
+        font-size: 12px;
+    }
+
+    .account-layout,
+    .account-sections {
+        gap: 20px;
+    }
+
+    .account-summary,
+    .account-card {
+        border-radius: 16px;
+    }
+
+    .account-cover {
+        height: 70px;
+    }
+
+    .account-summary-body {
+        padding: 0 18px 20px;
+    }
+
+    .account-avatar {
+        width: 84px;
+        height: 84px;
+        margin: -38px auto 12px;
+        border-width: 4px;
+    }
+
+    #accountInitials {
+        font-size: 28px;
+    }
+
+    .account-summary h2 {
+        font-size: 20px;
+    }
+
+    .account-role {
+        margin: 10px 0 16px;
+    }
+
+    .account-card {
+        padding: 20px 16px;
+    }
+
+    .account-card-heading {
+        gap: 10px;
+        margin-bottom: 18px;
+        padding-bottom: 16px;
+    }
+
+    .account-section-icon {
+        flex-basis: 38px;
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        font-size: 17px;
+    }
+
+    .account-card-heading h2 {
+        font-size: 17px;
+    }
+
+    .account-card-heading p {
+        font-size: 12px;
+    }
+
+    .account-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    .account-field input {
+        font-size: 16px;
+    }
+
+    .account-form-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-top: 22px;
+        padding-top: 18px;
+    }
+
+    .account-primary,
+    .account-delete-card > .account-danger-button {
+        width: 100%;
+        min-height: 48px;
+        font-size: 14px;
+    }
+
+    .account-toast {
+        top: 12px;
+        right: 12px;
+        width: calc(100% - 24px);
+        gap: 8px;
+        padding: 12px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -980,8 +824,40 @@ body.user-layout .main > .user-page-header {
     .account-deletion-heading h2 {
         font-size: 19px;
     }
+}
 
-    .account-delete-card > .account-danger-button {
-        width: 100%;
+@media (max-width: 360px) {
+    .account-card {
+        padding: 18px 12px;
+    }
+
+    .account-card-heading {
+        gap: 8px;
+    }
+
+    .account-card-heading h2 {
+        font-size: 16px;
+    }
+
+    .account-heading h1 {
+        font-size: 22px;
+    }
+}
+
+@media (hover: hover) {
+    .account-primary:hover:not(:disabled) {
+        background: #5920b7;
+    }
+
+    .account-danger-button:hover:not(:disabled) {
+        background: #961c1c;
+    }
+
+    .account-upload:hover {
+        background: #f0e8ff;
+    }
+
+    .account-password button:hover {
+        background: #eee7fb;
     }
 }

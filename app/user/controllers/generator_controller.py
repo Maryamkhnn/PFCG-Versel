@@ -454,45 +454,6 @@ def _save_generated(settings, result, user_id, email, update_stats=False):
 
     content_id = inserted.lastrowid
 
-    if update_stats:
-        # Keep the existing Quick mode statistics behavior.
-        existing = db.session.execute(
-            text("""
-                SELECT id
-                FROM dashboard_stats
-                WHERE user_email = :email
-                FOR UPDATE
-            """),
-            {"email": email},
-        ).first()
-
-        if existing:
-            db.session.execute(
-                text("""
-                    UPDATE dashboard_stats
-                    SET generated_count = COALESCE(generated_count, 0) + 1,
-                        total_words = COALESCE(total_words, 0) + :words
-                    WHERE user_email = :email
-                """),
-                {"email": email, "words": result["word_count"]},
-            )
-        else:
-            db.session.execute(
-                text("""
-                    INSERT INTO dashboard_stats
-                        (
-                            user_email,
-                            generated_count,
-                            total_words,
-                            humanized_count,
-                            reports_count,
-                            saved_count
-                        )
-                    VALUES
-                        (:email, 1, :words, 0, 0, 0)
-                """),
-                {"email": email, "words": result["word_count"]},
-            )
-
+ 
     db.session.commit()
     return content_id

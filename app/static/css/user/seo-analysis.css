@@ -1154,3 +1154,39 @@ body.user-layout .main > .user-page-header {
         transform: none;
     }
 }
+#seoHistoryPagination[hidden] {
+    display: none;
+}
+
+#seoHistoryPagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 12px;
+    flex-wrap: wrap;
+}
+
+#seoHistoryPagination button {
+    padding: 9px 16px;
+    border: 1px solid #6944ed;
+    border-radius: 8px;
+    background: #fff;
+    color: #6944ed;
+    font: inherit;
+    cursor: pointer;
+}
+
+#seoHistoryPagination button:hover:not(:disabled) {
+    background: #6944ed;
+    color: #fff;
+}
+
+#seoHistoryPagination button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+#seoHistoryPageInfo {
+    font-size: 14px;
+}

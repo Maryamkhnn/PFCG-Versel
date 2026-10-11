@@ -396,7 +396,7 @@ async function analyzeSEO() {
             body: JSON.stringify({
                 content,
                 keyword,
-                content_id: contentId,
+               
                 source_id: sourceId,
                 source_type: sourceType,
                 content_topic: contentTopic,
@@ -560,23 +560,30 @@ async function loadSEOHistory() {
         `;
     }
 }
-
-
-function renderSEOHistory(data) {
-
+function renderSEOHistory(data, page = 1) {
     const body = document.getElementById("seoHistoryBody");
+    const pagination = document.getElementById("seoHistoryPagination");
+    const previous = document.getElementById("seoHistoryPrev");
+    const next = document.getElementById("seoHistoryNext");
+    const pageInfo = document.getElementById("seoHistoryPageInfo");
 
-    if (!body) {
-        return;
-    }
+    if (!body) return;
 
+    const records = Array.isArray(data) ? data : [];
+    const pageSize = 10;
+    const totalPages = Math.max(1, Math.ceil(records.length / pageSize));
+
+    page = Math.max(1, Math.min(page, totalPages));
     body.innerHTML = "";
 
-    if (!data.length) {
+    if (pagination) {
+        pagination.hidden = records.length <= pageSize;
+    }
+
+    if (!records.length) {
         body.innerHTML = `
             <tr>
                 <td colspan="4" class="empty-history">
-                    <i class="fas fa-chart-line"></i>
                     No SEO reports available yet.
                 </td>
             </tr>
@@ -584,7 +591,10 @@ function renderSEOHistory(data) {
         return;
     }
 
-    data.forEach((item) => {
+    const start = (page - 1) * pageSize;
+    const visibleRecords = records.slice(start, start + pageSize);
+
+    visibleRecords.forEach((item) => {
         const score = Number(item.seo_score || 0);
 
         let scoreClass = "score-low";
@@ -606,38 +616,27 @@ function renderSEOHistory(data) {
                     <div class="history-icon">
                         <i class="fas fa-file-lines"></i>
                     </div>
-
                     <div>
                         <strong>
-                            ${escapeHTML(
-                                item.content_topic ||
-                                "Untitled Content"
-                            )}
+                            ${escapeHTML(item.content_topic || "Untitled Content")}
                         </strong>
-
                         <small>
                             ${escapeHTML(sourceLabel(item.source_type))}
-                            · ${item.word_count || 0} words
+                            · ${Number(item.word_count || 0)} words
                         </small>
                     </div>
                 </div>
             </td>
-
             <td>
                 <span class="history-score ${scoreClass}">
                     ${score}%
                 </span>
             </td>
-
             <td>
                 <span class="history-status ${statusClass}">
-                    ${escapeHTML(
-                        item.seo_status ||
-                        "Not Analyzed"
-                    )}
+                    ${escapeHTML(item.seo_status || "Not Analyzed")}
                 </span>
             </td>
-
             <td>
                 <span class="history-date">
                     ${formatDate(item.created_at)}
@@ -647,9 +646,21 @@ function renderSEOHistory(data) {
 
         body.appendChild(row);
     });
+
+    if (pageInfo) {
+        pageInfo.textContent = `Page ${page} of ${totalPages}`;
+    }
+
+    if (previous) {
+        previous.disabled = page === 1;
+        previous.onclick = () => renderSEOHistory(records, page - 1);
+    }
+
+    if (next) {
+        next.disabled = page === totalPages;
+        next.onclick = () => renderSEOHistory(records, page + 1);
+    }
 }
-
-
 function updateLiveWordCount() {
 
     const contentArea = document.getElementById("seoContent");

@@ -253,14 +253,10 @@ def seo_analyze_api():
             fallback_title=content_topic
         )
 
-        # content_id is kept only for compatibility with old AI reports.
-        legacy_content_id = (
-            source_id if source_type == "ai" else None
-        )
 
         save_seo_analysis({
             "user_email": user_email,
-            "content_id": legacy_content_id,
+            "content": content,
             "source_type": source_type,
             "source_id": source_id,
             "content_topic": content_topic,

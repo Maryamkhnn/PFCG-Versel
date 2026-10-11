@@ -175,73 +175,7 @@ def generate_ai_content(data):
     generated_text = generated_text.strip()
     generated_words = len(generated_text.split())
 
-    # DASHBOARD STATS
-    # Only reached after successful generation.
-    user_email = session.get("user_email")
-
-    if user_email:
-        try:
-            existing = db.session.execute(
-                text("""
-                    SELECT id
-                    FROM dashboard_stats
-                    WHERE user_email = :email
-                """),
-                {"email": user_email}
-            ).fetchone()
-
-            if existing:
-                db.session.execute(
-                    text("""
-                        UPDATE dashboard_stats
-                        SET
-                            generated_count = generated_count + 1,
-                            total_words = total_words + :words
-                        WHERE user_email = :email
-                    """),
-                    {
-                        "email": user_email,
-                        "words": generated_words
-                    }
-                )
-
-            else:
-                db.session.execute(
-                    text("""
-                        INSERT INTO dashboard_stats
-                        (
-                            user_email,
-                            generated_count,
-                            total_words,
-                            humanized_count,
-                            reports_count,
-                            saved_count
-                        )
-                        VALUES
-                        (
-                            :email,
-                            1,
-                            :words,
-                            0,
-                            0,
-                            0
-                        )
-                    """),
-                    {
-                        "email": user_email,
-                        "words": generated_words
-                    }
-                )
-
-            db.session.commit()
-
-        except Exception:
-            db.session.rollback()
-
-            current_app.logger.exception(
-                "Dashboard generation statistics update failed"
-            )
-
+   
     # ========================================================
     # FINAL RESPONSE — EXISTING FORMAT
     # ========================================================

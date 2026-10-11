@@ -93,8 +93,11 @@ function cancelLivePromptSuggestions() {
 
     liveSuggestionVersion++;
 }
-
-prompt?.addEventListener("input", function (event) {
+prompt?.addEventListener("input", function () {
+    cancelLivePromptSuggestions();
+    clearPromptSuggestions();
+});
+prompt?.addEventListener("blur", function (event) {
     cancelLivePromptSuggestions();
     clearPromptSuggestions();
 
@@ -925,10 +928,23 @@ async function humanizeContent() {
         humanizedContent.value = data.content;
         updateGeneratorWordCounts();
 
-        showGeneratorNotice(
-            "Content humanized successfully.",
-            "success"
-        );
+           const warning =
+            typeof data.warning === "string"
+                ? data.warning.trim()
+                : "";
+
+        if (warning || data.review_status === "unavailable") {
+            showGeneratorNotice(
+                warning ||
+                "Rewrite completed, but automatic meaning review was unavailable. Compare it with the original before using it.",
+                "warning"
+            );
+        } else {
+            showGeneratorNotice(
+                "Rewrite completed.",
+                "success"
+            );
+        }
     } catch (error) {
         console.error("HUMANIZE ERROR:", error);
 

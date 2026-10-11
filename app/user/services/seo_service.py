@@ -720,7 +720,7 @@ def save_seo_analysis(data):
                 INSERT INTO seo_history
                 (
                     user_email,
-                    content_id,
+                    content,
                     source_type,
                     source_id,
                     content_topic,
@@ -731,24 +731,24 @@ def save_seo_analysis(data):
                     keyword_count,
                     seo_status
                 )
-                VALUES
-                (
-                    :user_email,
-                    :content_id,
-                    :source_type,
-                    :source_id,
-                    :content_topic,
-                    :word_count,
-                    :seo_score,
-                    :readability_score,
-                    :keyword_density,
-                    :keyword_count,
-                    :seo_status
-                )
+            VALUES
+(
+    :user_email,
+    :content,
+    :source_type,
+    :source_id,
+    :content_topic,
+    :word_count,
+    :seo_score,
+    :readability_score,
+    :keyword_density,
+    :keyword_count,
+    :seo_status
+)
             """),
             {
                 "user_email": data.get("user_email"),
-                "content_id": data.get("content_id"),
+                "content": data.get("content"),
                 "source_type": source_type,
                 "source_id": source_id,
                 "content_topic": data.get("content_topic"),
@@ -787,7 +787,7 @@ def get_seo_history(user_email):
         text("""
             SELECT
                 id,
-                content_id,
+                
                 source_type,
                 source_id,
                 content_topic,
@@ -811,9 +811,9 @@ def get_seo_history(user_email):
     return [
         {
             "id": row["id"],
-            "content_id": row["content_id"],
+             "source_id": row["source_id"],
             "source_type": row["source_type"] or "manual",
-            "source_id": row["source_id"],
+            
             "content_topic": (
                 row["content_topic"]
                 or "Untitled Content"

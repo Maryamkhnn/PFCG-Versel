@@ -485,3 +485,28 @@ a:focus-visible {
         transform: none;
     }
 }
+.auth-home-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    margin-bottom: 20px;
+    padding: 4px 0;
+    color: #6236c9;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-decoration: none;
+}
+
+.auth-home-link:hover {
+    color: #43218f;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.auth-home-link:focus-visible {
+    outline: 2px solid #6236c9;
+    outline-offset: 4px;
+    border-radius: 4px;
+}

@@ -68,20 +68,7 @@
 
         <form id="accountProfileForm">
             <div class="account-grid">
-                <div class="account-field">
-                    <label for="accountName">Full Name</label>
-                    <input
-                        id="accountName"
-                        name="name"
-                        type="text"
-                        value="{{ admin_user.name or '' }}"
-                        minlength="3"
-                        maxlength="100"
-                        autocomplete="name"
-                        required
-                    >
-                </div>
-
+               
                 <div class="account-field">
                     <label for="accountEmail">Email Address</label>
                     <input
@@ -206,66 +193,6 @@
             </div>
         </div>
 
-        <form id="accountSettingsForm">
-            <div class="account-grid">
-                <div class="account-field">
-                    <label for="siteName">Site Name</label>
-                    <input
-                        id="siteName"
-                        type="text"
-                        value="{{ settings['site_name'] if settings else 'PFCG AI' }}"
-                        maxlength="100"
-                        required
-                    >
-                </div>
-
-                <div class="account-field">
-                    <label for="plagiarismThreshold">
-                        Plagiarism Threshold (%)
-                    </label>
-                    <input
-                        id="plagiarismThreshold"
-                        type="number"
-                        value="{{ settings['plagiarism_threshold'] if settings else 20 }}"
-                        min="0"
-                        max="100"
-                        required
-                    >
-                </div>
-
-                <div class="account-field">
-                    <label for="seoTargetScore">Target SEO Score</label>
-                    <input
-                        id="seoTargetScore"
-                        type="number"
-                        value="{{ settings['seo_target_score'] if settings else 70 }}"
-                        min="0"
-                        max="100"
-                        required
-                    >
-                </div>
-
-                <div class="account-field">
-                    <label for="defaultWordLimit">Default Word Limit</label>
-                    <input
-                        id="defaultWordLimit"
-                        type="number"
-                        value="{{ settings['default_word_limit'] if settings else 500 }}"
-                        min="100"
-                        max="5000"
-                        required
-                    >
-                </div>
-            </div>
-
-            <div class="account-card-actions">
-                <span>These values are saved in admin settings.</span>
-                <button type="submit" class="account-button">
-                    <i class="fas fa-floppy-disk"></i>
-                    Save Settings
-                </button>
-            </div>
-        </form>
     </section>
 
 </div>
