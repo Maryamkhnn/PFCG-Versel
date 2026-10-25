@@ -587,3 +587,435 @@
         grid-template-columns: minmax(0, 1fr);
     }
 }
+/* =========================================
+   SEO REPORT DETAIL PAGE
+========================================= */
+
+.seo-detail-page,
+.seo-detail-page * {
+    box-sizing: border-box;
+}
+
+.seo-detail-page {
+    width: 100%;
+    min-width: 0;
+    padding: 8px 0 24px;
+    color: #30273d;
+}
+
+/* NAVIGATION */
+
+.seo-detail-page .seo-detail-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.seo-detail-page .seo-detail-nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 11px 17px;
+    border: 1px solid #ded3ed;
+    border-radius: 10px;
+    background: #f3edfc;
+    color: #59319a;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-decoration: none;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.seo-detail-page .seo-detail-nav a:hover {
+    background: #e9def8;
+    border-color: #bda2df;
+}
+
+/* MAIN REPORT CARD */
+
+.seo-detail-page .report-card {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 28px;
+    border: 1px solid #e7e0ef;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 6px 24px rgba(55, 32, 88, 0.05);
+}
+
+/* REPORT HEADER */
+
+.seo-detail-page .report-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 20px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid #eee8f4;
+}
+
+.seo-detail-page .report-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    min-width: 0;
+    flex: 1 1 260px;
+}
+
+.seo-detail-page .report-title > div:last-child {
+    min-width: 0;
+}
+
+.seo-detail-page .report-file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 46px;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: #efe7fa;
+    color: #7040b6;
+    font-size: 20px;
+}
+
+.seo-detail-page .report-title h2 {
+    margin: 0;
+    color: #342044;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.seo-detail-page .report-title p {
+    margin: 6px 0 0;
+    color: #766c82;
+    font-size: 13px;
+}
+
+.seo-detail-page .report-date {
+    display: inline-block;
+    max-width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #f6f3fa;
+    color: #6d607d;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+/* SUMMARY METRICS */
+
+.seo-detail-page .report-seo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 22px 0;
+}
+
+.seo-detail-page .report-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid #e8e0f1;
+    border-radius: 12px;
+    background: #faf8fd;
+    overflow-wrap: anywhere;
+}
+
+.seo-detail-page .report-metric > span {
+    color: #71647f;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.seo-detail-page .report-metric > strong {
+    color: #6337a5;
+    font-size: 27px;
+    font-weight: 700;
+    line-height: 1.3;
+    font-variant-numeric: tabular-nums;
+}
+
+.seo-detail-page .report-metric > small {
+    color: #796d86;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* TEXT AND SECTIONS */
+
+.seo-detail-page .seo-detail-note {
+    margin: 12px 0;
+    color: #675c73;
+    font-size: 14px;
+    line-height: 1.9;
+    overflow-wrap: anywhere;
+}
+
+.seo-detail-page .seo-detail-note strong {
+    color: #44314f;
+    font-weight: 600;
+}
+
+.seo-detail-page .seo-detail-section {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px solid #eee8f4;
+}
+
+.seo-detail-page .seo-detail-section h3 {
+    margin: 0 0 16px;
+    color: #402765;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+/* CATEGORY CHECKS */
+
+.seo-detail-page .seo-detail-check {
+    margin-bottom: 12px;
+    padding: 17px 18px;
+    border: 1px solid #e6deef;
+    border-left: 4px solid #7950ce;
+    border-radius: 10px;
+    background: #faf8fd;
+    overflow-wrap: anywhere;
+}
+
+.seo-detail-page .seo-detail-check:last-child {
+    margin-bottom: 0;
+}
+
+.seo-detail-page .seo-detail-check strong {
+    display: block;
+    color: #482a6b;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.7;
+}
+
+.seo-detail-page .seo-detail-check p {
+    margin: 7px 0 0;
+    color: #6b6077;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+/* SUGGESTIONS */
+
+.seo-detail-page .seo-detail-list {
+    margin: 0;
+    padding-left: 23px;
+    color: #63576f;
+    font-size: 14px;
+    line-height: 1.85;
+    overflow-wrap: anywhere;
+}
+
+.seo-detail-page .seo-detail-list li {
+    margin-bottom: 12px;
+    padding-left: 4px;
+}
+
+.seo-detail-page .seo-detail-list li::marker {
+    color: #7950ce;
+}
+
+.seo-detail-page .seo-detail-list li:last-child {
+    margin-bottom: 0;
+}
+
+/* SAVED CONTENT */
+
+.seo-detail-page details.seo-detail-section summary {
+    padding: 8px 0;
+    color: #59319a;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.7;
+    cursor: pointer;
+}
+
+.seo-detail-page details[open] summary {
+    margin-bottom: 14px;
+}
+
+.seo-detail-page .seo-detail-text {
+    padding: 20px;
+    border: 1px solid #e7dfef;
+    border-radius: 10px;
+    background: #fbfafd;
+    color: #493f54;
+    font-size: 14px;
+    line-height: 1.95;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* KEYBOARD ACCESSIBILITY */
+
+.seo-detail-page a:focus-visible,
+.seo-detail-page summary:focus-visible {
+    outline: 3px solid #7950ce;
+    outline-offset: 4px;
+}
+
+/* TABLET */
+
+@media (max-width: 900px) {
+    .seo-detail-page .report-card {
+        padding: 22px;
+    }
+
+    .seo-detail-page .report-seo-grid {
+        gap: 12px;
+    }
+
+    .seo-detail-page .report-metric {
+        padding: 16px;
+    }
+
+    .seo-detail-page .report-metric > strong {
+        font-size: 24px;
+    }
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+    .seo-detail-page {
+        padding-top: 4px;
+    }
+
+    .seo-detail-page .seo-detail-nav {
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .seo-detail-page .seo-detail-nav a {
+        flex: 1 1 130px;
+        padding: 11px 12px;
+        font-size: 13px;
+    }
+
+    .seo-detail-page .report-card {
+        padding: 18px 15px;
+        border-radius: 12px;
+    }
+
+    .seo-detail-page .report-heading {
+        gap: 12px;
+        padding-bottom: 16px;
+    }
+
+    .seo-detail-page .report-title {
+        flex-basis: 100%;
+        gap: 10px;
+    }
+
+    .seo-detail-page .report-title h2 {
+        font-size: 19px;
+    }
+
+    .seo-detail-page .report-file-icon {
+        flex-basis: 40px;
+        width: 40px;
+        height: 40px;
+        font-size: 17px;
+    }
+
+    .seo-detail-page .report-seo-grid {
+        grid-template-columns: 1fr;
+        margin: 18px 0;
+    }
+
+    .seo-detail-page .report-metric {
+        padding: 16px;
+    }
+
+    .seo-detail-page .report-metric > strong {
+        font-size: 25px;
+    }
+
+    .seo-detail-page .seo-detail-section {
+        margin-top: 22px;
+        padding-top: 18px;
+    }
+
+    .seo-detail-page .seo-detail-section h3 {
+        font-size: 16px;
+    }
+
+    .seo-detail-page .seo-detail-check {
+        padding: 13px;
+    }
+
+    .seo-detail-page .seo-detail-text {
+        padding: 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .seo-detail-page .seo-detail-nav a {
+        transition: none;
+    }
+}
+.reports-page .report-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.reports-page .report-seo-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 11px 18px;
+    border: 1px solid #6940b5;
+    border-radius: 9px;
+    background: #6940b5;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+}
+
+.reports-page .report-seo-button:hover {
+    background: #542d99;
+    border-color: #542d99;
+}
+
+.reports-page .report-seo-button:focus-visible {
+    outline: 3px solid #9976dc;
+    outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+    .reports-page .report-seo-button {
+        width: 100%;
+    }
+}

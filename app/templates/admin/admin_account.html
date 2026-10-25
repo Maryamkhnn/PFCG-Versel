@@ -5,52 +5,60 @@
 {% block extra_css %}
 <link
     rel="stylesheet"
-    href="{{ url_for('static', filename='css/admin/admin_account.css') }}"
+    href="{{ url_for('static', filename='css/admin/admin_account.css', v='4') }}"
 >
 {% endblock %}
 
 {% block page_header %}
 <div class="account-heading">
     <h1>My Account</h1>
-    <p>Manage your profile, security, and platform preferences.</p>
+    <p>Manage your account, password, and appearance preferences.</p>
 </div>
 {% endblock %}
 
 {% block content %}
 <div class="account-page">
 
-    <div id="accountMessage" class="account-message" role="status"></div>
+    <div
+        id="accountMessage"
+        class="account-message"
+        role="status"
+        aria-live="polite"
+        hidden
+    ></div>
 
     <div class="account-hero">
         <div class="account-avatar">
-            <i class="fas fa-user-shield"></i>
+            <i class="fas fa-user-shield" aria-hidden="true"></i>
         </div>
 
         <div class="account-hero-details">
             <h2 id="accountDisplayName">
                 {{ admin_user.name or "Administrator" }}
             </h2>
-            <p id="accountDisplayEmail">{{ admin_user.email }}</p>
+            <p id="accountDisplayEmail">{{ admin_user.email or '' }}</p>
         </div>
 
         <span class="account-badge">
-            <i class="fas fa-circle-check"></i>
+            <i class="fas fa-circle-check" aria-hidden="true"></i>
             Administrator
         </span>
     </div>
 
     <nav class="account-nav" aria-label="Account sections">
         <a href="#profile" class="account-nav-link">
-            <i class="fas fa-user"></i> Profile
+            <i class="fas fa-user" aria-hidden="true"></i>
+            Profile
         </a>
+
         <a href="#security" class="account-nav-link">
-            <i class="fas fa-lock"></i> Security
+            <i class="fas fa-lock" aria-hidden="true"></i>
+            Security
         </a>
+
         <a href="#preferences" class="account-nav-link">
-            <i class="fas fa-palette"></i> Appearance
-        </a>
-        <a href="#platform" class="account-nav-link">
-            <i class="fas fa-sliders"></i> Platform Settings
+            <i class="fas fa-sliders" aria-hidden="true"></i>
+            Preferences
         </a>
     </nav>
 
@@ -58,8 +66,9 @@
     <section id="profile" class="account-card">
         <div class="account-card-header">
             <div class="account-card-icon">
-                <i class="fas fa-user"></i>
+                <i class="fas fa-user" aria-hidden="true"></i>
             </div>
+
             <div>
                 <h2>Profile Information</h2>
                 <p>Update your administrator name and email address.</p>
@@ -68,7 +77,18 @@
 
         <form id="accountProfileForm">
             <div class="account-grid">
-               
+                <div class="account-field">
+                    <label for="accountName">Full Name</label>
+                    <input
+                        id="accountName"
+                        name="name"
+                        type="text"
+                        value="{{ admin_user.name or '' }}"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
+
                 <div class="account-field">
                     <label for="accountEmail">Email Address</label>
                     <input
@@ -83,9 +103,10 @@
             </div>
 
             <div class="account-card-actions">
-                <span>Your email address is used for login.</span>
+                <span>Your email address is used to sign in.</span>
+
                 <button type="submit" class="account-button">
-                    <i class="fas fa-floppy-disk"></i>
+                    <i class="fas fa-floppy-disk" aria-hidden="true"></i>
                     Save Profile
                 </button>
             </div>
@@ -96,17 +117,18 @@
     <section id="security" class="account-card">
         <div class="account-card-header">
             <div class="account-card-icon">
-                <i class="fas fa-shield-halved"></i>
+                <i class="fas fa-shield-halved" aria-hidden="true"></i>
             </div>
+
             <div>
                 <h2>Password & Security</h2>
-                <p>Change the password for your administrator account.</p>
+                <p>Keep your administrator account secure.</p>
             </div>
         </div>
 
         <form id="accountPasswordForm">
             <div class="account-grid">
-                <div class="account-field">
+                <div class="account-field account-field-full">
                     <label for="currentPassword">Current Password</label>
                     <input
                         id="currentPassword"
@@ -142,59 +164,52 @@
                 </div>
             </div>
 
+            <label class="account-check" for="showPasswords">
+                <input id="showPasswords" type="checkbox">
+                <span>Show passwords</span>
+            </label>
+
             <div class="account-card-actions">
-                <span>New password must have at least 8 characters.</span>
+                <span>Use at least 8 characters for your new password.</span>
+
                 <button type="submit" class="account-button">
-                    <i class="fas fa-key"></i>
+                    <i class="fas fa-key" aria-hidden="true"></i>
                     Change Password
                 </button>
             </div>
         </form>
     </section>
 
-    <!-- APPEARANCE -->
+    <!-- PREFERENCES -->
     <section id="preferences" class="account-card">
         <div class="account-card-header">
             <div class="account-card-icon">
-                <i class="fas fa-palette"></i>
+                <i class="fas fa-sliders" aria-hidden="true"></i>
             </div>
+
             <div>
                 <h2>Appearance</h2>
-                <p>Choose how the admin panel looks on this browser.</p>
+                <p>Personalize your experience on this browser.</p>
             </div>
         </div>
 
-        <div class="account-toggle-row">
-            <div>
-                <h3>Dark Mode</h3>
-                <p>Switch between light and dark appearance.</p>
+        <div class="account-setting-row">
+            <div class="account-setting-details">
+                <h3>Appearance</h3>
+                <p>Choose a theme or follow your device settings.</p>
             </div>
 
-            <label class="account-switch" for="darkModeToggle">
-                <input
-                    type="checkbox"
-                    id="darkModeToggle"
-                    aria-label="Enable dark mode"
-                >
-                <span class="account-switch-slider"></span>
+            <label class="account-select-label" for="accountTheme">
+                <span class="account-sr-only">Choose appearance</span>
+                <select id="accountTheme">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="system">Use device setting</option>
+                </select>
             </label>
         </div>
-    </section>
-
-    <!-- PLATFORM SETTINGS -->
-    <section id="platform" class="account-card">
-        <div class="account-card-header">
-            <div class="account-card-icon">
-                <i class="fas fa-sliders"></i>
-            </div>
-            <div>
-                <h2>Platform Settings</h2>
-                <p>Update the settings stored for PFCG AI.</p>
-            </div>
-        </div>
 
     </section>
-
 </div>
 {% endblock %}
 
@@ -202,9 +217,8 @@
 <script>
     window.adminAccountEndpoints = {
         profile: "{{ url_for('admin.update_profile') }}",
-        password: "{{ url_for('admin.change_password') }}",
-        settings: "{{ url_for('admin.update_settings') }}"
+        password: "{{ url_for('admin.change_password') }}"
     };
 </script>
-<script src="{{ url_for('static', filename='js/admin/admin_account.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/admin_account.js', v='4') }}"></script>
 {% endblock %}

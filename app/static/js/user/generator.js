@@ -21,42 +21,63 @@ const humanizedContent =
 
 const prompt = document.getElementById("prompt");
 /* =====================================================
-   PROMPT SUGGESTIONS
+   LIVE PROMPT SUGGESTIONS
 ===================================================== */
 
-const promptSuggestions = document.createElement("div");
-promptSuggestions.className = "prompt-suggestions";
-promptSuggestions.hidden = true;
-promptSuggestions.setAttribute("aria-live", "polite");
+const promptSuggestions =
+    document.getElementById("promptSuggestionsPanel");
 
-prompt?.after(promptSuggestions);
+const promptSuggestionsList =
+    document.getElementById("promptSuggestionsList");
+
+const promptSuggestionsStatus =
+    document.getElementById("promptSuggestionsStatus");
+
+let liveSuggestionTimer = null;
+let liveSuggestionController = null;
+let liveSuggestionVersion = 0;
+
+function cancelLivePromptSuggestions() {
+    clearTimeout(liveSuggestionTimer);
+    liveSuggestionController?.abort();
+    liveSuggestionController = null;
+    liveSuggestionVersion++;
+}
 
 function clearPromptSuggestions() {
-    promptSuggestions.replaceChildren();
-    promptSuggestions.hidden = true;
+    promptSuggestionsList?.replaceChildren();
+
+    if (promptSuggestionsStatus) {
+        promptSuggestionsStatus.textContent = "";
+    }
+
+    if (promptSuggestions) {
+        promptSuggestions.hidden = true;
+    }
 }
 
 function showPromptSuggestions(values) {
     clearPromptSuggestions();
 
-    if (!prompt || !Array.isArray(values)) return;
+    if (
+        !prompt ||
+        !promptSuggestions ||
+        !promptSuggestionsList ||
+        !Array.isArray(values)
+    ) return;
 
     const suggestions = [...new Set(
         values
             .filter(value => typeof value === "string")
             .map(value => value.trim())
-            .filter(value => value.length >= 10 && value.length <= 180)
+            .filter(value =>
+                value.length >= 10 &&
+                value.length <= 300 &&
+                value !== prompt.value.trim()
+            )
     )].slice(0, 3);
 
     if (!suggestions.length) return;
-
-    const heading = document.createElement("strong");
-    heading.textContent = "Suggested completions";
-    promptSuggestions.appendChild(heading);
-
-    const help = document.createElement("p");
-    help.textContent = "Select a suggestion to complete your prompt.";
-    promptSuggestions.appendChild(help);
 
     suggestions.forEach(value => {
         const button = document.createElement("button");
@@ -66,57 +87,56 @@ function showPromptSuggestions(values) {
         button.textContent = value;
 
         button.addEventListener("click", () => {
+            if (generatorRequestBusy || prompt.disabled) return;
+
+            cancelLivePromptSuggestions();
             prompt.value = value;
 
+            // Notify existing listeners without requesting new ideas.
             prompt.dispatchEvent(
                 new Event("input", { bubbles: true })
             );
 
+            clearPromptSuggestions();
             prompt.focus();
         });
 
-        promptSuggestions.appendChild(button);
+        promptSuggestionsList.appendChild(button);
     });
 
     promptSuggestions.hidden = false;
 }
 
-let liveSuggestionTimer = null;
-let liveSuggestionController = null;
-let liveSuggestionVersion = 0;
-
-function cancelLivePromptSuggestions() {
-    clearTimeout(liveSuggestionTimer);
-
-    liveSuggestionController?.abort();
-    liveSuggestionController = null;
-
-    liveSuggestionVersion++;
-}
-prompt?.addEventListener("input", function () {
-    cancelLivePromptSuggestions();
-    clearPromptSuggestions();
-});
-prompt?.addEventListener("blur", function (event) {
+prompt?.addEventListener("input", event => {
     cancelLivePromptSuggestions();
     clearPromptSuggestions();
 
-    // Selecting a suggestion fills the field without another API call.
-    if (!event.isTrusted) return;
+    // Selecting a suggestion must not trigger another request.
+    if (!event.isTrusted || event.isComposing) return;
 
     const topic = prompt.value.trim();
 
-    if (topic.length < 4 || topic.length > 3000) return;
+    if (
+        topic.length < 4 ||
+        topic.length > 3000 ||
+        generatorRequestBusy
+    ) return;
 
     const version = liveSuggestionVersion;
 
-    liveSuggestionTimer = setTimeout(async function () {
-        if (generatorRequestBusy) return;
+    liveSuggestionTimer = setTimeout(async () => {
+        if (
+            generatorRequestBusy ||
+            !promptSuggestions ||
+            !promptSuggestionsStatus
+        ) return;
 
         const controller = new AbortController();
         liveSuggestionController = controller;
 
-        
+        promptSuggestions.hidden = false;
+        promptSuggestionsStatus.textContent =
+            "Finding writing ideas…";
 
         const headers = {
             "Content-Type": "application/json",
@@ -128,6 +148,11 @@ prompt?.addEventListener("blur", function (event) {
             document.querySelector('input[name="csrf_token"]')?.value;
 
         if (csrf) headers["X-CSRFToken"] = csrf;
+
+        const timeout = setTimeout(
+            () => controller.abort(),
+            15000
+        );
 
         try {
             const response = await fetch(
@@ -152,32 +177,51 @@ prompt?.addEventListener("blur", function (event) {
 
             const result = await response.json();
 
-            // Ignore responses for previous input.
             if (
                 version !== liveSuggestionVersion ||
                 prompt.value.trim() !== topic ||
                 generatorRequestBusy
-            ) {
-                return;
+            ) return;
+
+            if (result.success !== true) {
+                throw new Error("Suggestions unavailable.");
             }
 
-            showPromptSuggestions(
-                result.success ? result.suggestions : []
-            );
+            showPromptSuggestions(result.suggestions || []);
 
         } catch (error) {
             if (
-                error.name !== "AbortError" &&
-                version === liveSuggestionVersion
+                version === liveSuggestionVersion &&
+                !generatorRequestBusy
             ) {
                 clearPromptSuggestions();
+                promptSuggestions.hidden = false;
+                promptSuggestionsStatus.textContent =
+                    "Suggestions unavailable. You can still write your own topic.";
             }
         } finally {
+            clearTimeout(timeout);
+
             if (liveSuggestionController === controller) {
                 liveSuggestionController = null;
             }
         }
-    }, 1000);
+    }, 700);
+});
+
+// Hide suggestions when generation or humanization starts.
+for (const button of [generateBtn, regenerateBtn, humanizeBtn]) {
+    button?.addEventListener("click", () => {
+        cancelLivePromptSuggestions();
+        clearPromptSuggestions();
+    }, { capture: true });
+}
+
+prompt?.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        cancelLivePromptSuggestions();
+        clearPromptSuggestions();
+    }
 });
 const role = document.getElementById("role");
 const contentType = document.getElementById("contentType");

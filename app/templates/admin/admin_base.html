@@ -3,11 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>{% block title %}Admin | PFCG AI{% endblock %}</title>
 
@@ -22,15 +18,11 @@
         }
     </script>
 
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-    >
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/admin/common.css') }}"
-    >
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/admin/common.css') }}">
 
     {% block extra_css %}{% endblock %}
 
@@ -40,6 +32,7 @@
             --admin-shell-border: #e8e1f4;
             --admin-shell-text: #28165e;
             --admin-shell-muted: #867c99;
+            --admin-sidebar-width: 260px;
         }
 
         html[data-admin-theme="dark"] {
@@ -49,34 +42,59 @@
             --admin-shell-muted: #b5a9cb;
         }
 
+        html {
+            width: 100%;
+            overflow-x: clip;
+        }
+
         body {
             margin: 0;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .admin-layout,
+        .admin-layout *,
+        .admin-layout *::before,
+        .admin-layout *::after {
+            box-sizing: border-box;
         }
 
         .admin-layout {
-            display: flex;
+            display: block;
+            width: 100%;
             min-height: 100vh;
-            min-height: 100dvh;
         }
 
-        /* SIDEBAR */
+        /* ==========================================
+           FIXED SIDEBAR
+        ========================================== */
 
         #adminSidebar {
             position: fixed;
-            inset: 0 auto 0 0;
+            top: 0;
+            left: 0;
+            bottom: 0;
             z-index: 1000;
+
             display: flex !important;
             flex-direction: column;
-            width: 260px !important;
+
+            width: var(--admin-sidebar-width) !important;
             height: 100vh;
             height: 100dvh;
+
             padding: 24px 16px;
-            box-sizing: border-box;
             overflow-x: hidden;
             overflow-y: auto;
+            overscroll-behavior: contain;
+
             background: #211640;
             color: #ffffff;
+
             transform: none;
+            scrollbar-width: none;
+            scrollbar-color: #6047a0 #211640;
         }
 
         #adminSidebar .sidebar-top {
@@ -137,9 +155,7 @@
             align-items: center;
             gap: 12px;
             min-height: 48px;
-            margin: 0;
             padding: 12px 14px;
-            box-sizing: border-box;
             border: 0;
             border-radius: 12px;
             background: transparent;
@@ -172,7 +188,7 @@
         #adminSidebar .admin-nav .admin-nav-label {
             display: block !important;
             min-width: 0;
-            white-space: nowrap;
+            white-space: normal;
         }
 
         .admin-review-badge {
@@ -183,7 +199,6 @@
             height: 20px;
             margin-left: auto;
             padding: 0 5px;
-            box-sizing: border-box;
             border-radius: 20px;
             background: #dc4f5d;
             color: #ffffff;
@@ -213,7 +228,6 @@
             gap: 11px;
             width: 100%;
             padding: 12px;
-            box-sizing: border-box;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             background: rgba(255, 255, 255, 0.06);
@@ -293,13 +307,17 @@
             display: inline !important;
         }
 
-        /* MAIN HEADER */
+        /* ==========================================
+           MAIN CONTENT AND HEADER
+        ========================================== */
 
         .admin-layout > .admin-main {
-            flex: 1;
-            width: calc(100% - 260px);
+            display: block;
+            width: calc(100% - var(--admin-sidebar-width));
+            max-width: none;
             min-width: 0;
-            margin-left: 260px;
+            min-height: 100vh;
+            margin-left: var(--admin-sidebar-width);
             padding: 0;
         }
 
@@ -308,8 +326,9 @@
             display: flex;
             align-items: center;
             gap: 14px;
+            width: 100%;
+            min-width: 0;
             padding: 20px 24px;
-            box-sizing: border-box;
             overflow: visible;
             background: var(--admin-shell-surface);
             border-bottom: 1px solid var(--admin-shell-border);
@@ -325,6 +344,7 @@
             color: var(--admin-shell-text);
             font-size: 24px;
             line-height: 1.4;
+            overflow-wrap: anywhere;
         }
 
         .admin-header .header-left p {
@@ -332,9 +352,10 @@
             color: var(--admin-shell-muted);
             font-size: 13px;
             line-height: 1.5;
+            overflow-wrap: anywhere;
         }
 
-        /* REVIEW BELL */
+        /* NOTIFICATION BELL */
 
         #adminReviewBell {
             position: relative;
@@ -366,7 +387,6 @@
             min-width: 20px;
             height: 20px;
             padding: 0 5px;
-            box-sizing: border-box;
             border: 2px solid var(--admin-shell-surface);
             border-radius: 20px;
             background: #dc4f5d;
@@ -390,7 +410,12 @@
             display: none !important;
         }
 
+        /* ==========================================
+           TABLET AND MOBILE
+        ========================================== */
+
         @media (max-width: 768px) {
+
             #adminSidebar {
                 z-index: 3000;
                 width: min(280px, calc(100vw - 24px)) !important;
@@ -430,6 +455,7 @@
 
             .admin-layout > .admin-main {
                 width: 100%;
+                min-width: 0;
                 margin-left: 0;
             }
 
@@ -499,11 +525,45 @@
             }
         }
 
+        @media (max-width: 480px) {
+
+            .admin-main > .admin-header {
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .admin-header .header-left h1 {
+                font-size: 17px;
+            }
+
+            .admin-header .header-left p {
+                font-size: 11px;
+            }
+        }
+
         @media (prefers-reduced-motion: reduce) {
             #adminSidebar {
                 transition: none;
             }
         }
+        
+/* =====================================
+   SIDEBAR SCROLLBAR HIDE
+   SCROLLING REMAINS ENABLED
+===================================== */
+
+#adminSidebar {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none;
+}
+
+#adminSidebar::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
     </style>
 </head>
 
@@ -519,6 +579,7 @@
         tabindex="-1"
         aria-label="Admin navigation"
     >
+
         <button
             type="button"
             id="closeAdminMenu"
@@ -565,6 +626,7 @@
                 ] %}
 
                 {% for endpoint, icon, label in navigation %}
+
                 <a
                     href="{{ url_for(endpoint) }}"
                     class="{% if request.endpoint == endpoint %}active{% endif %}"
@@ -575,9 +637,10 @@
                     <i class="fas {{ icon }}" aria-hidden="true"></i>
                     <span class="admin-nav-label">{{ label }}</span>
                 </a>
+
                 {% endfor %}
 
-                <!-- ONE MODERATION LINK -->
+                <!-- CONTENT MODERATION -->
 
                 <a
                     href="{{ url_for('admin.content_moderation', tab='reviews') }}"
@@ -606,7 +669,7 @@
             </nav>
         </div>
 
-        <!-- ACCOUNT AND LOGOUT ONLY -->
+        <!-- ACCOUNT AND LOGOUT -->
 
         <div class="admin-bottom">
 
@@ -623,7 +686,7 @@
 
                 <span class="admin-account-details">
                     <strong>
-                        {{ session.get('user_name') or 'Administrator' }}
+                       Admin
                     </strong>
                     <small>My Account</small>
                 </span>
@@ -642,13 +705,15 @@
         </div>
     </aside>
 
+    <!-- MOBILE OVERLAY -->
+
     <div
         id="adminMenuOverlay"
         class="admin-menu-overlay"
         hidden
     ></div>
 
-    <!-- MAIN -->
+    <!-- MAIN CONTENT -->
 
     <main class="admin-main">
 
@@ -698,8 +763,13 @@
     </main>
 </div>
 
+<!-- ==========================================
+     MOBILE SIDEBAR JAVASCRIPT
+========================================== -->
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+
     const sidebar = document.getElementById("adminSidebar");
     const openBtn = document.getElementById("adminMenuBtn");
     const closeBtn = document.getElementById("closeAdminMenu");
@@ -710,6 +780,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!sidebar || !openBtn || !closeBtn || !overlay || !main) return;
 
     function closeMenu(restoreFocus = true) {
+
         const wasOpen = sidebar.classList.contains("is-open");
 
         sidebar.classList.remove("is-open");
@@ -727,6 +798,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function openMenu() {
+
         if (!mobile.matches) return;
 
         sidebar.inert = false;
@@ -741,7 +813,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     openBtn.addEventListener("click", openMenu);
+
     closeBtn.addEventListener("click", () => closeMenu());
+
     overlay.addEventListener("click", () => closeMenu());
 
     sidebar.querySelectorAll("a").forEach(link => {
@@ -749,6 +823,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.addEventListener("keydown", event => {
+
         if (!sidebar.classList.contains("is-open")) return;
 
         if (event.key === "Escape") {
@@ -782,6 +857,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     mobile.addEventListener("change", () => {
+
         const focusWasInside = sidebar.contains(document.activeElement);
 
         closeMenu(false);
@@ -795,8 +871,13 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+<!-- ==========================================
+     MODERATION NOTIFICATION JAVASCRIPT
+========================================== -->
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+
     const bell = document.getElementById("adminReviewBell");
 
     const badges = [
@@ -809,6 +890,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let loading = false;
 
     async function refreshReviewCount() {
+
         if (loading) return;
         loading = true;
 
@@ -845,6 +927,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 "aria-label",
                 `Open moderation reviews: ${count} pending`
             );
+
         } catch (error) {
             console.warn("Review count refresh failed:", error);
         } finally {

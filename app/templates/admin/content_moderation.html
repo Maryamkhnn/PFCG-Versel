@@ -401,105 +401,277 @@
     }
 
     @media (max-width: 768px) {
-        .moderation-page {
-            padding: 16px;
-        }
+    .moderation-page {
+        padding: 0 0 20px;
+        min-width: 0;
+    }
 
-        .mod-tabs {
-            gap: 8px;
-        }
+    .moderation-page .mod-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 16px;
+    }
 
-        .mod-tab {
-            flex: 1 1 140px;
-            padding: 10px;
-            font-size: 12px;
-        }
+    .moderation-page .mod-tab {
+        min-width: 0;
+        gap: 7px;
+        padding: 10px 8px;
+        font-size: 12px;
+    }
 
-        .mod-card-top {
-            align-items: stretch;
-            flex-direction: column;
-            padding: 16px;
-        }
+    .moderation-page .mod-tab i {
+        flex-shrink: 0;
+    }
 
-        .mod-search input {
+    .moderation-page .mod-card {
+        border-radius: 14px;
+    }
+
+    .moderation-page .mod-card-top {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        padding: 18px 16px;
+    }
+
+    .moderation-page .mod-card-top h2 {
+        margin: 0 0 6px;
+        color: var(--mod-text);
+        font-size: 18px;
+        line-height: 1.4;
+    }
+
+    .moderation-page .mod-card-top p {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    /* Search input and button on one line */
+    .moderation-page .mod-search {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .moderation-page .mod-search input[type="search"] {
+        flex: 1 1 0;
+        width: 0;
+        min-width: 0;
+        min-height: 42px;
+        font-size: 16px;
+    }
+
+    .moderation-page .mod-search .mod-button {
+        flex-shrink: 0;
+        padding: 10px 13px;
+        font-size: 12px;
+    }
+
+    .moderation-page .mod-summary,
+    .moderation-page .mod-filter {
+        padding: 12px 16px;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    /* History cards */
+    .moderation-page .mod-table-scroll {
+        padding: 12px;
+        overflow: visible;
+    }
+
+    .moderation-page .mod-table {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .moderation-page .mod-table thead {
+        display: none;
+    }
+
+    .moderation-page .mod-table tbody {
+        display: grid;
+        width: 100%;
+        gap: 12px;
+    }
+
+    .moderation-page .mod-table tbody tr {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 14px 12px;
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        padding: 16px;
+        border: 1px solid var(--mod-border);
+        border-radius: 12px;
+        background: var(--mod-soft);
+    }
+
+    .moderation-page .mod-table tbody td {
+        display: block;
+        width: auto;
+        min-width: 0;
+        padding: 0;
+        border: 0;
+        color: var(--mod-text);
+        font-size: 13px;
+        line-height: 1.5;
+        text-align: left;
+        overflow-wrap: anywhere;
+    }
+
+    .moderation-page .mod-table tbody td::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 7px;
+        color: var(--mod-muted);
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    /* Name and email */
+    .moderation-page .mod-table td[data-label="User"] {
+        grid-column: 1 / -1;
+    }
+
+    .moderation-page .mod-table td[data-label="User"]::before {
+        display: none;
+    }
+
+    .moderation-page .mod-table td[data-label="User"] strong {
+        color: var(--mod-text);
+        font-size: 15px;
+        line-height: 1.4;
+    }
+
+    .moderation-page .mod-table td[data-label="User"] small {
+        margin-top: 5px;
+        color: var(--mod-muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    /* User ID stays compact */
+    .moderation-page .mod-table td[data-label="User ID"] {
+        grid-column: 1 / -1;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--mod-border);
+        color: var(--mod-muted);
+        font-size: 12px;
+    }
+
+    .moderation-page .mod-table td[data-label="User ID"]::before {
+        content: "User ID: ";
+        display: inline;
+        margin: 0;
+    }
+
+    /* Category and attempts on one line */
+    .moderation-page .mod-table td[data-label="Category"] {
+        grid-column: 1;
+        color: var(--mod-purple);
+        font-weight: 600;
+    }
+
+    .moderation-page .mod-table td[data-label="Attempts"] {
+        grid-column: 2;
+        text-align: center;
+    }
+
+    .moderation-page .mod-table td[data-label="Attempts"] strong {
+        display: inline-grid;
+        place-items: center;
+        min-width: 36px;
+        min-height: 32px;
+        padding: 4px 9px;
+        border-radius: 8px;
+        background: var(--mod-bg);
+        color: var(--mod-purple);
+        font-size: 14px;
+    }
+
+    /* Accounts awaiting review */
+    .moderation-page .mod-table td[data-label="Account Status"],
+    .moderation-page .mod-table td[data-label="Actions"] {
+        grid-column: 1 / -1;
+    }
+
+    .moderation-page .mod-reason {
+        max-width: none;
+        margin-top: 6px;
+    }
+
+    .moderation-page .mod-actions {
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    /* Pagination */
+    .moderation-page .mod-pagination {
+        gap: 10px;
+        padding: 16px;
+    }
+
+    .moderation-page .mod-pagination span {
+        order: -1;
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Review dialog */
+    .moderation-page .mod-dialog-header,
+    .moderation-page .mod-dialog-body {
+        padding: 16px;
+    }
+
+    .moderation-page .mod-details {
+        grid-template-columns: 1fr;
+    }
+
+    .moderation-page .mod-form-actions {
+        gap: 10px;
+    }
+
+    .moderation-page .mod-form-actions .mod-button {
+        flex: 1;
+    }
+}
+    .mod-page-size {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--mod-muted);
+        font-size: 13px;
+    }
+
+    .mod-page-size select {
+        min-height: 42px;
+        padding: 8px 10px;
+        border: 1px solid var(--mod-border);
+        border-radius: 10px;
+        background: var(--mod-soft);
+        color: var(--mod-text);
+        font: inherit;
+        cursor: pointer;
+    }
+
+    .mod-pagination a.is-current {
+        background: #6944ed;
+        border-color: #6944ed;
+        color: #ffffff;
+    }
+
+    @media (max-width: 768px) {
+        .moderation-page .mod-pagination .mod-page-gap {
+            order: 0;
             width: auto;
-            flex: 1 1 160px;
-        }
-
-        .mod-summary,
-        .mod-filter {
-            padding: 12px 16px;
-        }
-
-        .mod-table-scroll {
-            padding: 12px;
-            overflow: visible;
-        }
-
-        .mod-table,
-        .mod-table tbody,
-        .mod-table tr,
-        .mod-table td {
-            display: block;
-            width: 100%;
-        }
-
-        .mod-table thead {
-            display: none;
-        }
-
-        .mod-table tr {
-            margin-bottom: 12px;
-            padding: 6px 14px;
-            border: 1px solid var(--mod-border);
-            border-radius: 12px;
-            background: var(--mod-soft);
-        }
-
-        .mod-table tr:last-child {
-            margin-bottom: 0;
-        }
-
-        .mod-table td {
-            padding: 11px 0;
-            overflow-wrap: anywhere;
-        }
-
-        .mod-table td:last-child {
-            border-bottom: 0;
-        }
-
-        .mod-table td::before {
-            display: block;
-            margin-bottom: 6px;
-            content: attr(data-label);
-            color: var(--mod-muted);
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .mod-reason {
-            max-width: none;
-        }
-
-        .mod-actions {
-            flex-direction: row;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .mod-dialog-header,
-        .mod-dialog-body {
-            padding: 16px;
-        }
-
-        .mod-details {
-            grid-template-columns: 1fr;
-        }
-
-        .mod-form-actions .mod-button {
-            flex: 1;
         }
     }
 </style>
@@ -544,7 +716,7 @@
 
                 <p>
                     {% if tab == 'reviews' %}
-                        Review automatic suspensions and their records.
+                      Review temporary generator restrictions and account suspensions.
                     {% else %}
                         Browse blocked attempts by user and category.
                     {% endif %}
@@ -557,7 +729,17 @@
                 action="{{ url_for('admin.content_moderation') }}"
             >
                 <input type="hidden" name="tab" value="{{ tab }}">
-
+                <label class="mod-page-size">
+                    Per page
+                    <select name="per_page" onchange="this.form.requestSubmit()">
+                        {% for size in [10, 25, 50] %}
+                        <option
+                            value="{{ size }}"
+                            {% if per_page == size %}selected{% endif %}
+                        >{{ size }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
                 {% if selected_email %}
                 <input
                     type="hidden"
@@ -570,7 +752,7 @@
                     type="search"
                     name="search"
                     value="{{ search or '' }}"
-                    placeholder="Search records..."
+                                        placeholder="{{ 'Name, email or user ID...' if tab == 'reviews' else 'Name, email, user ID or category...' }}"
                     aria-label="Search moderation records"
                 >
 
@@ -584,7 +766,8 @@
                     href="{{ url_for(
                         'admin.content_moderation',
                         tab=tab,
-                        email=selected_email or ''
+                        email=selected_email or '',
+                        per_page=per_page
                     ) }}"
                 >Clear</a>
                 {% endif %}
@@ -733,31 +916,61 @@
 
         {% endif %}
 
-        {% if total_pages > 1 %}
+                {% if total_records > 0 %}
         <nav class="mod-pagination" aria-label="Moderation pages">
+            <span>
+                Showing {{ (page - 1) * per_page + 1 }}–{{ [page * per_page, total_records]|min }}
+                of {{ total_records }} records
+                · Page {{ page }} of {{ total_pages }}
+            </span>
+
             {% if page > 1 %}
             <a href="{{ url_for(
                 'admin.content_moderation',
                 tab=tab,
                 page=page - 1,
+                per_page=per_page,
                 search=search or '',
                 email=selected_email or ''
             ) }}">Previous</a>
             {% endif %}
 
-            <span>Page {{ page }} of {{ total_pages }}</span>
+            {% for number in range(1, total_pages + 1) %}
+                {% if number == 1
+                    or number == total_pages
+                    or (number >= page - 2 and number <= page + 2) %}
+                <a
+                    href="{{ url_for(
+                        'admin.content_moderation',
+                        tab=tab,
+                        page=number,
+                        per_page=per_page,
+                        search=search or '',
+                        email=selected_email or ''
+                    ) }}"
+                    {% if number == page %}
+                    class="is-current"
+                    aria-current="page"
+                    {% endif %}
+                >{{ number }}</a>
+                {% elif number == page - 3 or number == page + 3 %}
+                <span class="mod-page-gap">…</span>
+                {% endif %}
+            {% endfor %}
 
             {% if page < total_pages %}
             <a href="{{ url_for(
                 'admin.content_moderation',
                 tab=tab,
                 page=page + 1,
+                per_page=per_page,
                 search=search or '',
                 email=selected_email or ''
             ) }}">Next</a>
             {% endif %}
         </nav>
         {% endif %}
+
     </section>
 
     <dialog
@@ -790,11 +1003,11 @@
 
                 <dl class="mod-details">
                     <div>
-                        <dt>Current account status</dt>
+                    <dt>Case type and current account status</dt>
                         <dd id="moderationReviewAccountStatus"></dd>
                     </div>
                     <div>
-                        <dt>Original suspension expiry</dt>
+                  <dt id="moderationReviewExpiryLabel">Original expiry</dt>
                         <dd id="moderationReviewExpiry"></dd>
                     </div>
                 </dl>
@@ -828,11 +1041,9 @@
                             <option value="incorrect">Incorrect Detection</option>
                         </select>
                     </label>
-
-                    <p class="mod-note">
-                        Confirming closes the review without extending the
-                        suspension. Incorrect Detection cancels the matching
-                        automatic suspension if it is still present.
+            <p id="moderationReviewDecisionNote" class="mod-note">
+                        Confirming closes the review without extending
+                        the original expiry.
                     </p>
 
                     <label class="mod-field" for="moderationReviewComment">
@@ -975,18 +1186,54 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById("moderationReviewName").textContent =
                     currentCase.name;
 
-                document.getElementById("moderationReviewEmail").textContent =
+                              document.getElementById("moderationReviewEmail").textContent =
                     currentCase.email;
+
+                const isSuspension =
+                    currentCase.case_type === "account_suspended";
+
+                const caseLabel = isSuspension
+                    ? "Account Suspended"
+                    : "Generator Restricted";
 
                 document.getElementById(
                     "moderationReviewAccountStatus"
-                ).textContent = currentCase.account_status;
+                ).textContent =
+                    caseLabel +
+                    " | Account: " +
+                    (currentCase.account_status || "active");
 
-                document.getElementById("moderationReviewExpiry").textContent =
-                    formatDate(currentCase.suspended_until);
+                document.getElementById(
+                    "moderationReviewExpiryLabel"
+                ).textContent = isSuspension
+                    ? "Original suspension expiry"
+                    : "Original generator restriction expiry";
 
-                document.getElementById("moderationReviewReason").textContent =
-                    "Original reason: " + currentCase.reason;
+                document.getElementById(
+                    "moderationReviewExpiry"
+                ).textContent = formatDate(
+                    isSuspension
+                        ? currentCase.suspended_until
+                        : currentCase.restricted_until
+                );
+
+                document.getElementById(
+                    "moderationReviewReason"
+                ).textContent =
+                    "Original reason: " + (currentCase.reason || "—");
+
+                document.getElementById(
+                    "moderationReviewDecisionNote"
+                ).textContent = isSuspension
+                    ? "Confirming closes the review without extending " +
+                      "the suspension. Incorrect Detection cancels only " +
+                      "the matching account suspension if it is still " +
+                      "present. Generator restriction history is retained."
+                    : "Confirming closes the review without extending " +
+                      "the generator restriction. Incorrect Detection " +
+                      "removes only the matching generator restriction " +
+                      "if it is still present and excludes that record " +
+                      "from future suspension counting. History is retained.";
 
                 const evidence = document.getElementById(
                     "moderationReviewEvidence"
@@ -1074,10 +1321,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "POST",
                 credentials: "same-origin",
                 headers,
-                body: JSON.stringify({
+                    body: JSON.stringify({
                     action,
                     reason,
-                    suspension_id: currentCase.suspension_id
+                    suspension_id: currentCase.suspension_id ?? null,
+                    restriction_id: currentCase.restriction_id ?? null
                 })
             });
 

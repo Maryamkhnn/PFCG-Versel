@@ -3,6 +3,10 @@
 # Reliable Web Evidence + Coverage Aware Scoring
 # ============================================================
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 import re
 import time
 import threading
@@ -13,6 +17,9 @@ import requests
 from bs4 import BeautifulSoup
 from ddgs import DDGS
 from rapidfuzz import fuzz
+import base64
+from urllib.parse import urlparse, parse_qs, unquote
+from difflib import SequenceMatcher
 
 
 # ============================================================
@@ -25,7 +32,7 @@ MAX_SEARCH_RESULTS = 5
 MAX_PAGES_PER_SENTENCE = 5
 MAX_TOTAL_PAGES = 25
 
-SEARCH_TIMEOUT = 8
+SEARCH_TIMEOUT = 4
 PAGE_TIMEOUT = 8
 
 SEARCH_WORKERS = 4
@@ -35,7 +42,7 @@ MIN_SENTENCE_WORDS = 7
 MIN_PAGE_WORDS = 35
 MAX_PAGE_WORDS = 8000
 
-SEARCH_RETRIES = 3
+SEARCH_RETRIES = 1
 
 # Match thresholds
 STRONG_SIMILARITY = 78
@@ -296,7 +303,7 @@ def build_queries(sentence, topic=""):
     phrase = best_search_phrase(sentence)
 
     if phrase:
-        queries.append(f'"{phrase}"')
+     queries.append(f'"{phrase}"')
 
     useful = distinctive_words(sentence)
 
@@ -347,7 +354,7 @@ def build_queries(sentence, topic=""):
         seen.add(key)
         output.append(query)
 
-    return output[:3]
+    return output[:2]
 
 
 # ============================================================
@@ -407,6 +414,80 @@ def normalize_url(url):
     except Exception:
         return url
 
+# ============================================================
+# Tavily SEARCH
+# ============================================================
+
+
+def search_tavily(query):
+    api_key = os.getenv("TAVILY_API_KEY")
+
+    if not api_key:
+        print("[TAVILY ERROR] API key missing")
+        return {
+            "success": False,
+            "results": []
+        }
+
+    try:
+        response = requests.post(
+            "https://api.tavily.com/search",
+            headers={
+                "Authorization": f"Bearer {api_key}"
+            },
+            json={
+                "query": query,
+                "search_depth": "basic",
+                "max_results": MAX_SEARCH_RESULTS,
+                "include_answer": False,
+                "include_raw_content": False
+            },
+            timeout=15
+        )
+
+        if response.status_code != 200:
+            print(
+                "[TAVILY ERROR]",
+                "HTTP",
+                response.status_code,
+                response.text[:150]
+            )
+            return {
+                "success": False,
+                "results": []
+            }
+
+        cleaned = []
+
+        for item in response.json().get("results", []):
+            url = item.get("url", "")
+
+            if not usable_url(url):
+                continue
+
+            cleaned.append({
+                "url": url,
+                "title": item.get("title", ""),
+                "snippet": item.get("content", ""),
+                "engine": "Tavily"
+            })
+
+        return {
+            "success": True,
+            "results": cleaned
+        }
+
+    except requests.RequestException as error:
+        print(
+            "[TAVILY ERROR]",
+            type(error).__name__,
+            str(error)[:150]
+        )
+
+        return {
+            "success": False,
+            "results": []
+        }
 
 # ============================================================
 # DDGS SEARCH
@@ -483,18 +564,47 @@ def search_ddgs(query):
 
 def search_bing(query):
 
-    try:
+    def decode_bing_url(url):
+        if not url:
+            return ""
 
+        parsed = urlparse(url)
+
+        # Decode Bing tracking links.
+        if parsed.netloc.lower() in ("bing.com", "www.bing.com"):
+            if parsed.path.startswith("/ck/a"):
+                encoded = parse_qs(parsed.query).get("u", [""])[0]
+
+                if not encoded:
+                    return ""
+
+                if encoded.startswith("a1"):
+                    encoded = encoded[2:]
+
+                try:
+                    encoded += "=" * (-len(encoded) % 4)
+                    decoded = base64.urlsafe_b64decode(
+                        encoded
+                    ).decode("utf-8", errors="replace")
+
+                    if decoded.startswith(("https://", "http://")):
+                        return decoded
+
+                except Exception:
+                    return ""
+
+                return ""
+
+        return url
+
+    try:
         response = get_session().get(
             "https://www.bing.com/search",
             params={
                 "q": query,
                 "count": MAX_SEARCH_RESULTS
             },
-            timeout=(
-                4,
-                SEARCH_TIMEOUT
-            )
+            timeout=(4, SEARCH_TIMEOUT)
         )
 
         if response.status_code != 200:
@@ -508,7 +618,12 @@ def search_bing(query):
             "html.parser"
         )
 
+        print(
+        "[BING QUERY]",
+        query[:180]
+        )
         output = []
+        seen_urls = set()
 
         for item in soup.select("li.b_algo"):
 
@@ -517,42 +632,46 @@ def search_bing(query):
             if not link:
                 continue
 
-            url = link.get(
-                "href",
-                ""
-            )
+            raw_url = link.get("href", "")
+            url = decode_bing_url(raw_url)
 
             if not usable_url(url):
                 continue
 
-            snippet_node = item.select_one(
-                ".b_caption p"
-            )
+            if url in seen_urls:
+                continue
+
+            seen_urls.add(url)
+
+            snippet_node = item.select_one(".b_caption p")
 
             snippet = (
-                snippet_node.get_text(
-                    " ",
-                    strip=True
-                )
+                snippet_node.get_text(" ", strip=True)
                 if snippet_node
                 else ""
             )
 
             output.append({
                 "url": url,
-                "title": link.get_text(
-                    " ",
-                    strip=True
-                ),
+                "title": link.get_text(" ", strip=True),
                 "snippet": snippet,
                 "engine": "Bing"
             })
+            print(
+            "[BING SOURCE]",
+            "Title:", link.get_text(" ", strip=True)[:80],
+            "| URL:", url[:150]
+            )
 
             if len(output) >= MAX_SEARCH_RESULTS:
                 break
 
-        # Request succeeded.
-        # output may legitimately be empty.
+        print(
+            f"[BING RESULTS] "
+            f"Blocks: {len(soup.select('li.b_algo'))} "
+            f"| Valid URLs: {len(output)}"
+        )
+
         return {
             "success": True,
             "results": output
@@ -572,86 +691,79 @@ def search_bing(query):
         }
 
 
+
 # ============================================================
 # SEARCH ONE QUERY
 # ============================================================
 
+
+
 def search_query(query):
 
-    # ---------------------------------------------
-    # 1. Try DDGS first
-    # ---------------------------------------------
+    started = time.perf_counter()
 
-    ddgs_response = search_ddgs(query)
+    # First try Tavily
+    response = search_tavily(query)
 
-    if ddgs_response["success"]:
+    print(
+        f"[TAVILY TIMING] "
+        f"{time.perf_counter() - started:.2f}s "
+        f"| Results: {len(response['results'])} "
+        f"| Success: {response['success']}"
+    )
 
-        return {
-            "success": True,
-            "results": ddgs_response["results"]
-        }
+    # Use DDGS only when Tavily fails or finds no results
+    if not response["results"]:
 
-    # ---------------------------------------------
-    # 2. DDGS actually failed, so try Bing
-    # ---------------------------------------------
+        print("[FALLBACK] Trying DDGS")
 
-    bing_response = search_bing(query)
+        fallback_started = time.perf_counter()
 
-    if bing_response["success"]:
+        fallback = search_ddgs(query)
 
-        return {
-            "success": True,
-            "results": bing_response["results"]
-        }
+        print(
+            f"[DDGS TIMING] "
+            f"{time.perf_counter() - fallback_started:.2f}s "
+            f"| Results: {len(fallback['results'])} "
+            f"| Success: {fallback['success']}"
+        )
 
-    # ---------------------------------------------
-    # 3. Both search providers actually failed
-    # ---------------------------------------------
+        if fallback["results"]:
+            return fallback
 
-    return {
-        "success": False,
-        "results": []
-    }
+        # Preserve a successful Tavily search with zero results
+        if not response["success"]:
+            return fallback
+
+    return response
+
 
 
 # ============================================================
 # SEARCH ONE SENTENCE
 # ============================================================
 
-def search_sentence(sentence, topic=""):
 
-    queries = build_queries(
-        sentence,
-        topic
-    )
+def search_sentence(sentence, topic=""):
+    started = time.perf_counter()
+    queries = build_queries(sentence, topic)
 
     all_results = []
     seen = set()
-
-    # True means at least one search request completed
-    # successfully, even if it returned zero results.
     successful_request = False
 
     for attempt in range(SEARCH_RETRIES):
 
         for query in queries:
-
             response = search_query(query)
 
-            # Search provider successfully handled the query.
             if response.get("success"):
                 successful_request = True
 
-            results = response.get(
-                "results",
-                []
-            )
+            results = response.get("results", [])
 
             for result in results:
-
-                url = normalize_url(
-                    result.get("url", "")
-                )
+                url = normalize_url(result.get("url", ""))
 
                 if not url or url in seen:
                     continue
@@ -659,30 +771,60 @@ def search_sentence(sentence, topic=""):
                 seen.add(url)
                 all_results.append(result)
 
-                if (
-                    len(all_results)
-                    >= MAX_PAGES_PER_SENTENCE
+            # Check whether current results contain
+            # strong evidence of copied content.
+            strong_match_found = False
+
+            for result in all_results:
+                match = compare_snippet(sentence, result)
+
+                if match and (
+                    match.get("reason") == "strong_exact_phrase"
+                    or (
+                        match.get("similarity", 0) >= 90
+                        and match.get("exact_phrase_words", 0) >= 6
+                    )
                 ):
-                    return {
-                        "searched": True,
-                        "results": all_results
-                    }
+                    strong_match_found = True
+                    break
 
-        # If useful search results were found,
-        # there is no need for another retry.
-        if all_results:
+            # Strong evidence found: save API credits
+            # by skipping the second search query.
+            if strong_match_found:
+                print("[SEARCH] Strong snippet match found")
+                break
+
+        # Avoid retries if a search succeeded or
+        # at least one result was collected.
+        if successful_request or all_results:
             break
 
-        # If at least one provider successfully searched
-        # but simply found no results, that is still
-        # a completed search — do not retry unnecessarily.
-        if successful_request:
-            break
+        if attempt < SEARCH_RETRIES - 1:
+            time.sleep(0.5 * (attempt + 1))
 
-        # Both providers failed, so retry.
-        time.sleep(
-            0.5 * (attempt + 1)
-        )
+    # Keep unique results, prioritizing those with
+    # stronger evidence of matching content.
+    def result_score(item):
+        match = compare_snippet(sentence, item)
+
+        if not match:
+            return 0
+
+        return match.get("similarity", 0)
+
+    all_results.sort(
+        key=result_score,
+        reverse=True
+    )
+
+    all_results = all_results[:MAX_PAGES_PER_SENTENCE]
+
+    print(
+        f"[SEARCH TIMING] {time.perf_counter() - started:.2f}s "
+        f"| Queries available: {len(queries)} "
+        f"| Results: {len(all_results)} "
+        f"| Successful: {successful_request}"
+    )
 
     return {
         "searched": successful_request,
@@ -953,131 +1095,143 @@ def distinctive_overlap(
 # COMPARE SENTENCE TO SOURCE TEXT
 # ============================================================
 
-def compare_text(
-    target_sentence,
-    source_text
-):
+def compare_text(target_sentence, source_text):
 
-    target_normalized = normalize_text(
-        target_sentence
-    )
+    target_normalized = normalize_text(target_sentence)
+    source_normalized = normalize_text(source_text)
 
-    source_normalized = normalize_text(
-        source_text
-    )
-
-    if (
-        not target_normalized
-        or not source_normalized
-    ):
+    if not target_normalized or not source_normalized:
         return None
 
-    # Exact shared phrase
-    phrase = longest_shared_phrase(
-        target_sentence,
-        source_text
-    )
+    target_words = tokenize(target_sentence)
+    source_words = tokenize(source_text)
 
-    # RapidFuzz partial ratio is useful because the source
-    # page can be much longer than the target sentence.
-    similarity = float(
-        fuzz.partial_ratio(
-            target_normalized,
-            source_normalized
-        )
-    )
+    if not target_words or not source_words:
+        return None
 
-    overlap, shared_count = (
-        distinctive_overlap(
+    target_length = len(target_words)
+
+    # Compare against nearby words, not the entire webpage.
+    window_size = max(12, target_length * 2)
+    step_size = max(1, target_length // 2)
+
+    best = None
+
+    for start in range(0, len(source_words), step_size):
+
+        window_words = source_words[
+            start:start + window_size
+        ]
+
+        if not window_words:
+            continue
+
+        window_text = " ".join(window_words)
+
+        phrase = longest_shared_phrase(
             target_sentence,
-            source_text
+            window_text
         )
-    )
 
-    exact_words = (
-        len(tokenize(phrase))
-        if phrase
-        else 0
-    )
+        similarity = float(
+            fuzz.partial_ratio(
+                target_normalized,
+                window_text
+            )
+        )
 
-    valid = False
-    reason = ""
+        overlap, shared_count = distinctive_overlap(
+            target_sentence,
+            window_text
+        )
 
-    # Strong exact copied phrase
-    # Require supporting distinctive-word overlap as well,
-    # so common/generic phrases do not become false positives.
-    if (
-        exact_words >= 7
-        and shared_count >= 4
-        and overlap >= 40
-    ):
-        valid = True
-        reason = "strong_exact_phrase"
+        exact_words = (
+            len(tokenize(phrase))
+            if phrase
+            else 0
+        )
+        matched_words = sum(
+        block.size
+        for block in SequenceMatcher(
+        None,
+        target_words,
+        window_words,
+        autojunk=False
+        ).get_matching_blocks()
+        )
 
-    # Smaller exact phrase + supporting similarity
-    # Require stronger evidence to avoid common academic phrases
-    # being reported as plagiarism.
-    elif (
-        exact_words >= 6
-        and similarity >= 75
-        and shared_count >= 4
-        and overlap >= 40
-    ):
-        valid = True
-        reason = "exact_phrase_with_similarity"
+        word_coverage = round(
+    matched_words / target_length * 100,
+    2
+)
 
-    # Strong fuzzy similarity
-    elif (
-        similarity >= STRONG_SIMILARITY
-        and shared_count >= MIN_DISTINCTIVE_OVERLAP
-        and overlap >= 45
-    ):
-        valid = True
-        reason = "strong_fuzzy_similarity"
+        valid = False
+        reason = ""
 
-    # Medium similarity requires stronger word overlap
-    elif (
-        similarity >= MEDIUM_SIMILARITY
-        and overlap >= 65
-        and shared_count >= 5
-    ):
+        if (
+            exact_words >= 7
+            and shared_count >= 4
+            and overlap >= 40
+        ):
+            valid = True
+            reason = "strong_exact_phrase"
 
-        valid = True
-        reason = "high_word_overlap"
+        elif (
+            exact_words >= 6
+            and similarity >= 75
+            and shared_count >= 4
+            and overlap >= 40
+        ):
+            valid = True
+            reason = "exact_phrase_with_similarity"
 
-    if not valid:
-        return None
+        elif (
+            similarity >= STRONG_SIMILARITY
+            and shared_count >= MIN_DISTINCTIVE_OVERLAP
+            and overlap >= 45
+        ):
+            valid = True
+            reason = "strong_fuzzy_similarity"
 
-    # Evidence strength
-    phrase_score = min(
-        100,
-        exact_words * 10
-    )
+        elif (
+            similarity >= MEDIUM_SIMILARITY
+            and overlap >= 65
+            and shared_count >= 5
+        ):
+            valid = True
+            reason = "high_word_overlap"
 
-    evidence_strength = max(
-        similarity,
-        overlap,
-        phrase_score
-    )
+        if not valid:
+            continue
 
-    return {
-        "similarity": round(
-            evidence_strength,
-            2
-        ),
-        "fuzzy_similarity": round(
+        phrase_score = (
+            exact_words / target_length * 100
+        )
+
+        evidence_strength = max(
             similarity,
-            2
-        ),
-        "overlap": round(
-            overlap,
-            2
-        ),
+            phrase_score
+        )
+
+        candidate = {
+        "similarity": round(evidence_strength, 2),
+        "fuzzy_similarity": round(similarity, 2),
+        "word_coverage": word_coverage,
+        "matched_words": matched_words,
+        "overlap": round(overlap, 2),
         "shared_words": shared_count,
         "phrase": phrase,
         "exact_phrase_words": exact_words,
         "reason": reason
-    }
+        }
+
+        if (
+            best is None
+            or candidate["similarity"] > best["similarity"]
+        ):
+            best = candidate
+
+    return best
 
 
 # ============================================================
@@ -1154,11 +1308,10 @@ def find_best_match(
             continue
 
         if (
-            best is None
-            or candidate["similarity"]
-            > best["similarity"]
+        best is None
+        or candidate["similarity"] >= best["similarity"]
         ):
-            best = candidate
+         best = candidate
 
     # ---------------------------------------------
     # Fetched webpages
@@ -1213,10 +1366,7 @@ def find_best_match(
 # SCORE CALCULATION
 # ============================================================
 
-def calculate_score(
-    sentences,
-    matches
-):
+def calculate_score(sentences, matches):
 
     if not sentences or not matches:
         return 0.0
@@ -1230,28 +1380,45 @@ def calculate_score(
         return 0.0
 
     copied_equivalent_words = 0.0
+    seen_indexes = set()
 
     for match in matches:
 
-        sentence_words = int(
-            match.get(
-                "sentence_word_count",
-                0
-            )
+        sentence_index = match.get("sentence_index")
+
+        if sentence_index is not None:
+            if sentence_index in seen_indexes:
+                continue
+            seen_indexes.add(sentence_index)
+
+        sentence_words = max(
+            0,
+            int(match.get("sentence_word_count", 0))
         )
 
-        similarity = float(
-            match.get(
-                "similarity",
-                0
-            )
+        similarity = max(
+            0.0,
+            min(100.0, float(match.get("similarity", 0)))
         )
 
-        # A 90% match on a 20-word sentence contributes
-        # approximately 18 copied-equivalent words.
+        coverage = match.get("word_coverage")
+
+        if coverage is not None:
+            coverage = max(
+                0.0,
+                min(100.0, float(coverage))
+            )
+
+            effective_similarity = min(
+                similarity,
+                coverage
+            )
+        else:
+            effective_similarity = similarity
+
         copied_equivalent_words += (
             sentence_words
-            * similarity
+            * effective_similarity
             / 100
         )
 
@@ -1262,16 +1429,9 @@ def calculate_score(
     )
 
     return round(
-        max(
-            0,
-            min(
-                100,
-                score
-            )
-        ),
+        max(0.0, min(100.0, score)),
         2
     )
-
 
 # ============================================================
 # MAIN CHECKER
@@ -1561,6 +1721,30 @@ def check_plagiarism(
                 ""
             )
         )
+        print(
+        "  Evidence Type:",
+        best.get("evidence_type", "")
+        )
+
+        print(
+        "  Exact Phrase:",
+        best.get("phrase", "")
+        )
+
+        print(
+        "  Exact Phrase Words:",
+        best.get("exact_phrase_words", 0)
+        )
+
+        print(
+        "  Fuzzy Similarity:",
+        best.get("fuzzy_similarity", 0)
+        )
+
+        print(
+        "  Word Overlap:",
+        best.get("overlap", 0)
+        )
 
     # ========================================================
     # FINAL SCORE
@@ -1746,19 +1930,25 @@ def check_plagiarism(
         "matches":
             matches,
 
-        "status":
-            (
-                "complete_web_evidence"
-                if matches
-                else
-                "complete_no_validated_match"
-            ),
+        "status": (
+        "incomplete_search"
+        if covered_sentences < total_sentences
+        else (
+        "complete_web_evidence"
+        if matches
+        else "complete_no_validated_match"
+        )
+        ),
 
-        "coverage_note":
-            (
-                "All selected sentences were searched."
-            ),
-
+        "coverage_note": (
+        "Some selected sentences could not be searched successfully. "
+        "The plagiarism score may be incomplete."
+        if covered_sentences < total_sentences
+        else
+        "Search results were obtained for all selected sentences. "
+        "This does not guarantee complete web coverage."
+        ),
+        
         "processing_time":
             processing_time
     }

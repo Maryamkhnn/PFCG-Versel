@@ -527,7 +527,6 @@ def get_reports_data():
                 keyword_density,
                 keyword_count,
                 seo_status,
-                content_id,
                 created_at
             FROM seo_history
             ORDER BY created_at DESC

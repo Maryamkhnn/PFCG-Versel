@@ -8,14 +8,15 @@ from flask import (
     request,
     jsonify
 )
-from datetime import timedelta
+from datetime import datetime, timedelta
 from secrets import token_urlsafe, compare_digest
 
 from app.user.services.automatic_moderation_service import (
     ModerationReviewError,
     review_moderation_case,
+    _add_notification,
 )
-from flask import request
+
 from sqlalchemy.exc import IntegrityError
 import re
 from flask import current_app
@@ -154,7 +155,6 @@ def view_user(user_id):
     })
 # =====================================================
 # EDIT BASIC USER DETAILS
-# =====================================================
 
 @admin.route("/users/<int:user_id>/edit", methods=["POST"])
 def edit_user(user_id):
@@ -174,6 +174,7 @@ def edit_user(user_id):
             }), 400
 
         name = data.get("name")
+        reason = data.get("reason")
 
         if not isinstance(name, str) or not name.strip():
             return jsonify({
@@ -187,6 +188,20 @@ def edit_user(user_id):
             return jsonify({
                 "success": False,
                 "message": "Name must not exceed 100 characters."
+            }), 400
+
+        if not isinstance(reason, str):
+            return jsonify({
+                "success": False,
+                "message": "An edit reason is required."
+            }), 400
+
+        reason = reason.strip()
+
+        if not 10 <= len(reason) <= 1000:
+            return jsonify({
+                "success": False,
+                "message": "Edit reason must contain 10 to 1000 characters."
             }), 400
 
         if "username" in data:
@@ -208,6 +223,8 @@ def edit_user(user_id):
                         "or be left empty."
                     )
                 }), 400
+
+
 
         user = (
             User.query
@@ -249,8 +266,9 @@ def edit_user(user_id):
                 }), 400
 
         if "username" not in data:
-            username = user.username
+            username = user.username or ""
 
+        
         if username:
             existing = User.query.filter(
                 User.username == username,
@@ -265,9 +283,35 @@ def edit_user(user_id):
                     "message": "Username is already taken."
                 }), 409
 
-        # Preserve email, role and all moderation fields.
+        old_values = {
+            "name": user.name or "",
+            "username": user.username or "",
+            
+        }
+
+        new_values = {
+            "name": name,
+            "username": username,
+          
+        }
+
+        changes = [
+            f"{field}: {old_values[field]!r} -> {new_values[field]!r}"
+            for field in new_values
+            if old_values[field] != new_values[field]
+        ]
+
+        if not changes:
+            db.session.rollback()
+
+            return jsonify({
+                "success": False,
+                "message": "No changes were made."
+            }), 400
+
         user.name = name
         user.username = username or None
+        
 
         db.session.execute(
             text("""
@@ -293,7 +337,8 @@ def edit_user(user_id):
                 "admin_email": session.get("user_email"),
                 "details": (
                     f"User #{user.id}; Email: {user.email}; "
-                    "Updated basic profile details."
+                    + "; ".join(changes)
+                    + f"; Reason: {reason}"
                 )
             }
         )
@@ -302,8 +347,27 @@ def edit_user(user_id):
             "id": user.id,
             "name": user.name,
             "username": user.username or "",
-            "email": user.email or ""
+           
+            "email": user.email or "",
+            "status": user.status or "active",
         }
+        changed_fields = [
+            "name" if field == "name" else "username"
+            for field in new_values
+            if old_values[field] != new_values[field]
+        ]
+
+        _add_notification(
+            user.id,
+            "info",
+            "Profile updated",
+            (
+                "An administrator updated your "
+                + " and ".join(changed_fields)
+                + f". Reason: {reason}"
+            ),
+            datetime.utcnow(),
+        )
 
         db.session.commit()
 
@@ -318,8 +382,10 @@ def edit_user(user_id):
 
         return jsonify({
             "success": False,
-            "message": "Details could not be saved. "
-                       "The username may already be taken."
+            "message": (
+                "Details could not be saved. "
+                "The username may already be taken."
+            )
         }), 409
 
     except Exception:
@@ -330,6 +396,7 @@ def edit_user(user_id):
             "success": False,
             "message": "Unable to update this user."
         }), 500
+
 # =====================================================
 # DISABLED MANUAL ACCOUNT ACTIONS
 # =====================================================
@@ -391,7 +458,10 @@ def content():
     if page < 1:
         page = 1
 
-    per_page = 10
+    per_page = request.args.get("per_page", 10, type=int)
+
+    if per_page not in {10, 25, 50}:
+        per_page = 10
 
     generated_content, total_content = get_generated_content(
         page=page,
@@ -1223,11 +1293,11 @@ def content_moderation():
 
     page = max(1, request.args.get("page", 1, type=int) or 1)
     per_page = 10
-
     params = {
         "email": selected_email,
         "search": search,
-        "pattern": f"%{search}%"
+        "pattern": f"%{search}%",
+        "user_id_search": search.removeprefix("#").strip(),
     }
 
     cases = []
@@ -1243,6 +1313,7 @@ def content_moderation():
                   :search = ''
                   OR u.name LIKE :pattern
                   OR u.email LIKE :pattern
+                  OR CAST(c.user_id AS CHAR) = :user_id_search
                   OR u.status_reason LIKE :pattern
               )
         """
@@ -1291,7 +1362,8 @@ def content_moderation():
               AND (
                   :search = ''
                   OR u.name LIKE :pattern
-                  OR u.email LIKE :pattern
+                                  OR u.email LIKE :pattern
+                  OR CAST(b.user_id AS CHAR) = :user_id_search
                   OR b.category LIKE :pattern
               )
         """
@@ -1353,6 +1425,15 @@ def content_moderation():
             }
         ).mappings().all()
 
+    pending_review_count = db.session.execute(
+        text("""
+            SELECT COUNT(*)
+            FROM moderation_review_cases
+            WHERE pending = 1
+        """)
+    ).scalar() or 0
+
+   
     return render_template(
         "admin/content_moderation.html",
         tab=tab,
@@ -1364,8 +1445,11 @@ def content_moderation():
         total_attempts=total_attempts,
         total_users=total_users,
         page=page,
-        total_pages=total_pages
+        per_page=per_page,
+        total_pages=total_pages,
+        pending_review_count=int(pending_review_count)
     )
+
 @admin.route("/needs-review", methods=["GET"])
 def needs_review():
     if not admin_required():
@@ -1436,6 +1520,8 @@ def moderation_date(value):
     "/api/moderation/cases/<int:case_id>",
     methods=["GET"],
 )
+
+
 def moderation_case_details_api(case_id):
     try:
         if not moderation_admin_allowed():
@@ -1484,61 +1570,91 @@ def moderation_case_details_api(case_id):
                     suspended_until
                 FROM account_suspension_events
                 WHERE user_id = :uid
+                  AND started_at = :flagged_at
                 ORDER BY id DESC
                 LIMIT 1
             """),
-            {"uid": case["user_id"]},
+            {
+                "uid": case["user_id"],
+                "flagged_at": case["flagged_at"],
+            },
         ).mappings().first()
 
-        if (
-            suspension is None
-            or suspension["started_at"] != case["flagged_at"]
-        ):
-            return jsonify({
-                "success": False,
-                "message": (
-                    "Matching suspension history was not found. "
-                    "Refresh the moderation page."
-                ),
-            }), 409
+        restriction = None
 
-        # Earlier suspension events start a new escalation cycle.
-        previous_trigger = db.session.execute(
-            text("""
-                SELECT COALESCE(MAX(trigger_restriction_id), 0)
-                FROM account_suspension_events
-                WHERE user_id = :uid
-                  AND id < :suspension_id
-            """),
-            {
-                "uid": case["user_id"],
-                "suspension_id": suspension["id"],
-            },
-        ).scalar() or 0
+        if suspension is not None:
+            case_type = "account_suspended"
 
-        restrictions = db.session.execute(
-            text("""
-                SELECT
-                    id,
-                    category,
-                    started_at,
-                    restricted_until
-                FROM generator_restriction_events
-                WHERE user_id = :uid
-                  AND id > :previous_trigger
-                  AND id <= :current_trigger
-                  AND started_at >= :since
-                ORDER BY id ASC
-            """),
-            {
-                "uid": case["user_id"],
-                "previous_trigger": previous_trigger,
-                "current_trigger": suspension["trigger_restriction_id"],
-                "since": (
-                    suspension["started_at"] - timedelta(days=7)
-                ),
-            },
-        ).mappings().all()
+            previous_trigger = db.session.execute(
+                text("""
+                    SELECT COALESCE(MAX(trigger_restriction_id), 0)
+                    FROM account_suspension_events
+                    WHERE user_id = :uid
+                      AND id < :suspension_id
+                """),
+                {
+                    "uid": case["user_id"],
+                    "suspension_id": suspension["id"],
+                },
+            ).scalar() or 0
+
+            restrictions = db.session.execute(
+                text("""
+                    SELECT
+                        id,
+                        category,
+                        started_at,
+                        restricted_until
+                    FROM generator_restriction_events
+                    WHERE user_id = :uid
+                      AND id > :previous_trigger
+                      AND id <= :current_trigger
+                      AND started_at >= :since
+                    ORDER BY id ASC
+                """),
+                {
+                    "uid": case["user_id"],
+                    "previous_trigger": previous_trigger,
+                    "current_trigger": suspension[
+                        "trigger_restriction_id"
+                    ],
+                    "since": (
+                        suspension["started_at"] - timedelta(days=7)
+                    ),
+                },
+            ).mappings().all()
+
+        else:
+            restriction = db.session.execute(
+                text("""
+                    SELECT
+                        id,
+                        category,
+                        started_at,
+                        restricted_until
+                    FROM generator_restriction_events
+                    WHERE user_id = :uid
+                      AND started_at = :flagged_at
+                    ORDER BY id DESC
+                    LIMIT 1
+                """),
+                {
+                    "uid": case["user_id"],
+                    "flagged_at": case["flagged_at"],
+                },
+            ).mappings().first()
+
+            if restriction is None:
+                return jsonify({
+                    "success": False,
+                    "message": (
+                        "Matching restriction or suspension history "
+                        "was not found. Refresh the moderation page."
+                    ),
+                }), 409
+
+            case_type = "generator_restricted"
+            restrictions = [restriction]
 
         if not session.get("moderation_review_csrf"):
             session["moderation_review_csrf"] = token_urlsafe(32)
@@ -1552,13 +1668,40 @@ def moderation_case_details_api(case_id):
                 "name": case["name"] or "User",
                 "email": case["email"] or "",
                 "account_status": case["status"] or "active",
+                "case_type": case_type,
                 "restriction_count": case["restriction_count"],
                 "flagged_at": moderation_date(case["flagged_at"]),
-                "suspension_id": suspension["id"],
-                "reason": suspension["reason"] or "",
-                "suspended_until": moderation_date(
-                    suspension["suspended_until"]
+
+                "suspension_id": (
+                    suspension["id"]
+                    if suspension is not None
+                    else None
                 ),
+
+                "restriction_id": (
+                    restriction["id"]
+                    if restriction is not None
+                    else None
+                ),
+
+                "reason": (
+                    (suspension["reason"] or "")
+                    if suspension is not None
+                    else "Temporary generator restriction."
+                ),
+
+                "suspended_until": (
+                    moderation_date(suspension["suspended_until"])
+                    if suspension is not None
+                    else None
+                ),
+
+                "restricted_until": (
+                    moderation_date(restriction["restricted_until"])
+                    if restriction is not None
+                    else None
+                ),
+
                 "restrictions": [
                     {
                         "id": item["id"],
@@ -1580,6 +1723,7 @@ def moderation_case_details_api(case_id):
 
     except Exception:
         db.session.rollback()
+
         current_app.logger.exception(
             "Unable to load moderation case"
         )
@@ -1588,8 +1732,6 @@ def moderation_case_details_api(case_id):
             "success": False,
             "message": "Unable to load this review case.",
         }), 500
-
-
 # Save the administrator's review.
 @admin.route(
     "/api/moderation/cases/<int:case_id>/review",
@@ -1633,8 +1775,8 @@ def moderation_case_review_api(case_id):
             action=data.get("action"),
             reason=data.get("reason"),
             expected_suspension_id=data.get("suspension_id"),
+            expected_restriction_id=data.get("restriction_id"),
         )
-
         response = jsonify({
             "success": True,
             "data": result,

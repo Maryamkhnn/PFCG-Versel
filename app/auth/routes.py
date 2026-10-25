@@ -486,7 +486,7 @@ def forgot_password():
 
         msg = Message(
             subject="PFCG - Password Reset Code",
-            sender=current_app.config["MAIL_USERNAME"],
+            sender=("PFCG AI", current_app.config["MAIL_USERNAME"]),
             recipients=[email]
         )
 

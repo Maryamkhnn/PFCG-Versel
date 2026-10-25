@@ -1,0 +1,184 @@
+{% extends "user/base.html" %}
+
+{% block title %}Plagiarism Report | PFCG AI{% endblock %}
+{% block page_title %}{% endblock %}
+
+{% block css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/user/reports.css', v='34') }}"
+>
+
+<style>
+    .plag-source-link {
+        display: inline-block;
+        margin-top: 10px;
+        color: #59319a;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    .plag-evidence {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #f0ebf7;
+        color: #493f54;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        line-height: 1.8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="seo-detail-page">
+
+    <nav class="seo-detail-nav" aria-label="Report navigation">
+        <a href="{{ url_for('user.reports') }}">
+            <i class="fas fa-arrow-left" aria-hidden="true"></i>
+            All Reports
+        </a>
+    </nav>
+
+    <article class="report-card">
+
+        <div class="report-heading">
+            <div class="report-title">
+                <div class="report-file-icon">
+                    <i
+                        class="fas fa-magnifying-glass"
+                        aria-hidden="true"
+                    ></i>
+                </div>
+
+                <div>
+                    <h2>{{ saved.topic or 'Untitled Content' }}</h2>
+
+                    <p>
+                        {{ saved.check_type }}
+                        Plagiarism Report #{{ saved.id }}
+                    </p>
+                </div>
+            </div>
+
+            <span class="report-date">
+                {{ saved.created_at }}
+            </span>
+        </div>
+
+        <div class="report-seo-grid">
+            <div class="report-metric">
+                <span>Overall Plagiarism Score</span>
+
+                <strong>
+                    {% if saved.score is not none %}
+                        {{ saved.score|float|round(2) }}%
+                    {% else %}
+                        Not recorded
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="report-metric">
+                <span>Word Count</span>
+                <strong>{{ saved.word_count or 0 }}</strong>
+            </div>
+
+            <div class="report-metric">
+                <span>Saved Source Matches</span>
+                <strong>{{ sources|length }}</strong>
+            </div>
+        </div>
+
+        <p class="seo-detail-note">
+            This report shows the results saved when the check was run.
+            Source similarity describes an individual saved match;
+            it is not the overall plagiarism percentage.
+        </p>
+
+        <section class="seo-detail-section">
+            <h3>Matched Sources</h3>
+
+            {% for source in sources %}
+            <section class="seo-detail-check">
+                <strong>
+                    {{ loop.index }}. {{ source.title }}
+                </strong>
+
+                <p>
+                    <strong>Source similarity:</strong>
+
+                    {% if source.similarity is not none %}
+                        {{ source.similarity|round(2) }}%
+                    {% else %}
+                        Not recorded
+                    {% endif %}
+                </p>
+
+                {% if source.reason %}
+                <p>
+                    <strong>Matching reason:</strong>
+                    {{ source.reason }}
+                </p>
+                {% endif %}
+
+                {% if source.evidence_type %}
+                <p>
+                    <strong>Evidence type:</strong>
+                    {{ source.evidence_type }}
+                </p>
+                {% endif %}
+
+                {% if source.sentence_index is not none %}
+                <p>
+                    <strong>Saved sentence index:</strong>
+                    {{ source.sentence_index }}
+                </p>
+                {% endif %}
+
+                {% if source.url %}
+                <a
+                    class="plag-source-link"
+                    href="{{ source.url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Open source
+                    <i
+                        class="fas fa-arrow-up-right-from-square"
+                        aria-hidden="true"
+                    ></i>
+                </a>
+                {% endif %}
+
+                {% if source.matched_text %}
+                <p><strong>Matched text from your content:</strong></p>
+                <div class="plag-evidence">{{ source.matched_text }}</div>
+                {% else %}
+                <p>Matched text was not saved for this source.</p>
+                {% endif %}
+
+                {% if source.source_text %}
+                <p><strong>Saved source excerpt:</strong></p>
+                <div class="plag-evidence">{{ source.source_text }}</div>
+                {% endif %}
+            </section>
+
+            {% else %}
+            <p class="seo-detail-note">
+                No source evidence was saved for this check.
+                This alone does not prove the content is original.
+            </p>
+            {% endfor %}
+        </section>
+
+        <details class="seo-detail-section">
+            <summary>View Checked Content</summary>
+
+            <div class="seo-detail-text">{{ saved.content or 'Checked text was not saved for this report.' }}</div>
+        </details>
+
+    </article>
+</div>
+{% endblock %}

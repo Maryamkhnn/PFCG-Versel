@@ -697,14 +697,13 @@ The final sentence must be complete.
         # Silent repair only if required
         # ====================================================
 
-        for attempt in range(2):
+        for attempt in range(3):
 
             remaining()
 
             repairing = (
-                attempt == 1
+                attempt > 0
             )
-
             # -----------------------------------------------
             # STATUS
             # -----------------------------------------------
@@ -762,18 +761,51 @@ The final sentence must be complete.
 
             if repairing:
 
-                messages.append(
+                
+             if words > high:
+              length_instruction = (
+        f"The draft contains {words} words, "
+        f"but the maximum allowed is {high}. "
+        f"Reduce it to approximately {target} words "
+        f"and keep the final count between {low} and {high}. "
+        "Remove unnecessary details, repeated explanations, "
+        "and redundant examples. "
+        "Shorten existing paragraphs instead of adding sections. "
+        "Do not remove essential information or the conclusion."
+    )
+
+            elif words < low:
+                    length_instruction = (
+                        f"The draft contains {words} words. "
+                        f"Add approximately {target - words} words. "
+                        "Develop existing explanations without repetition."
+                    )
+            else:
+                    length_instruction = (
+                        "Keep the current length and complete "
+                        "any unfinished sentence."
+                    )
+
+            messages.append(
                     {
                         "role": "user",
 
                         "content": (
+                            f"{length_instruction} "
                             "Revise the supplied "
+                            
                             "draft into one complete "
                             f"document close to "
                             f"{target} words. "
+                            f"The required range is "
+                            f"{low}-{high} words, including headings. "
 
-                            f"The preferred range is "
-                            f"{low}-{high} words. "
+                            f"Aim for {target} words. "
+
+                            "Count words separated by whitespace. "
+
+                            "Rewrite the document to fit this range; "
+                            "do not merely append a conclusion. "
 
                             f"The current draft has "
                             f"{words} words. "
@@ -844,15 +876,16 @@ The final sentence must be complete.
 
                     stream=True,
 
-                    max_tokens=min(
-                        max(
-                            target * 5,
-                            3000
-                        )
-                        + attempt * 1000,
-                        12000,
-                    ),
+                    reasoning_effort="low",
 
+                    max_completion_tokens=min(
+                        max(
+                            target * 5 + 3000,
+                            6000
+                        )
+                        + attempt * 2000,
+                        16000,
+                    ),
                     temperature=(
                         0.35
                         if repairing
@@ -1140,112 +1173,27 @@ The final sentence must be complete.
         # Do NOT throw the old 450-550 error.
         # ----------------------------------------------------
 
-        if (
-            draft
-            and
-            finish == "stop"
-        ):
+        
+        
+        if draft and finish == "stop":
+         yield {
+        "type": "ready",
+        "content": draft,
+        "word_count": words,
+        "review_level": "basic",
+        "externally_verified": False,
+        }
+         return
 
-            if not (
-                low <= words <= high
-            ):
-
-                log.warning(
-                    "PFCG quick draft "
-                    "outside preferred range: "
-                    "words=%s target=%s-%s. "
-                    "Returning complete draft.",
-
-                    words,
-                    low,
-                    high,
-                )
-
-            yield {
-                "type":
-                    "ready",
-
-                "content":
-                    draft,
-
-                "word_count":
-                    words,
-
-                "review_level":
-                    "basic",
-
-                "externally_verified":
-                    False,
-            }
-
-            return
-
-        # ----------------------------------------------------
-        # CASE 2:
-        # Repair failed/truncated but FIRST draft was complete.
-        #
-        # Return first complete version rather than throwing
-        # away content the user already saw.
-        # ----------------------------------------------------
-
-        if (
-            first_draft
-            and
-            first_finish == "stop"
-        ):
-
-            log.warning(
-                "PFCG repair was not usable. "
-                "Returning first complete draft. "
-                "words=%s target=%s-%s.",
-
-                first_words,
-                low,
-                high,
-            )
-
-            yield {
-                "type":
-                    "ready",
-
-                "content":
-                    first_draft,
-
-                "word_count":
-                    first_words,
-
-                "review_level":
-                    "basic",
-
-                "externally_verified":
-                    False,
-            }
-
-            return
-
-        # ----------------------------------------------------
-        # CASE 3:
-        # Both responses were actually incomplete.
-        # ----------------------------------------------------
 
         if draft:
-
             raise RuntimeError(
-                "The AI response was cut off "
-                "before completion. "
-                "Please try again."
+                "The AI response was cut off. Please try again."
             )
 
-        # ----------------------------------------------------
-        # CASE 4:
-        # No content at all.
-        # ----------------------------------------------------
-
         raise RuntimeError(
-            "The AI could not complete "
-            "the draft. Please try again."
+            "The AI could not complete the draft. Please try again."
         )
-
     # ========================================================
     # ERROR HANDLING
     # ========================================================

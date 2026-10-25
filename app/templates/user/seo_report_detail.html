@@ -1,0 +1,301 @@
+{% extends "user/base.html" %}
+
+{% block title %}SEO Report | PFCG AI{% endblock %}
+{% block page_title %}{% endblock %}
+
+{% block css %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/user/reports.css', v='32') }}"
+>
+
+<style>
+    .seo-detail-page {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .seo-detail-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .seo-detail-nav a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 44px;
+        padding: 10px 14px;
+        border: 1px solid #ddd3ee;
+        border-radius: 9px;
+        background: #f3edfc;
+        color: #59319a;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .seo-detail-page .report-card {
+        min-width: 0;
+    }
+
+    .seo-detail-section {
+        margin-top: 22px;
+    }
+
+    .seo-detail-section h3 {
+        margin: 0 0 12px;
+        color: #402765;
+    }
+
+    .seo-detail-check {
+        padding: 14px;
+        margin-bottom: 12px;
+        border: 1px solid #e5dfed;
+        border-left: 4px solid #7950ce;
+        border-radius: 10px;
+        background: #faf8fd;
+        overflow-wrap: anywhere;
+    }
+
+    .seo-detail-check strong {
+        display: block;
+        color: #402765;
+    }
+
+    .seo-detail-check p {
+        margin: 7px 0 0;
+        color: #635b6e;
+        line-height: 1.75;
+    }
+
+    .seo-detail-note {
+        color: #696173;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+    }
+
+    .seo-detail-list {
+        padding-left: 22px;
+        line-height: 1.8;
+        overflow-wrap: anywhere;
+    }
+
+    .seo-detail-list li {
+        margin-bottom: 10px;
+    }
+
+    .seo-detail-text {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        line-height: 1.8;
+    }
+
+    .seo-detail-page details summary {
+        cursor: pointer;
+        padding: 12px 0;
+        font-weight: 600;
+    }
+
+    .seo-detail-page a:focus-visible,
+    .seo-detail-page summary:focus-visible {
+        outline: 3px solid #7950ce;
+        outline-offset: 3px;
+    }
+
+    @media (max-width: 600px) {
+        .seo-detail-page .report-seo-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="seo-detail-page">
+
+    <nav class="seo-detail-nav" aria-label="Report navigation">
+        <a href="{{ url_for('user.reports') }}">
+            <i class="fas fa-arrow-left" aria-hidden="true"></i>
+            All Reports
+        </a>
+
+        <a href="{{ url_for('user.seo_analysis') }}">
+            SEO Analysis
+        </a>
+    </nav>
+
+    <article class="report-card">
+
+        <div class="report-heading">
+            <div class="report-title">
+                <div class="report-file-icon">
+                    <i class="fas fa-chart-line" aria-hidden="true"></i>
+                </div>
+
+                <div>
+                    <h2>
+                        {{ saved.content_topic or 'Untitled Content' }}
+                    </h2>
+                    <p>Saved SEO Report #{{ saved.id }}</p>
+                </div>
+            </div>
+
+            <span class="report-date">
+                {{ saved.created_at }}
+            </span>
+        </div>
+
+        <p class="seo-detail-note">
+            Saved results for the content analyzed at that time.
+            This is PFCG's content assessment, not a Google ranking.
+        </p>
+
+        <div class="report-seo-grid">
+            <div class="report-metric">
+                <span>Content SEO Score</span>
+                <strong>
+                    {% if saved.seo_score is not none %}
+                        {{ saved.seo_score|float|round(2) }}/100
+                    {% else %}
+                        Not recorded
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="report-metric">
+                <span>Reading Ease</span>
+                <strong>
+                    {% if saved.readability_score is not none %}
+                        {{ saved.readability_score|float|round(2) }}/100
+                    {% else %}
+                        Not recorded
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="report-metric">
+                <span>Keyword Density</span>
+                <strong>
+                    {% if saved.keyword_density is not none %}
+                        {{ saved.keyword_density|float|round(2) }}%
+                    {% else %}
+                        Not recorded
+                    {% endif %}
+                </strong>
+
+                <small>
+                    {{ saved.keyword_count or 0 }} keyword matches
+                </small>
+            </div>
+        </div>
+
+        <p class="seo-detail-note">
+            <strong>Status:</strong>
+            {{ saved.seo_status or 'Not recorded' }}
+            <br>
+
+            <strong>Word count:</strong>
+            {{ saved.word_count or 0 }}
+            <br>
+
+            <strong>Target keyword:</strong>
+            {{ keyword or 'Not saved in this older report' }}
+            <br>
+
+            <strong>Scoring version:</strong>
+            {{ details.get('scoring_version', 'Older rubric') }}
+        </p>
+
+        <section class="seo-detail-section">
+            <h3>Title and Meta Description</h3>
+
+            <p class="seo-detail-note">
+                <strong>Title used:</strong><br>
+                {{ details.get('seo_title') or 'Not saved' }}
+            </p>
+
+            <p class="seo-detail-note">
+                <strong>Meta description:</strong><br>
+                {{ details.get('meta_description') or 'Not supplied or not saved' }}
+            </p>
+        </section>
+
+        <section class="seo-detail-section">
+            <h3>Detailed Checks</h3>
+
+            {% for check in checks %}
+            <div class="seo-detail-check">
+                <strong>
+                    {{ check.get('category', 'Check') }}:
+                    {{ check.get('earned', 0) }}/{{ check.get('maximum', 0) }}
+                    · {{ check.get('status', 'Review') }}
+                </strong>
+
+                <p>{{ check.get('detail', '') }}</p>
+            </div>
+            {% else %}
+            <p class="seo-detail-note">
+                Detailed checks were not stored for this older report.
+                Its original summary scores are shown above.
+            </p>
+            {% endfor %}
+        </section>
+
+        <section class="seo-detail-section">
+            <h3>Suggested Improvements</h3>
+
+            {% if suggestions %}
+            <ul class="seo-detail-list">
+                {% for suggestion in suggestions %}
+                <li>{{ suggestion }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="seo-detail-note">
+                Suggestions were not stored for this report.
+            </p>
+            {% endif %}
+        </section>
+<section class="seo-detail-section">
+    <h3>AI Content Review</h3>
+
+    {% set review = details.get('ai_review') or {} %}
+
+    <p class="seo-detail-note">
+        {{ review.get(
+            'message',
+            'AI review was not saved for this report.'
+        ) }}
+    </p>
+
+    {% if review.get('status') == 'available' %}
+        {% for check in review.get('checks', []) %}
+        <div class="seo-detail-check">
+            <strong>
+                {{ check.category }} · {{ check.status }}
+            </strong>
+
+            <p>{{ check.explanation }}</p>
+
+            {% if check.suggestion %}
+            <p>
+                <strong>Suggestion:</strong>
+                {{ check.suggestion }}
+            </p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% endif %}
+</section>
+        <details class="seo-detail-section">
+            <summary>View Analyzed Content</summary>
+
+            <div class="seo-detail-text">{{ analyzed_content or 'Saved text is unavailable for this report.' }}</div>
+        </details>
+
+    </article>
+</div>
+{% endblock %}

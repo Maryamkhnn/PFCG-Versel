@@ -1818,3 +1818,43 @@
         transform: none;
     }
 }
+/* Edit page mobile action buttons */
+@media (max-width: 650px) {
+    .editor-page .editor-actions {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        justify-content: stretch;
+        gap: 12px;
+        padding: 12px;
+        position: static;
+    }
+
+    .editor-page .editor-actions .button-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        width: 100%;
+        min-width: 0;
+        gap: 8px;
+    }
+
+    .editor-page .editor-actions .button-row > button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        width: 100%;
+        min-width: 0;
+        min-height: 44px;
+        margin: 0;
+        padding: 10px 4px;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .editor-page .editor-actions #saveBtn {
+        grid-column: 1 / -1;
+        width: 100%;
+        min-height: 46px;
+        font-size: 13px;
+    }
+}

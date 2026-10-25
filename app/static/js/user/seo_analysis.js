@@ -1,3 +1,798 @@
+// document.addEventListener("DOMContentLoaded", () => {
+//     initSEOPage();
+// });
+
+// const seoContentStore = new Map();
+
+// function initSEOPage() {
+
+//     const selector = document.getElementById("seoSelector");
+//     const loadBtn = document.getElementById("loadBtn");
+//     const analyzeBtn = document.getElementById("analyzeBtn");
+//     const contentArea = document.getElementById("seoContent");
+//     const keywordInput = document.getElementById("targetKeyword");
+
+//     if (!selector) {
+//         return;
+//     }
+
+//     loadAllContent();
+//     loadSEOHistory();
+
+//     if (loadBtn) {
+//         loadBtn.addEventListener(
+//             "click",
+//             loadSelectedContent
+//         );
+//     }
+
+//     selector.addEventListener("change", () => {
+//         if (!selector.value && contentArea) {
+//             delete contentArea.dataset.contentId;
+//             delete contentArea.dataset.sourceId;
+//             delete contentArea.dataset.sourceType;
+//             delete contentArea.dataset.contentTopic;
+//         }
+//     });
+
+//     if (analyzeBtn) {
+//         analyzeBtn.addEventListener(
+//             "click",
+//             analyzeSEO
+//         );
+//     }
+
+//     if (contentArea) {
+//         contentArea.addEventListener(
+//             "input",
+//             updateLiveWordCount
+//         );
+//     }
+
+//     if (keywordInput) {
+//         keywordInput.addEventListener(
+//             "keydown",
+//             (event) => {
+//                 if (event.key === "Enter") {
+//                     event.preventDefault();
+//                     analyzeSEO();
+//                 }
+//             }
+//         );
+//     }
+// }
+
+
+// function notify(message, type = "info") {
+
+//     if (typeof showToast === "function") {
+//         showToast(message, type);
+//         return;
+//     }
+
+//     alert(message);
+// }
+
+
+// async function loadAllContent() {
+
+//     const selector = document.getElementById("seoSelector");
+
+//     if (!selector) {
+//         return;
+//     }
+
+//     try {
+//         selector.disabled = true;
+
+//         selector.innerHTML = `
+//             <option value="">
+//                 Loading your content...
+//             </option>
+//         `;
+
+//         const response = await fetch(
+//             "/user/api/my-content"
+//         );
+
+//         const result = await response.json();
+
+//         if (!response.ok || !result.success) {
+//             throw new Error(
+//                 result.message || "Unable to load content."
+//             );
+//         }
+
+//         const contents = Array.isArray(result.data)
+//             ? result.data
+//             : [];
+
+//         selector.innerHTML = `
+//             <option value="">
+//                 Select content to analyze
+//             </option>
+//         `;
+
+//         if (!contents.length) {
+//             selector.innerHTML += `
+//                 <option value="" disabled>
+//                     No generated content found
+//                 </option>
+//             `;
+//             return;
+//         }
+
+//         seoContentStore.clear();
+
+//         contents.forEach((item) => {
+//             const option = document.createElement("option");
+
+//             const sourceType = item.source_type === "humanized"
+//                 ? "humanized"
+//                 : "ai";
+
+//             const sourceId = Number(item.source_id || item.id);
+//             const contentKey = item.content_key
+//                 || `${sourceType}-${sourceId}`;
+
+//             seoContentStore.set(contentKey, {
+//                 ...item,
+//                 source_type: sourceType,
+//                 source_id: sourceId,
+//                 content_key: contentKey
+//             });
+
+//             option.value = contentKey;
+//             option.textContent = `${
+//                 sourceType === "humanized" ? "[Humanized]" : "[AI]"
+//             } ${item.topic || "Untitled Content"}`;
+
+//             selector.appendChild(option);
+//         });
+
+//     } catch (error) {
+//         console.error("LOAD CONTENT ERROR:", error);
+
+//         selector.innerHTML = `
+//             <option value="">
+//                 Unable to load content
+//             </option>
+//         `;
+
+//         notify(
+//             "Unable to load saved content.",
+//             "error"
+//         );
+
+//     } finally {
+//         selector.disabled = false;
+//     }
+// }
+
+
+// async function loadSelectedContent() {
+
+//     const selector = document.getElementById("seoSelector");
+//     const loadBtn = document.getElementById("loadBtn");
+//     const contentArea = document.getElementById("seoContent");
+//     const topicElement = document.getElementById("contentTopic");
+//     const typeBadge = document.getElementById("contentTypeBadge");
+
+//     if (!selector || !contentArea) {
+//         return;
+//     }
+
+//     const contentKey = selector.value;
+
+//     if (!contentKey) {
+//         notify(
+//             "Please select content first.",
+//             "warning"
+//         );
+//         return;
+//     }
+
+//     try {
+//         if (loadBtn) {
+//             loadBtn.disabled = true;
+//             loadBtn.innerHTML = `
+//                 <i class="fas fa-spinner fa-spin"></i>
+//                 Loading...
+//             `;
+//         }
+
+//         const selected = seoContentStore.get(contentKey);
+
+//         if (!selected) {
+//             throw new Error("Selected content is no longer available.");
+//         }
+
+//         const response = await fetch(
+//             "/user/api/get-content",
+//             {
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json"
+//                 },
+//                 body: JSON.stringify({
+//                     id: selected.source_id,
+//                     source_id: selected.source_id,
+//                     source_type: selected.source_type
+//                 })
+//             }
+//         );
+
+//         const result = await response.json();
+
+//         if (!response.ok || !result.success) {
+//             throw new Error(
+//                 result.message || "Unable to load content."
+//             );
+//         }
+
+//         const data = result.data || {};
+
+//         contentArea.value = data.content || "";
+//         contentArea.dataset.sourceId = String(
+//             data.source_id || selected.source_id
+//         );
+//         contentArea.dataset.sourceType = (
+//             data.source_type || selected.source_type
+//         );
+//         contentArea.dataset.contentTopic = (
+//             data.topic || selected.topic || "Untitled Content"
+//         );
+//         contentArea.dataset.contentId = (
+//             (data.source_type || selected.source_type) === "ai"
+//                 ? String(data.source_id || selected.source_id)
+//                 : ""
+//         );
+
+//         const titleInput = document.getElementById("seoTitle");
+//         const metaInput = document.getElementById("metaDescription");
+
+//         if (titleInput) titleInput.value = "";
+//         if (metaInput) metaInput.value = "";
+
+//         if (topicElement) {
+//             topicElement.textContent =
+//                 data.topic || "Untitled Content";
+//         }
+
+//         if (typeBadge) {
+//             typeBadge.textContent = (
+//                 (data.source_type || selected.source_type) === "humanized"
+//                     ? "Humanized"
+//                     : `AI · ${data.content_type || "Content"}`
+//             );
+//         }
+
+//         updateLiveWordCount();
+
+//         notify(
+//             "Content loaded successfully.",
+//             "success"
+//         );
+
+//     } catch (error) {
+//         console.error("LOAD SELECTED CONTENT ERROR:", error);
+
+//         notify(
+//             error.message || "Unable to load content.",
+//             "error"
+//         );
+
+//     } finally {
+//         if (loadBtn) {
+//             loadBtn.disabled = false;
+//             loadBtn.innerHTML = `
+//                 <i class="fas fa-folder-open"></i>
+//                 Load Content
+//             `;
+//         }
+//     }
+// }
+
+// async function analyzeSEO() {
+//     const contentArea = document.getElementById("seoContent");
+//     const keywordInput = document.getElementById("targetKeyword");
+//     const analyzeBtn = document.getElementById("analyzeBtn");
+//     const selector = document.getElementById("seoSelector");
+//     const loadBtn = document.getElementById("loadBtn");
+//     const seoTitleInput = document.getElementById("seoTitle");
+//     const metaInput = document.getElementById("metaDescription");
+
+//     if (!contentArea || !keywordInput || !analyzeBtn) {
+//         console.error("Required SEO page elements are missing.");
+//         return;
+//     }
+
+//     // Prevent duplicate requests without relying on disabled alone.
+//     if (analyzeBtn.dataset.busy === "true") return;
+
+//     if (contentArea.dataset.loading === "true") {
+//         notify("Please wait for your document to finish loading.", "info");
+//         return;
+//     }
+
+//     const content = contentArea.value.trim();
+//     const keyword = keywordInput.value.trim();
+
+//     if (!content) {
+//         notify("Please load or enter content first.", "warning");
+//         contentArea.focus();
+//         return;
+//     }
+
+//     if (!keyword) {
+//         notify("Please enter a target keyword.", "warning");
+//         keywordInput.focus();
+//         return;
+//     }
+
+//     // Use only the document actually loaded by loadSelectedContent().
+//     // If that tracking is absent, treat the text as manual content.
+//     const sourceId = contentArea.dataset.sourceId || null;
+//     const sourceType = sourceId
+//         ? (contentArea.dataset.sourceType || "ai")
+//         : "manual";
+//     const contentId = sourceType === "ai" ? sourceId : null;
+
+//     const contentTopic = sourceId
+//         ? (
+//             contentArea.dataset.contentTopic ||
+//             document.getElementById("contentTopic")?.textContent ||
+//             "Untitled Content"
+//         ).trim()
+//         : "Manual SEO Analysis";
+
+//     const originalButton = analyzeBtn.innerHTML;
+
+//     const controls = [
+//         selector,
+//         loadBtn,
+//         contentArea,
+//         keywordInput
+//     ].filter(Boolean);
+
+//     const previousDisabled = controls.map(
+//         (element) => element.disabled
+//     );
+
+//     analyzeBtn.dataset.busy = "true";
+//     analyzeBtn.disabled = true;
+
+//     controls.forEach((element) => {
+//         element.disabled = true;
+//     });
+
+//     analyzeBtn.innerHTML = `
+//         <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+//         Analyzing...
+//     `;
+
+//     const controller = new AbortController();
+//     const timeout = setTimeout(() => controller.abort(), 45000);
+
+//     try {
+//         const headers = {
+//             "Content-Type": "application/json",
+//             "Accept": "application/json"
+//         };
+
+//         const csrf = document.querySelector(
+//             'meta[name="csrf-token"]'
+//         )?.content || document.querySelector(
+//             'input[name="csrf_token"]'
+//         )?.value;
+
+//         if (csrf) headers["X-CSRFToken"] = csrf;
+
+//         const response = await fetch("/user/api/analyze-seo", {
+//             method: "POST",
+//             credentials: "same-origin",
+//             headers,
+//             signal: controller.signal,
+//             body: JSON.stringify({
+//                 content,
+//                 keyword,
+               
+//                 source_id: sourceId,
+//                 source_type: sourceType,
+//                 content_topic: contentTopic,
+//                 seo_title: seoTitleInput?.value.trim() || "",
+//                 meta_description: metaInput?.value.trim() || ""
+//             })
+//         });
+
+//         if (response.redirected || response.status === 401) {
+//             throw new Error(
+//                 "Your session has expired. Please sign in again."
+//             );
+//         }
+
+//         const responseType =
+//             response.headers.get("content-type") || "";
+
+//         if (!responseType.includes("application/json")) {
+//             throw new Error(
+//                 `The server returned an unexpected response (HTTP ${response.status}).`
+//             );
+//         }
+
+//         const result = await response.json();
+
+//         if (!response.ok || result.success !== true) {
+//             throw new Error(
+//                 result.message || "Unable to analyze this content."
+//             );
+//         }
+
+//         const data = result.data;
+
+//         if (!data || typeof data !== "object") {
+//             throw new Error(
+//                 "The server did not return an SEO report."
+//             );
+//         }
+
+//         const rawScore = Number(data.seo_score);
+//         const score = Number.isFinite(rawScore)
+//             ? Math.max(0, Math.min(100, rawScore))
+//             : 0;
+
+//         setText("wordCount", data.word_count ?? 0);
+//         setText("keywordCount", data.keyword_count ?? 0);
+//         setText("keywordDensity", `${data.keyword_density ?? 0}%`);
+//         setText("seoScore", `${score}%`);
+//         setText("seoStatus", data.seo_status || "Analyzed");
+//         setText("scoreLabel", data.seo_status || "Analyzed");
+
+//         const progress = document.getElementById("seoProgress");
+
+//         if (progress) {
+//             progress.style.width = `${score}%`;
+//         }
+
+//         const statusBox = document.getElementById("seoStatusBox");
+
+//         if (statusBox) {
+//             statusBox.classList.remove(
+//                 "status-good",
+//                 "status-medium",
+//                 "status-low"
+//             );
+
+//             statusBox.classList.add(
+//                 score >= 70
+//                     ? "status-good"
+//                     : score >= 50
+//                         ? "status-medium"
+//                         : "status-low"
+//             );
+//         }
+
+//         renderSuggestions(
+//             Array.isArray(data.suggestions)
+//                 ? data.suggestions
+//                 : []
+//         );
+
+//         notify(
+//             result.message ||
+//                 "SEO analysis completed and saved automatically.",
+//             "success"
+//         );
+
+//         // History failure must not turn a successful analysis
+//         // into an "analysis failed" notification.
+//         try {
+//             await loadSEOHistory();
+//         } catch (historyError) {
+//             console.error("SEO HISTORY REFRESH ERROR:", historyError);
+//         }
+
+//     } catch (error) {
+//         console.error("SEO ANALYSIS ERROR:", error);
+
+//         const message = error.name === "AbortError"
+//             ? (
+//                 "The request timed out. Check SEO History before "
+//                 + "retrying; the report may already have been saved."
+//             )
+//             : error.message;
+
+//         notify(message || "Unable to complete SEO analysis.", "error");
+
+//     } finally {
+//         clearTimeout(timeout);
+
+//         analyzeBtn.dataset.busy = "false";
+//         analyzeBtn.disabled = false;
+//         analyzeBtn.innerHTML = originalButton;
+
+//         controls.forEach((element, index) => {
+//             element.disabled = previousDisabled[index];
+//         });
+//     }
+// }
+// async function loadSEOHistory() {
+
+//     const body = document.getElementById("seoHistoryBody");
+
+//     if (!body) {
+//         return;
+//     }
+
+//     try {
+//         body.innerHTML = `
+//             <tr>
+//                 <td colspan="4" class="empty-history">
+//                     <i class="fas fa-spinner fa-spin"></i>
+//                     Loading history...
+//                 </td>
+//             </tr>
+//         `;
+
+//         const response = await fetch(
+//             "/user/api/seo-history"
+//         );
+
+//         const result = await response.json();
+
+//         if (!response.ok || !result.success) {
+//             throw new Error(
+//                 result.message || "Unable to load SEO history."
+//             );
+//         }
+
+//         renderSEOHistory(result.data || []);
+
+//     } catch (error) {
+//         console.error("SEO HISTORY ERROR:", error);
+
+//         body.innerHTML = `
+//             <tr>
+//                 <td colspan="4" class="empty-history">
+//                     Unable to load SEO history.
+//                 </td>
+//             </tr>
+//         `;
+//     }
+// }
+// function renderSEOHistory(data, page = 1) {
+//     const body = document.getElementById("seoHistoryBody");
+//     const pagination = document.getElementById("seoHistoryPagination");
+//     const previous = document.getElementById("seoHistoryPrev");
+//     const next = document.getElementById("seoHistoryNext");
+//     const pageInfo = document.getElementById("seoHistoryPageInfo");
+
+//     if (!body) return;
+
+//     const records = Array.isArray(data) ? data : [];
+//     const pageSize = 10;
+//     const totalPages = Math.max(1, Math.ceil(records.length / pageSize));
+
+//     page = Math.max(1, Math.min(page, totalPages));
+//     body.innerHTML = "";
+
+//     if (pagination) {
+//         pagination.hidden = records.length <= pageSize;
+//     }
+
+//     if (!records.length) {
+//         body.innerHTML = `
+//             <tr>
+//                 <td colspan="4" class="empty-history">
+//                     No SEO reports available yet.
+//                 </td>
+//             </tr>
+//         `;
+//         return;
+//     }
+
+//     const start = (page - 1) * pageSize;
+//     const visibleRecords = records.slice(start, start + pageSize);
+
+//     visibleRecords.forEach((item) => {
+//         const score = Number(item.seo_score || 0);
+
+//         let scoreClass = "score-low";
+//         let statusClass = "status-low";
+
+//         if (score >= 80) {
+//             scoreClass = "score-high";
+//             statusClass = "status-high";
+//         } else if (score >= 50) {
+//             scoreClass = "score-medium";
+//             statusClass = "status-medium";
+//         }
+
+//         const row = document.createElement("tr");
+
+//         row.innerHTML = `
+//             <td>
+//                 <div class="history-content">
+//                     <div class="history-icon">
+//                         <i class="fas fa-file-lines"></i>
+//                     </div>
+//                     <div>
+//                         <strong>
+//                             ${escapeHTML(item.content_topic || "Untitled Content")}
+//                         </strong>
+//                         <small>
+//                             ${escapeHTML(sourceLabel(item.source_type))}
+//                             · ${Number(item.word_count || 0)} words
+//                         </small>
+//                     </div>
+//                 </div>
+//             </td>
+//             <td>
+//                 <span class="history-score ${scoreClass}">
+//                     ${score}%
+//                 </span>
+//             </td>
+//             <td>
+//                 <span class="history-status ${statusClass}">
+//                     ${escapeHTML(item.seo_status || "Not Analyzed")}
+//                 </span>
+//             </td>
+//             <td>
+//                 <span class="history-date">
+//                     ${formatDate(item.created_at)}
+//                 </span>
+//             </td>
+//         `;
+
+//         body.appendChild(row);
+//     });
+
+//     if (pageInfo) {
+//         pageInfo.textContent = `Page ${page} of ${totalPages}`;
+//     }
+
+//     if (previous) {
+//         previous.disabled = page === 1;
+//         previous.onclick = () => renderSEOHistory(records, page - 1);
+//     }
+
+//     if (next) {
+//         next.disabled = page === totalPages;
+//         next.onclick = () => renderSEOHistory(records, page + 1);
+//     }
+// }
+// function updateLiveWordCount() {
+
+//     const contentArea = document.getElementById("seoContent");
+//     const counter = document.getElementById("liveWordCount");
+
+//     if (!contentArea || !counter) {
+//         return;
+//     }
+
+//     const text = contentArea.value.trim();
+
+//     if (!text) {
+//         counter.textContent = "0";
+//         return;
+//     }
+
+//     counter.textContent = text.split(/\s+/).filter(
+//         (word) => word.length > 0
+//     ).length;
+// }
+
+
+// function updateStatusClass(score) {
+
+//     const box = document.getElementById("seoStatusBox");
+
+//     if (!box) {
+//         return;
+//     }
+
+//     box.classList.remove(
+//         "status-good",
+//         "status-medium",
+//         "status-low"
+//     );
+
+//     const numericScore = Number(score || 0);
+
+//     if (numericScore >= 80) {
+//         box.classList.add("status-good");
+//     } else if (numericScore >= 50) {
+//         box.classList.add("status-medium");
+//     } else {
+//         box.classList.add("status-low");
+//     }
+// }
+
+
+// function renderSuggestions(suggestions) {
+
+//     const list = document.getElementById("seoSuggestions");
+
+//     if (!list) {
+//         return;
+//     }
+
+//     list.innerHTML = "";
+
+//     if (!suggestions.length) {
+//         list.innerHTML = `
+//             <li class="empty-suggestion">
+//                 <i class="fas fa-circle-check"></i>
+//                 Excellent! No major SEO issues found.
+//             </li>
+//         `;
+//         return;
+//     }
+
+//     suggestions.forEach((suggestion) => {
+//         const item = document.createElement("li");
+
+//         item.innerHTML = `
+//             <i class="fas fa-check"></i>
+//             <span>${escapeHTML(suggestion)}</span>
+//         `;
+
+//         list.appendChild(item);
+//     });
+// }
+
+
+// function setText(id, value) {
+
+//     const element = document.getElementById(id);
+
+//     if (element) {
+//         element.textContent = value;
+//     }
+// }
+
+
+// function escapeHTML(value) {
+
+//     const div = document.createElement("div");
+
+//     div.textContent = value ?? "";
+
+//     return div.innerHTML;
+// }
+
+
+// function formatDate(value) {
+
+//     if (!value) {
+//         return "—";
+//     }
+
+//     const date = new Date(value);
+
+//     if (Number.isNaN(date.getTime())) {
+//         return value;
+//     }
+
+//     return date.toLocaleDateString(
+//         "en-US",
+//         {
+//             day: "2-digit",
+//             month: "short",
+//             year: "numeric"
+//         }
+//     );
+// }
+
+
+// function sourceLabel(sourceType) {
+//     if (sourceType === "humanized") return "Humanized";
+//     if (sourceType === "ai") return "AI Content";
+//     return "Manual";
+// }
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
     initSEOPage();
 });
@@ -49,6 +844,7 @@ function initSEOPage() {
         );
     }
 
+    [contentArea, keywordInput, document.getElementById("seoTitle"), document.getElementById("metaDescription")].filter(Boolean).forEach(el => el.addEventListener("input", markSEOStale));
     if (keywordInput) {
         keywordInput.addEventListener(
             "keydown",
@@ -192,6 +988,7 @@ async function loadSelectedContent() {
         return;
     }
 
+    contentArea.dataset.loading = "true";
     try {
         if (loadBtn) {
             loadBtn.disabled = true;
@@ -212,7 +1009,8 @@ async function loadSelectedContent() {
             {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    ...seoCSRFHeaders()
                 },
                 body: JSON.stringify({
                     id: selected.source_id,
@@ -268,6 +1066,7 @@ async function loadSelectedContent() {
         }
 
         updateLiveWordCount();
+        markSEOStale();
 
         notify(
             "Content loaded successfully.",
@@ -283,6 +1082,7 @@ async function loadSelectedContent() {
         );
 
     } finally {
+        delete contentArea.dataset.loading;
         if (loadBtn) {
             loadBtn.disabled = false;
             loadBtn.innerHTML = `
@@ -352,7 +1152,7 @@ async function analyzeSEO() {
         selector,
         loadBtn,
         contentArea,
-        keywordInput
+        keywordInput, seoTitleInput, metaInput
     ].filter(Boolean);
 
     const previousDisabled = controls.map(
@@ -372,7 +1172,7 @@ async function analyzeSEO() {
     `;
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 45000);
+    const timeout = setTimeout(() => controller.abort(), 90000);
 
     try {
         const headers = {
@@ -444,7 +1244,10 @@ async function analyzeSEO() {
         setText("wordCount", data.word_count ?? 0);
         setText("keywordCount", data.keyword_count ?? 0);
         setText("keywordDensity", `${data.keyword_density ?? 0}%`);
-        setText("seoScore", `${score}%`);
+        setText("seoScore", `${score}/100`);
+        renderDetailedChecks(data);
+        renderSEOAIReview(data.ai_review);
+        setText("seoStaleNotice", "");
         setText("seoStatus", data.seo_status || "Analyzed");
         setText("scoreLabel", data.seo_status || "Analyzed");
 
@@ -600,7 +1403,7 @@ function renderSEOHistory(data, page = 1) {
         let scoreClass = "score-low";
         let statusClass = "status-low";
 
-        if (score >= 80) {
+        if (score >= 70) {
             scoreClass = "score-high";
             statusClass = "status-high";
         } else if (score >= 50) {
@@ -629,7 +1432,7 @@ function renderSEOHistory(data, page = 1) {
             </td>
             <td>
                 <span class="history-score ${scoreClass}">
-                    ${score}%
+                    ${score}/100
                 </span>
             </td>
             <td>
@@ -644,6 +1447,16 @@ function renderSEOHistory(data, page = 1) {
             </td>
         `;
 
+        if (item.saved_report?.report) {
+            const cell=row.querySelector("td");
+            const button=document.createElement("button");
+            button.type="button";button.className="seo-btn seo-btn-secondary";button.textContent="View saved report";
+            button.onclick = () => {
+    window.location.href =
+        `/user/reports?seo_id=${encodeURIComponent(item.id)}`;
+};
+            cell.appendChild(button);
+        }
         body.appendChild(row);
     });
 
@@ -699,7 +1512,7 @@ function updateStatusClass(score) {
 
     const numericScore = Number(score || 0);
 
-    if (numericScore >= 80) {
+    if (numericScore >= 70) {
         box.classList.add("status-good");
     } else if (numericScore >= 50) {
         box.classList.add("status-medium");
@@ -789,4 +1602,227 @@ function sourceLabel(sourceType) {
     if (sourceType === "humanized") return "Humanized";
     if (sourceType === "ai") return "AI Content";
     return "Manual";
+}
+
+function seoCSRFHeaders() {
+ const token=document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('input[name="csrf_token"]')?.value;
+ return token ? {"X-CSRFToken":token} : {};
+}
+function markSEOStale() {
+ if(document.getElementById("seoScore")?.textContent !== "—")
+  setText("seoStaleNotice", "Content or settings changed. Analyze again to update this report.");
+}
+function renderDetailedChecks(data) {
+ const area=document.getElementById("seoDetailedChecks"); if(!area) return;
+ area.replaceChildren();
+ for(const check of data.checks || []) {
+  const row=document.createElement("div");row.className="seo-check-row";
+  const title=document.createElement("strong");title.textContent=`${check.category}: ${check.earned}/${check.maximum} · ${check.status}`;
+  const detail=document.createElement("p");detail.textContent=check.detail;
+  row.append(title,detail);area.appendChild(row);
+ }
+ const metrics=document.createElement("p");metrics.textContent=`Reading ease: ${data.readability_score}/100 · Headings: ${data.heading_count} · Paragraphs: ${data.paragraph_count}`;area.appendChild(metrics);
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const button = document.getElementById("suggestMetadataBtn");
+
+    if (button) {
+        button.addEventListener("click", suggestSEOMetadata);
+    }
+});
+
+
+async function suggestSEOMetadata() {
+    const button = document.getElementById("suggestMetadataBtn");
+    const contentArea = document.getElementById("seoContent");
+    const keywordInput = document.getElementById("targetKeyword");
+    const titleInput = document.getElementById("seoTitle");
+    const metaInput = document.getElementById("metaDescription");
+    const status = document.getElementById("metadataSuggestionStatus");
+    const analyzeButton = document.getElementById("analyzeBtn");
+
+    if (
+        !button || !contentArea || !titleInput ||
+        !metaInput || !status
+    ) {
+        return;
+    }
+
+    if (
+        button.dataset.busy === "true" ||
+        analyzeButton?.dataset.busy === "true"
+    ) {
+        return;
+    }
+
+    if (contentArea.dataset.loading === "true") {
+        status.textContent = "Please wait for the document to load.";
+        return;
+    }
+
+    const content = contentArea.value.trim();
+    const keyword = keywordInput?.value.trim() || "";
+
+    if (!content) {
+        status.textContent = "Please load or paste content first.";
+        contentArea.focus();
+        return;
+    }
+
+    const originalButton = button.innerHTML;
+
+    const controls = [
+        contentArea,
+        keywordInput,
+        titleInput,
+        metaInput,
+        analyzeButton,
+        document.getElementById("loadBtn"),
+        document.getElementById("seoSelector")
+    ].filter(Boolean);
+
+    const previousStates = controls.map(element => element.disabled);
+
+    button.dataset.busy = "true";
+    button.disabled = true;
+
+    controls.forEach(element => {
+        element.disabled = true;
+    });
+
+    button.textContent = "Generating suggestions...";
+    status.textContent = "Preparing a title and description...";
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 60000);
+
+    try {
+        const headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        };
+
+        const csrf = document.querySelector(
+            'meta[name="csrf-token"]'
+        )?.content || document.querySelector(
+            'input[name="csrf_token"]'
+        )?.value;
+
+        if (csrf) {
+            headers["X-CSRFToken"] = csrf;
+        }
+
+        const response = await fetch(
+            "/user/api/seo-suggest-metadata",
+            {
+                method: "POST",
+                credentials: "same-origin",
+                headers,
+                signal: controller.signal,
+                body: JSON.stringify({
+                    content,
+                    keyword
+                })
+            }
+        );
+
+        if (response.status === 401 || response.redirected) {
+            throw new Error(
+                "Your session has expired. Please sign in again."
+            );
+        }
+
+        const contentType = response.headers.get("content-type") || "";
+
+        if (!contentType.includes("application/json")) {
+            throw new Error(
+                `Unexpected server response (HTTP ${response.status}).`
+            );
+        }
+
+        const result = await response.json();
+
+        if (!response.ok || result.success !== true) {
+            throw new Error(
+                result.message || "Unable to generate suggestions."
+            );
+        }
+
+        if (
+            typeof result.data?.seo_title !== "string" ||
+            typeof result.data?.meta_description !== "string"
+        ) {
+            throw new Error("The server returned invalid suggestions.");
+        }
+
+        titleInput.value = result.data.seo_title;
+        metaInput.value = result.data.meta_description;
+
+        // Mark the earlier analysis as outdated.
+        titleInput.dispatchEvent(
+            new Event("input", { bubbles: true })
+        );
+
+        status.textContent = (
+            "Suggestions added. Review or edit both fields, "
+            + "then select Analyze SEO."
+        );
+
+    } catch (error) {
+        status.textContent = error.name === "AbortError"
+            ? "The request timed out. Please try again."
+            : error.message || "Unable to generate suggestions.";
+
+    } finally {
+        clearTimeout(timeout);
+
+        button.dataset.busy = "false";
+        button.disabled = false;
+        button.innerHTML = originalButton;
+
+        controls.forEach((element, index) => {
+            element.disabled = previousStates[index];
+        });
+    }
+}
+
+function renderSEOAIReview(review) {
+    const container = document.getElementById("seoAIReview");
+    if (!container) return;
+
+    container.replaceChildren();
+
+    const note = document.createElement("p");
+    note.textContent = review?.message || "AI review unavailable.";
+    container.appendChild(note);
+
+    if (
+        review?.status !== "available"
+        || !Array.isArray(review.checks)
+    ) {
+        return;
+    }
+
+    review.checks.forEach(check => {
+        const row = document.createElement("div");
+        row.className = "seo-check-row";
+
+        const heading = document.createElement("strong");
+        heading.textContent = `${check.category} · ${check.status}`;
+
+        const explanation = document.createElement("p");
+        explanation.textContent = check.explanation;
+
+        row.append(heading, explanation);
+
+        if (check.suggestion) {
+            const suggestion = document.createElement("p");
+            suggestion.textContent = `Suggestion: ${check.suggestion}`;
+            row.appendChild(suggestion);
+        }
+
+        container.appendChild(row);
+    });
 }

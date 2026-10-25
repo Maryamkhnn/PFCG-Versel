@@ -289,6 +289,7 @@ def record_blocked_attempt(user_id, category):
                 SELECT COUNT(*)
                 FROM generator_restriction_events
                 WHERE user_id = :uid
+                  AND is_incorrect = 0
                   AND id > :last_trigger
                   AND started_at >= :since
             """),
@@ -298,6 +299,51 @@ def record_blocked_attempt(user_id, category):
                 "since": now - timedelta(days=SUSPENSION_WINDOW_DAYS),
             },
         ).scalar_one()
+
+        # Create or reopen an admin review case for the restriction.
+        case = db.session.execute(
+            text("""
+                SELECT id
+                FROM moderation_review_cases
+                WHERE user_id = :uid
+                FOR UPDATE
+            """),
+            {"uid": user_id},
+        ).mappings().first()
+
+        if case is None:
+            db.session.execute(
+                text("""
+                    INSERT INTO moderation_review_cases (
+                        user_id,
+                        pending,
+                        restriction_count,
+                        flagged_at
+                    )
+                    VALUES (:uid, 1, :count, :flagged)
+                """),
+                {
+                    "uid": user_id,
+                    "count": restriction_count,
+                    "flagged": now,
+                },
+            )
+        else:
+            db.session.execute(
+                text("""
+                    UPDATE moderation_review_cases
+                    SET pending = 1,
+                        restriction_count = :count,
+                        flagged_at = :flagged,
+                        reviewed_at = NULL
+                    WHERE id = :case_id
+                """),
+                {
+                    "count": restriction_count,
+                    "flagged": now,
+                    "case_id": case["id"],
+                },
+            )
 
         if restriction_count >= SUSPENSION_THRESHOLD:
             suspension_until = now + timedelta(hours=SUSPENSION_HOURS)
@@ -489,24 +535,23 @@ class ModerationReviewError(ValueError):
     def __init__(self, message, status=400):
         super().__init__(message)
         self.status = status
-
-
 def review_moderation_case(
     case_id,
     admin_id,
     action,
     reason,
     expected_suspension_id,
+    expected_restriction_id=None,
 ):
     """
-    Review an automatic suspension.
+    Review an automatic generator restriction or account suspension.
 
     confirm:
-        Close the review without extending the suspension.
+        Close the review without extending the restriction.
 
     incorrect:
-        Cancel the matching automatic suspension.
-        Preserve any newer or unrelated account restriction.
+        Remove only the matching current restriction.
+        Preserve newer or unrelated restrictions and event history.
     """
 
     if action not in {"confirm", "incorrect"}:
@@ -522,17 +567,32 @@ def review_moderation_case(
             "Review reason must contain 10 to 1000 characters."
         )
 
+    def valid_event_id(value):
+        return (
+            isinstance(value, int)
+            and not isinstance(value, bool)
+            and value > 0
+        )
+
+    has_suspension = valid_event_id(expected_suspension_id)
+    has_restriction = valid_event_id(expected_restriction_id)
+
     if (
-        isinstance(expected_suspension_id, bool)
-        or not isinstance(expected_suspension_id, int)
-        or expected_suspension_id < 1
+        has_suspension == has_restriction
+        or (
+            expected_suspension_id is not None
+            and not has_suspension
+        )
+        or (
+            expected_restriction_id is not None
+            and not has_restriction
+        )
     ):
         raise ModerationReviewError(
             "Please reopen the case before reviewing it."
         )
 
     try:
-        # Verify the administrator against the database.
         administrator = db.session.execute(
             text("""
                 SELECT id, email, role, status
@@ -544,7 +604,8 @@ def review_moderation_case(
 
         if (
             administrator is None
-            or (administrator["role"] or "").strip().lower() != "admin"
+            or (administrator["role"] or "").strip().lower()
+                != "admin"
             or (administrator["status"] or "active").strip().lower()
                 != "active"
         ):
@@ -563,15 +624,23 @@ def review_moderation_case(
         ).scalar_one_or_none()
 
         if case_user_id is None:
-            raise ModerationReviewError("Review case not found.", 404)
+            raise ModerationReviewError(
+                "Review case not found.",
+                404,
+            )
 
-        # Same lock order as automatic moderation:
-        # user first, then review case.
+        # Keep the existing lock order: user, then case.
         user = db.session.execute(
             text("""
                 SELECT
-                    id, name, email, role, status,
-                    suspended_until, status_reason
+                    id,
+                    name,
+                    email,
+                    role,
+                    status,
+                    suspended_until,
+                    status_reason,
+                    generator_restricted_until
                 FROM users
                 WHERE id = :uid
                 FOR UPDATE
@@ -590,7 +659,10 @@ def review_moderation_case(
         ).mappings().first()
 
         if user is None or case is None:
-            raise ModerationReviewError("Review case not found.", 404)
+            raise ModerationReviewError(
+                "Review case not found.",
+                404,
+            )
 
         if not case["pending"]:
             raise ModerationReviewError(
@@ -620,83 +692,183 @@ def review_moderation_case(
             {"uid": user["id"]},
         ).mappings().first()
 
-        if (
-            suspension is None
-            or suspension["id"] != expected_suspension_id
-            or suspension["started_at"] != case["flagged_at"]
-        ):
-            raise ModerationReviewError(
-                "This case has changed. Reopen it and review again.",
-                409,
-            )
+        matching_case_suspension = (
+            suspension is not None
+            and suspension["started_at"] == case["flagged_at"]
+        )
 
         now = datetime.utcnow()
         status = (user["status"] or "active").strip().lower()
+
         suspension_cancelled = False
+        restriction_cancelled = False
 
-        if action == "incorrect":
-            # Only undo the suspension belonging to this case.
-            matching_suspension = (
-                status == "suspended"
-                and user["suspended_until"]
-                    == suspension["suspended_until"]
-                and user["status_reason"] == suspension["reason"]
-            )
-
-            if status != "active" and not matching_suspension:
+        if has_suspension:
+            if (
+                not matching_case_suspension
+                or suspension["id"] != expected_suspension_id
+            ):
                 raise ModerationReviewError(
-                    "The account has a different restriction. "
-                    "This review cannot remove it.",
+                    "This case has changed. Reopen it and review again.",
                     409,
                 )
 
-            if matching_suspension:
-                db.session.execute(
-                    text("""
-                        UPDATE users
-                        SET status = 'active',
-                            suspended_until = NULL,
-                            status_reason = NULL,
-                            status_changed_at = :changed
-                        WHERE id = :uid
-                    """),
-                    {"uid": user["id"], "changed": now},
+            case_type = "account_suspended"
+            event_id = suspension["trigger_restriction_id"]
+            event_description = f"Suspension #{suspension['id']}"
+            subject = "automatic account suspension"
+
+            if action == "incorrect":
+                matching_current_suspension = (
+                    status == "suspended"
+                    and user["suspended_until"]
+                        == suspension["suspended_until"]
+                    and user["status_reason"] == suspension["reason"]
                 )
 
-                suspension_cancelled = True
-                status = "active"
+                if status != "active" and not matching_current_suspension:
+                    raise ModerationReviewError(
+                        "The account has a different restriction. "
+                        "This review cannot remove it.",
+                        409,
+                    )
 
-            title = "Moderation review completed"
+                if matching_current_suspension:
+                    db.session.execute(
+                        text("""
+                            UPDATE users
+                            SET status = 'active',
+                                suspended_until = NULL,
+                                status_reason = NULL,
+                                status_changed_at = :changed
+                            WHERE id = :uid
+                        """),
+                        {
+                            "uid": user["id"],
+                            "changed": now,
+                        },
+                    )
 
-            if suspension_cancelled:
-                message = (
-                    "An administrator reviewed your case and found "
-                    "the automatic suspension incorrect. "
-                    "That account suspension has been cancelled. "
-                    f"Review reason: {reason}"
+                    suspension_cancelled = True
+                    status = "active"
+
+                outcome = (
+                    "That account suspension has been cancelled."
+                    if suspension_cancelled
+                    else "Your account was already active."
                 )
-            else:
-                message = (
-                    "An administrator reviewed your previous automatic "
-                    "suspension and found it incorrect. "
-                    "Your account was already active. "
-                    f"Review reason: {reason}"
-                )
-
-            notification_type = "info"
 
         else:
-            title = "Moderation review completed"
+            # A suspension case cannot be reviewed as a generator case.
+            if matching_case_suspension:
+                raise ModerationReviewError(
+                    "This case has changed. Reopen it and review again.",
+                    409,
+                )
 
+            restriction = db.session.execute(
+                text("""
+                    SELECT
+                        id,
+                        started_at,
+                        restricted_until
+                    FROM generator_restriction_events
+                    WHERE user_id = :uid
+                    ORDER BY id DESC
+                    LIMIT 1
+                """),
+                {"uid": user["id"]},
+            ).mappings().first()
+
+            if (
+                restriction is None
+                or restriction["id"] != expected_restriction_id
+                or restriction["started_at"] != case["flagged_at"]
+            ):
+                raise ModerationReviewError(
+                    "This case has changed. Reopen it and review again.",
+                    409,
+                )
+
+            case_type = "generator_restricted"
+            event_id = restriction["id"]
+            event_description = f"Generator restriction #{event_id}"
+            subject = "automatic generator restriction"
+
+            if action == "incorrect":
+                    db.session.execute(
+                    text("""
+                        UPDATE generator_restriction_events
+                        SET is_incorrect = 1
+                        WHERE id = :restriction_id
+                          AND user_id = :uid
+                    """),
+                    {
+                        "restriction_id": restriction["id"],
+                        "uid": user["id"],
+                    },
+                )
+            current_until = user["generator_restricted_until"]
+
+            matching_current_restriction = (
+                    current_until is not None
+                    and current_until == restriction["restricted_until"]
+                )
+
+            if (
+                    current_until is not None
+                    and current_until > now
+                    and not matching_current_restriction
+                ):
+                    raise ModerationReviewError(
+                        "The user has a different generator restriction. "
+                        "This review cannot remove it.",
+                        409,
+                    )
+
+            if matching_current_restriction:
+                    db.session.execute(
+                        text("""
+                            UPDATE users
+                            SET generator_restricted_until = NULL
+                            WHERE id = :uid
+                              AND generator_restricted_until = :until
+                        """),
+                        {
+                            "uid": user["id"],
+                            "until": restriction["restricted_until"],
+                        },
+                    )
+
+                    restriction_cancelled = True
+
+            outcome = (
+                    "That generator restriction has been removed."
+                    if restriction_cancelled
+                    else "That generator restriction is no longer active."
+                )
+
+            if status != "active":
+                    outcome += (
+                        " Your account status remains unchanged."
+                    )
+
+        title = "Moderation review completed"
+
+        if action == "incorrect":
             message = (
-                "An administrator reviewed your automatic suspension "
+                f"An administrator reviewed your {subject} "
+                f"and found it incorrect. {outcome} "
+                f"Review reason: {reason}"
+            )
+        else:
+            message = (
+                f"An administrator reviewed your {subject} "
                 "and confirmed the violation records. "
                 f"Review reason: {reason}. "
-                "The review does not add another suspension "
+                "This review does not add another restriction "
                 "or extend the original expiry."
             )
-
-            notification_type = "info"
 
         db.session.execute(
             text("""
@@ -715,11 +887,10 @@ def review_moderation_case(
                 "admin_id": administrator["id"],
                 "action": action,
                 "reason": reason,
-                "event_id": suspension["trigger_restriction_id"],
+                "event_id": event_id,
             },
         )
 
-        # Audit history stays even when this user's case is reopened.
         db.session.execute(
             text("""
                 INSERT INTO admin_logs (
@@ -743,14 +914,16 @@ def review_moderation_case(
                 "admin_id": administrator["id"],
                 "admin_email": administrator["email"],
                 "action": (
-                    "Confirmed automatic suspension"
+                    f"Confirmed {subject}"
                     if action == "confirm"
-                    else "Marked automatic suspension incorrect"
+                    else f"Marked {subject} incorrect"
                 ),
                 "details": (
                     f"Case #{case_id}; User #{user['id']}; "
-                    f"Suspension #{suspension['id']}; "
-                    f"Cancelled: {suspension_cancelled}; "
+                    f"{event_description}; "
+                    f"Suspension cancelled: {suspension_cancelled}; "
+                    f"Generator restriction removed: "
+                    f"{restriction_cancelled}; "
                     f"Reason: {reason}"
                 ),
                 "created": now,
@@ -759,7 +932,7 @@ def review_moderation_case(
 
         _add_notification(
             user["id"],
-            notification_type,
+            "info",
             title,
             message,
             now,
@@ -778,14 +951,15 @@ def review_moderation_case(
         db.session.rollback()
         raise
 
-    # Email delivery happens after saving the review.
     email_sent = _send_moderation_email(*email_details)
 
     return {
         "case_id": case_id,
+        "case_type": case_type,
         "action": action,
         "account_status": status,
         "suspension_cancelled": suspension_cancelled,
+        "restriction_cancelled": restriction_cancelled,
         "email_sent": email_sent,
         "message": "Review saved successfully.",
     }

@@ -1,4 +1,7 @@
+
+
 import re
+import json
 from html import unescape
 
 from sqlalchemy import text
@@ -8,7 +11,7 @@ from app.database import db
 
 # ============================================================
 # GET USER CONTENT
-# ============================================================
+# ==========================================a==================
 
 def get_user_content(user_email):
 
@@ -405,295 +408,88 @@ def count_paragraphs(content):
     return max(1, len(paragraphs))
 
 
-def analyze_seo(
-    content,
-    keyword,
-    seo_title="",
-    meta_description="",
-    fallback_title=""
-):
+def analyze_seo(content, keyword, seo_title="", meta_description="", fallback_title=""):
+    """PFCG editorial rubric v3. Thresholds are product heuristics, not Google rules."""
     if not isinstance(content, str) or not content.strip():
-        raise ValueError("Please load or enter content first.")
-
+        raise ValueError("Please enter content first.")
     if not isinstance(keyword, str) or not keyword.strip():
         raise ValueError("Please enter a target keyword.")
-
-    content = content.strip()
-    keyword = normalize_text(keyword)
-    plain_content = clean_html(content)
-
-    words = get_words(plain_content)
-    word_count = len(words)
-
-    if not word_count:
+    if len(content) > 200000 or len(keyword) > 200:
+        raise ValueError("Use at most 200,000 content characters and 200 keyword characters.")
+    plain = clean_html(content)
+    words = get_words(plain)
+    if not words:
         raise ValueError("Please enter readable content.")
-
-    keyword_pattern = (
-        r"(?<![a-zA-Z0-9])"
-        + re.escape(keyword)
-        + r"(?![a-zA-Z0-9])"
-    )
-
-    def contains_keyword(value):
-        return bool(
-            re.search(
-                keyword_pattern,
-                value,
-                flags=re.IGNORECASE
-            )
-        )
-
-    keyword_count = len(
-        re.findall(
-            keyword_pattern,
-            plain_content,
-            flags=re.IGNORECASE
-        )
-    )
-
-    keyword_density = round(
-        keyword_count / word_count * 100,
-        2
-    )
-
-    keyword_in_first_part = contains_keyword(
-        " ".join(words[:100])
-    )
-
+    # This rubric's syllable estimator supports English only.
+    letters = [c for c in plain if c.isalpha()]
+    if letters and sum(c.isascii() for c in letters) / len(letters) < .9:
+        raise ValueError("This version supports English content only.")
+    keyword = normalize_text(keyword)
+    pattern = r"(?<!\w)" + r"\s+".join(re.escape(x) for x in keyword.split()) + r"(?!\w)"
+    def matches(value):
+        return len(re.findall(pattern, normalize_text(value), re.I))
+    count = matches(plain)
+    density = round(count / len(words) * 100, 2)
     headings = extract_seo_headings(content)
-    heading_count = len(headings)
+    blocks = re.split(r"\n\s*\n|</p\s*>|</div\s*>|<br\s*/?>", content, flags=re.I)
+    paragraphs = [clean_html(b) for b in blocks if clean_html(b)]
+    long_paragraphs = [{"number": i+1, "words": len(get_words(p))}
+                       for i,p in enumerate(paragraphs) if len(get_words(p)) > 120]
+    sentences = [s.strip() for s in re.split(r"[.!?]+", plain) if get_words(s)]
+    long_sentences = [{"number": i+1, "words": len(get_words(s)), "excerpt": s[:140]}
+                      for i,s in enumerate(sentences) if len(get_words(s)) > 30]
+    readability = calculate_readability(words, plain)
+    title = normalize_text(seo_title or fallback_title)
+    meta = normalize_text(meta_description)
+    checks = []
+    def add(category, earned, maximum, detail):
+        checks.append({"category": category, "earned": earned, "maximum": maximum,
+                       "status": "Pass" if earned == maximum else "Review", "detail": detail})
+    title_points = (10 if title else 0) + (10 if matches(title) else 0)
+    add("Title", title_points, 20,
+        "Title provided; exact target phrase present." if title_points == 20 else
+        "Add a descriptive title and review how it relates to the target phrase. Exact matching is only a proxy for relevance.")
+    intro = matches(" ".join(words[:100])) > 0
+    key_points = (15 if count else 0) + (5 if intro else 0)
+    add("Keyword coverage", key_points, 20,
+        f"{count} exact phrase matches; {density}% occurrence density. No ideal density target is scored."
+        + (" Introduce the topic clearly near the start." if not intro else " Topic phrase appears near the start."))
+    heading_needed = len(words) >= 300
+    heading_points = 15 if not heading_needed or headings else 0
+    add("Section structure", heading_points, 15,
+        f"{len(headings)} possible headings detected. Plain-text detection is approximate."
+        if headings else "Short content: headings are optional." if not heading_needed else
+        "Consider descriptive section headings for this longer article.")
+    read_points = 15 if readability >= 60 else 10 if readability >= 45 else 5 if readability >= 30 else 0
+    add("Reading ease", read_points, 15,
+        f"Estimated English Flesch score: {readability}/100. Technical vocabulary can lower it; retain necessary terms.")
+    paragraph_points = round(15 * (1-len(long_paragraphs)/max(1,len(paragraphs))))
+    add("Paragraph length", paragraph_points, 15,
+        "; ".join(f"Paragraph {p['number']}: {p['words']} words; consider splitting." for p in long_paragraphs[:5])
+        or "No paragraph exceeds PFCG's 120-word review threshold.")
+    # Description presence is assessed; character length is informational, never a Google limit.
+    add("Meta description", 10 if meta else 0, 10,
+        f"Description supplied ({len(meta)} characters). Review accuracy and usefulness manually."
+        if meta else "Add a short, accurate summary for use when publishing. No fixed Google character limit is assumed.")
+    normalized = [normalize_text(s).lower() for s in sentences]
+    duplicates = len(normalized)-len(set(normalized))
+    add("Sentence repetition", 5 if not duplicates else 0, 5,
+        f"{duplicates} repeated sentence occurrences detected." if duplicates else "No exact repeated sentences detected.")
+    score = sum(c["earned"] for c in checks)
+    status = "Strong content checks" if score >= 85 else "Good content checks" if score >= 70 else "Needs improvement" if score >= 50 else "Needs substantial review"
+    suggestions = [c["detail"] for c in checks if c["status"] == "Review"]
+    suggestions += [f"Sentence {s['number']} has {s['words']} words: consider simplifying. {s['excerpt']}" for s in long_sentences[:5]]
+    suggestions.append("Manually review factual accuracy, search intent and completeness. These are not measured by this score.")
+    return {"scoring_version": "pfcg-content-v3", "word_count": len(words),
+            "keyword_count": count, "keyword_density": density,
+            "heading_count": len(headings), "paragraph_count": len(paragraphs),
+            "readability_score": readability, "seo_score": score, "seo_status": status,
+            "keyword_in_first_part": intro, "keyword_in_headings": any(matches(h) for h in headings),
+            "checks": checks, "score_breakdown": {c["category"]: {"earned":c["earned"], "maximum":c["maximum"]} for c in checks},
+            "long_paragraphs": long_paragraphs, "long_sentences": long_sentences,
+            "suggestions": suggestions, "seo_title": title, "meta_description": meta}
 
-        # Match the exact keyword first.
-    keyword_in_headings = any(
-        contains_keyword(heading)
-        for heading in headings
-    )
 
-    # Recognize abbreviations explicitly defined in the document.
-    # Example: Artificial intelligence (AI).
-    # Keyword counts and density remain exact-match measurements.
-    if (
-        not keyword_in_headings
-        and re.fullmatch(r"[A-Za-z]{2,8}", keyword)
-    ):
-        abbreviation = keyword.upper()
-
-        definition_pattern = (
-            r"((?:[A-Za-z][A-Za-z'-]*\s+){1,7}"
-            r"[A-Za-z][A-Za-z'-]*)"
-            r"\s*\(\s*"
-            + re.escape(abbreviation)
-            + r"\s*\)"
-        )
-
-        definitions = re.finditer(
-            definition_pattern,
-            plain_content,
-            flags=re.IGNORECASE
-        )
-
-        for definition in definitions:
-            preceding_words = definition.group(1).split()
-
-            # Take the words immediately before the abbreviation.
-            expanded_words = preceding_words[-len(abbreviation):]
-
-            initials = "".join(
-                word[0] for word in expanded_words
-            ).upper()
-
-            if initials != abbreviation:
-                continue
-
-            expanded_phrase = " ".join(expanded_words)
-
-            expanded_pattern = (
-                r"(?<!\w)"
-                + re.escape(expanded_phrase)
-                + r"(?!\w)"
-            )
-
-            if any(
-                re.search(
-                    expanded_pattern,
-                    normalize_text(heading),
-                    flags=re.IGNORECASE
-                )
-                for heading in headings
-            ):
-                keyword_in_headings = True
-                break
-
-    paragraph_count = count_paragraphs(content)
-
-    readability_score = calculate_readability(
-        words,
-        plain_content
-    )
-
-    # PFCG heuristic rubric v2: 65 possible points, not search-engine criteria.
-    # Title and metadata checks are excluded entirely.
-    score = 0
-
-    # Keyword use: 25 points.
-    if keyword_count > 0:
-        score += 5
-
-    if keyword_in_first_part:
-        score += 8
-
-    if keyword_count >= 2:
-        score += 3
-
-    if 0.5 <= keyword_density <= 2.5:
-        score += 9
-    elif 0.3 <= keyword_density < 0.5:
-        score += 4
-    elif 2.5 < keyword_density <= 3:
-        score += 4
-    elif keyword_density > 3:
-        score -= 10
-
-    # Headings: 15 points.
-    if heading_count >= 2:
-        score += 5
-
-    if keyword_in_headings:
-        score += 10
-
-    # Readability: 15 points.
-    if readability_score >= 60:
-        score += 15
-    elif readability_score >= 45:
-        score += 10
-    elif readability_score >= 30:
-        score += 5
-
-    # Paragraph structure: 10 points.
-    if paragraph_count >= 3:
-        score += 10
-    elif paragraph_count >= 2:
-        score += 5
-
-    # Length is reported, not scored: the requested length is not supplied
-    # to this analyzer, and a longer document is not automatically better.
-    seo_score = round(max(0, min(score, 65)) / 65 * 100)
-
-    if seo_score >= 85:
-        seo_status = "Excellent SEO"
-    elif seo_score >= 70:
-        seo_status = "Good SEO"
-    elif seo_score >= 50:
-        seo_status = "Needs Improvement"
-    else:
-        seo_status = "Poor SEO"
-
-    suggestions = []
-
-    if keyword_count == 0:
-        suggestions.append(
-            "The exact target keyword was not found. "
-            "Choose a phrase relevant to the content and "
-            "include it naturally."
-        )
-    else:
-        if not keyword_in_first_part:
-            suggestions.append(
-                "Introduce the target keyword naturally "
-                "within the first 100 words."
-            )
-
-        if keyword_density < 0.5:
-            suggestions.append(
-                "The target phrase appears infrequently under "
-                "this application's rules. Review relevance "
-                "without adding forced repetition."
-            )
-        elif 2.5 < keyword_density <= 3:
-            suggestions.append(
-                "Keyword density is between 2.5% and 3%. This application's "
-                "rubric awards 4/9 density points here. Check for unnecessary "
-                "repetition; do not remove useful technical terms just for the score."
-            )
-        elif keyword_density > 3:
-            suggestions.append(
-                "Review repeated uses of the target keyword "
-                "and remove unnecessary repetition."
-            )
-
-    if heading_count < 2:
-        suggestions.append(
-            "Where appropriate, organize the content using "
-            "clear headings on separate lines."
-        )
-
-    if not keyword_in_headings:
-        suggestions.append(
-            "Use the target keyword in a relevant heading "
-            "where it reads naturally."
-        )
-
-    if paragraph_count < 3:
-        suggestions.append(
-            "Where the format allows, divide long content "
-            "into readable paragraphs."
-        )
-
-    if readability_score < 60:
-        suggestions.append(
-            f"Estimated reading ease is {readability_score}/100. This heuristic "
-            "uses sentence length and estimated syllables; technical vocabulary "
-            "can lower it. Review overloaded sentences and preserve necessary terms."
-        )
-
-    if keyword_count == 1:
-        suggestions.append(
-            "The exact keyword appears once (0/3 repeat-use points). "
-            "Only use it again if it helps explain the topic naturally."
-        )
-
-    if not suggestions:
-        suggestions.append(
-            "No additional suggestions were triggered. "
-            "Review accuracy and relevance before publishing."
-        )
-
-    keyword_points = (
-        (5 if keyword_count else 0)
-        + (8 if keyword_in_first_part else 0)
-        + (3 if keyword_count >= 2 else 0)
-        + (9 if 0.5 <= keyword_density <= 2.5 else
-           4 if 0.3 <= keyword_density < 0.5 or 2.5 < keyword_density <= 3 else
-           -10 if keyword_density > 3 else 0)
-    )
-    heading_points = (5 if heading_count >= 2 else 0) + (10 if keyword_in_headings else 0)
-    readability_points = (15 if readability_score >= 60 else 10 if readability_score >= 45
-                          else 5 if readability_score >= 30 else 0)
-    paragraph_points = 10 if paragraph_count >= 3 else 5 if paragraph_count >= 2 else 0
-    suggestions.insert(0,
-        f"Score breakdown: keyword use {keyword_points}/25; headings {heading_points}/15; "
-        f"reading ease {readability_points}/15; paragraph structure {paragraph_points}/10. "
-        "Length is not scored. These are PFCG checks, not search-engine ranking factors."
-    )
-    return {
-        "scoring_version": "pfcg-content-v2",
-        "score_breakdown": {
-            "keyword_use": keyword_points, "headings": heading_points,
-            "readability": readability_points, "paragraphs": paragraph_points,
-            "maximum": 65
-        },
-        "word_count": word_count,
-        "keyword_count": keyword_count,
-        "keyword_density": keyword_density,
-        "heading_count": heading_count,
-        "paragraph_count": paragraph_count,
-        "keyword_in_first_part": keyword_in_first_part,
-        "keyword_in_headings": keyword_in_headings,
-        "readability_score": readability_score,
-        "seo_score": seo_score,
-        "seo_status": seo_status,
-        "suggestions": suggestions
-    }
 # ============================================================
 # SAVE SEO ANALYSIS
 # ============================================================
@@ -721,6 +517,7 @@ def save_seo_analysis(data):
                 (
                     user_email,
                     content,
+                    report_json,
                     source_type,
                     source_id,
                     content_topic,
@@ -735,6 +532,7 @@ def save_seo_analysis(data):
 (
     :user_email,
     :content,
+    :report_json,
     :source_type,
     :source_id,
     :content_topic,
@@ -749,6 +547,7 @@ def save_seo_analysis(data):
             {
                 "user_email": data.get("user_email"),
                 "content": data.get("content"),
+                "report_json": json.dumps({"keyword": data.get("keyword"), "content": data.get("content"), "report": data.get("report")}, ensure_ascii=False),
                 "source_type": source_type,
                 "source_id": source_id,
                 "content_topic": data.get("content_topic"),
@@ -787,7 +586,7 @@ def get_seo_history(user_email):
         text("""
             SELECT
                 id,
-                
+                report_json,
                 source_type,
                 source_id,
                 content_topic,
@@ -811,6 +610,7 @@ def get_seo_history(user_email):
     return [
         {
             "id": row["id"],
+            "saved_report": json.loads(row["report_json"]) if isinstance(row["report_json"], str) and row["report_json"] else row["report_json"],
              "source_id": row["source_id"],
             "source_type": row["source_type"] or "manual",
             
@@ -836,3 +636,132 @@ def get_seo_history(user_email):
         }
         for row in rows
     ]
+
+def apply_ai_metadata_scoring(result):
+    review = result.get("ai_review") or {}
+    available = review.get("status") == "available"
+
+    ai_checks = {
+        check["category"]: check
+        for check in review.get("checks", [])
+        if isinstance(check, dict) and "category" in check
+    }
+
+    categories = {
+        "Title": ("Title relevance", 20),
+        "Meta description": ("Meta description", 10)
+    }
+
+    updated_checks = []
+    old_metadata_details = set()
+    metadata_suggestions = []
+    major_issue = False
+
+    for original in result.get("checks", []):
+        check = dict(original)
+        category = check.get("category")
+
+        if category in categories:
+            ai_category, maximum = categories[category]
+            finding = ai_checks.get(ai_category)
+
+            old_metadata_details.add(check.get("detail", ""))
+
+            if not available or not finding:
+                check.update({
+                    "earned": 0,
+                    "maximum": maximum,
+                    "status": "Not assessed",
+                    "detail": (
+                        "AI relevance assessment unavailable. "
+                        "No points awarded for this category; "
+                        "the total is provisional."
+                    )
+                })
+
+                metadata_suggestions.append(
+                    f"{category}: relevance was not assessed."
+                )
+
+            else:
+                severity = finding.get("severity")
+
+                points = {
+                    "none": maximum,
+                    "minor": maximum // 2,
+                    "major": 0,
+                    "missing": 0
+                }
+
+                if severity not in points:
+                    raise ValueError(
+                        "Invalid AI metadata assessment."
+                    )
+
+                major_issue = (
+                    major_issue or severity == "major"
+                )
+
+                check.update({
+                    "earned": points[severity],
+                    "maximum": maximum,
+                    "status": finding["status"],
+                    "severity": severity,
+                    "detail": finding["explanation"]
+                })
+
+                suggestion = finding.get("suggestion", "")
+
+                if suggestion:
+                    metadata_suggestions.append(
+                        f"{category}: {suggestion}"
+                    )
+
+        updated_checks.append(check)
+
+    total = sum(
+        check["earned"]
+        for check in updated_checks
+    )
+
+    provisional = any(
+        check.get("status") == "Not assessed"
+        for check in updated_checks
+    )
+
+    if provisional:
+        status = "Provisional — AI relevance not assessed"
+    elif major_issue:
+        status = "Needs metadata correction"
+    elif total >= 85:
+        status = "Strong content checks"
+    elif total >= 70:
+        status = "Good content checks"
+    elif total >= 50:
+        status = "Needs improvement"
+    else:
+        status = "Needs substantial review"
+
+    suggestions = [
+        suggestion
+        for suggestion in result.get("suggestions", [])
+        if suggestion not in old_metadata_details
+    ]
+
+    result.update({
+        "scoring_version": "pfcg-content-v4-ai-metadata",
+        "score_provisional": provisional,
+        "checks": updated_checks,
+        "seo_score": total,
+        "seo_status": status,
+        "score_breakdown": {
+            check["category"]: {
+                "earned": check["earned"],
+                "maximum": check["maximum"]
+            }
+            for check in updated_checks
+        },
+        "suggestions": metadata_suggestions + suggestions
+    })
+
+    return result

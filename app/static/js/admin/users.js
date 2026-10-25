@@ -143,7 +143,8 @@ document.addEventListener("DOMContentLoaded", () => {
             byId("editName").value = user.name;
             byId("editEmail").value = user.email;
             byId("editUsername").value = user.username;
-
+            byId("editStatus").value = user.status.replaceAll("_", " ");
+            byId("editReason").value = "";
             openModal(editModal, button);
         });
     });
@@ -155,10 +156,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const userId = byId("editUserId").value;
         const user = getUser(userId);
 
-        const data = {
+            const data = {
             name: byId("editName").value.trim(),
             email: user?.email || "",
-            username: byId("editUsername").value.trim()
+            username: byId("editUsername").value.trim(),
+            reason: byId("editReason").value.trim()
         };
 
         if (!user || !editUrl) {

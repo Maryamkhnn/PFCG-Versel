@@ -170,10 +170,17 @@
                 label
             )
         );
+        const isEdited = (
+            item.is_edited === true ||
+            item.is_edited === 1 ||
+            ["1", "true"].includes(
+                String(item.is_edited).toLowerCase()
+            )
+        );
 
         if (
             source === "edited" ||
-            (source === "humanized" && item.is_edited)
+            (source === "humanized" && isEdited)
         ) {
             box.append(
                 node(

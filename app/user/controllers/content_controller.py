@@ -108,6 +108,11 @@ def my_content_api():
 
                     NULL AS secondary_id,
 
+                    CASE
+                        WHEN ec.id IS NOT NULL THEN 1
+                        ELSE 0
+                    END AS is_edited,
+
                     gc.id AS original_content_id,
 
                     CASE
@@ -171,7 +176,7 @@ def my_content_api():
                     hh.id AS record_id,
 
                     hh.id AS secondary_id,
-
+                    hh.is_edited AS is_edited,
                     NULL AS original_content_id,
 
                     'humanized' AS source_type,
@@ -417,7 +422,7 @@ COALESCE(
                 "word_count": word_count,
 
                 "is_saved": is_saved,
-
+                "is_edited": bool(row["is_edited"]),
                 "created_at": created_at_value
             })
 

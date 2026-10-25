@@ -4,148 +4,278 @@
 {% block page_title %}{% endblock %}
 
 {% block css %}
-<link rel="stylesheet"
-      href="{{ url_for('static', filename='css/user/reports.css', v='31') }}">
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/user/reports.css', v='35') }}"
+>
+
+<style>
+    #reportsWorkspace .report-card[hidden],
+    #reportsWorkspace [hidden] {
+        display: none !important;
+    }
+
+    #reportsWorkspace .report-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 22px 0;
+    }
+
+    #reportsWorkspace .report-action-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        min-height: 46px;
+        max-width: 100%;
+        padding: 12px 17px;
+        border: 1px solid #6940b5;
+        border-radius: 10px;
+        background: #6940b5;
+        color: #ffffff;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.5;
+        text-align: center;
+        text-decoration: none;
+        white-space: normal;
+        cursor: pointer;
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+    #reportsWorkspace .report-action-button:hover {
+        background: #542d99;
+        border-color: #542d99;
+    }
+
+   #reportsWorkspace .report-action-button.action-plagiarism {
+    background: #6940b5;
+    border-color: #6940b5;
+    color: #ffffff;
+}
+
+#reportsWorkspace .report-action-button.action-plagiarism:hover {
+    background: #542d99;
+    border-color: #542d99;
+    color: #ffffff;
+}
+
+    #reportsWorkspace .report-action-button:focus-visible {
+        outline: 3px solid #9976dc;
+        outline-offset: 3px;
+    }
+
+    #reportsWorkspace .report-unchecked {
+        color: #796d87;
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+    #reportsWorkspace .report-text {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    #reportsWorkspace .report-title h2 {
+        overflow-wrap: anywhere;
+    }
+
+    #reportsWorkspace .reports-result-count {
+        line-height: 1.7;
+    }
+
+    @media (max-width: 600px) {
+        #reportsWorkspace .report-actions {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #reportsWorkspace .report-action-button {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        #reportsWorkspace .report-action-button {
+            transition: none;
+        }
+    }
+</style>
 {% endblock %}
 
-{% macro score(value, percent=true) %}
+
+{% macro score(value, suffix='%') %}
     {% if value is defined and value is not none %}
-        {{ value|float|round(2) }}{% if percent %}%{% endif %}
+        {{ value|float|round(2) }}{{ suffix }}
     {% else %}
         <span class="report-unchecked">Not checked</span>
     {% endif %}
 {% endmacro %}
 
+
 {% block content %}
 
-{# Combine results only when the saved content is identical. #}
+{# Controller supplies newest records first.
+   Combine only identical saved text, not merely matching topics. #}
+
 {% set collection = namespace(items=[]) %}
 
 {% for report in reports|default([], true) %}
+
     {% set content = report.content|default('', true) %}
     {% set key = content|trim %}
     {% set match = namespace(item=none) %}
 
     {% if key %}
-        {% for item in collection.items %}
-            {% if item.key == key %}
-                {% set match.item = item %}
+        {% for existing in collection.items %}
+            {% if existing.key == key %}
+                {% set match.item = existing %}
             {% endif %}
         {% endfor %}
     {% endif %}
 
     {% if match.item is none %}
-        {% set item = namespace(
+        {% set new_item = namespace(
             key=key,
             topic=report.topic|default('Untitled Content', true),
             date=report.created_at|default('', true),
             content=content,
             versions=report.versions|default([], true),
             seo=none,
+            seo_id=none,
             readability=none,
             density=none,
             keywords=none,
             ai=none,
-            human=none
+            human=none,
+            ai_report_id=none,
+            human_report_id=none
         ) %}
-        {% set collection.items = collection.items + [item] %}
-        {% set match.item = item %}
+
+        {% set collection.items = collection.items + [new_item] %}
+        {% set match.item = new_item %}
     {% endif %}
 
     {% set item = match.item %}
+    {% set report_type = report.report_type|default('') %}
 
-    {% if report.seo_score is defined and report.seo_score is not none
-          and item.seo is none %}
-        {% set item.seo = report.seo_score %}
+    {# Keep the SEO score and detail link from the same record. #}
+
+    {% if report_type == 'seo'
+          and item.seo_id is none %}
+
+        {% set item.seo_id = report.id %}
+        {% set item.seo = report.seo_score|default(none) %}
         {% set item.readability = report.readability_score|default(none) %}
         {% set item.density = report.keyword_density|default(none) %}
         {% set item.keywords = report.keyword_count|default(none) %}
+
     {% endif %}
 
-    {% for seo in report.seo_versions|default([], true) %}
-        {% if item.seo is none %}
-            {% set item.seo = seo.seo_score|default(none) %}
-            {% set item.readability = seo.readability_score|default(none) %}
-            {% set item.density = seo.keyword_density|default(none) %}
-            {% set item.keywords = seo.keyword_count|default(none) %}
-        {% endif %}
-    {% endfor %}
+    {# Keep each plagiarism score with its exact history ID. #}
 
-    {% if report.ai_score is defined and report.ai_score is not none
-          and item.ai is none %}
-        {% set item.ai = report.ai_score %}
-    {% endif %}
+    {% if report_type == 'plagiarism' %}
 
-    {% if report.humanized_score is defined
-          and report.humanized_score is not none
-          and item.human is none %}
-        {% set item.human = report.humanized_score %}
-    {% endif %}
-
-    {% if report.plagiarism_score is defined
-          and report.plagiarism_score is not none %}
         {% set source = (
-            (report.source_label|default('', true)) ~ ' ' ~
             (report.source_type|default('', true)) ~ ' ' ~
             (report.check_type|default('', true))
         )|lower %}
 
         {% if 'human' in source %}
-            {% if item.human is none %}
-                {% set item.human = report.plagiarism_score %}
+
+            {% if item.human_report_id is none %}
+                {% set item.human_report_id = report.id %}
+                {% set item.human = report.plagiarism_score|default(none) %}
             {% endif %}
-        {% elif item.ai is none %}
-            {% set item.ai = report.plagiarism_score %}
+
+        {% elif 'ai' in source %}
+
+            {% if item.ai_report_id is none %}
+                {% set item.ai_report_id = report.id %}
+                {% set item.ai = report.plagiarism_score|default(none) %}
+            {% endif %}
+
         {% endif %}
+
     {% endif %}
+
 {% endfor %}
+
 
 <div class="reports-page" id="reportsWorkspace">
 
     {% if collection.items %}
     <div class="reports-tools">
+
         <div class="reports-search">
             <i class="fas fa-search" aria-hidden="true"></i>
-            <input type="search"
-                   id="searchReports"
-                   placeholder="Search content..."
-                   aria-label="Search reports"
-                   autocomplete="off">
+
+            <input
+                type="search"
+                id="searchReports"
+                placeholder="Search content..."
+                aria-label="Search reports"
+                autocomplete="off"
+            >
         </div>
 
         <div class="reports-page-size">
             <label for="reportsPerPage">Per page</label>
+
             <select id="reportsPerPage">
                 <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="20">20</option>
             </select>
         </div>
+
     </div>
     {% endif %}
 
-    <p id="reportsResultCount"
-       class="reports-result-count"
-       role="status"
-       aria-live="polite"></p>
+    <p
+        id="reportsResultCount"
+        class="reports-result-count"
+        role="status"
+        aria-live="polite"
+    ></p>
 
-    <div id="reportsNoMatch" class="reports-no-match" hidden>
+    <div
+        id="reportsNoMatch"
+        class="reports-no-match"
+        hidden
+    >
         <h3>No matching reports</h3>
         <p>Try another topic.</p>
-        <button type="button" id="clearReportsSearch">Clear Search</button>
+
+        <button type="button" id="clearReportsSearch">
+            Clear Search
+        </button>
     </div>
 
     <div class="reports-container">
+
         {% for item in collection.items %}
-        <article class="report-card"
-                 data-topic="{{ item.topic }}"
-                 data-type="SEO plagiarism AI humanized">
+        <article
+            class="report-card"
+            data-topic="{{ item.topic }}"
+            data-type="{% if item.seo_id is not none %}SEO {% endif %}{% if item.ai_report_id is not none %}AI plagiarism {% endif %}{% if item.human_report_id is not none %}humanized plagiarism{% endif %}"
+        >
 
             <div class="report-heading">
+
                 <div class="report-title">
                     <div class="report-file-icon">
-                        <i class="fas fa-file-alt" aria-hidden="true"></i>
+                        <i
+                            class="fas fa-file-alt"
+                            aria-hidden="true"
+                        ></i>
                     </div>
+
                     <div>
                         <h2>{{ item.topic }}</h2>
                         <p>Content Analysis</p>
@@ -153,31 +283,46 @@
                 </div>
 
                 {% if item.date %}
-                <span class="report-date">{{ item.date }}</span>
+                <span class="report-date">
+                    {{ item.date }}
+                </span>
                 {% endif %}
+
             </div>
 
+            <!-- SEO SUMMARY -->
+
             <div class="report-seo-grid">
+
                 <div class="report-metric">
-                    <span>SEO Score</span>
-                    <strong>{{ score(item.seo) }}</strong>
+                    <span>Content SEO Score</span>
+                    <strong>{{ score(item.seo, '/100') }}</strong>
                 </div>
 
                 <div class="report-metric">
-                    <span>Readability</span>
-                    <strong>{{ score(item.readability, false) }}</strong>
+                    <span>Reading Ease</span>
+                    <strong>
+                        {{ score(item.readability, '/100') }}
+                    </strong>
                 </div>
 
                 <div class="report-metric">
                     <span>Keyword Density</span>
                     <strong>{{ score(item.density) }}</strong>
+
                     {% if item.keywords is not none %}
-                    <small>{{ item.keywords }} keyword matches</small>
+                    <small>
+                        {{ item.keywords }} keyword matches
+                    </small>
                     {% endif %}
                 </div>
+
             </div>
 
+            <!-- PLAGIARISM SUMMARY -->
+
             <div class="report-plagiarism-grid">
+
                 <div class="report-metric">
                     <span>AI Content Plagiarism</span>
                     <strong>{{ score(item.ai) }}</strong>
@@ -187,117 +332,295 @@
                     <span>Humanized Content Plagiarism</span>
                     <strong>{{ score(item.human) }}</strong>
                 </div>
+
             </div>
+
+            <!-- DETAIL BUTTONS -->
+
+            {% if item.seo_id is not none
+                  or item.ai_report_id is not none
+                  or item.human_report_id is not none %}
+
+            <div class="report-actions">
+
+                {% if item.seo_id is not none %}
+                <a
+                    href="{{ url_for('user.reports', seo_id=item.seo_id) }}"
+                    class="report-action-button"
+                >
+                    <i
+                        class="fas fa-chart-line"
+                        aria-hidden="true"
+                    ></i>
+                    View SEO Report
+                </a>
+                {% endif %}
+
+                {% if item.ai_report_id is not none %}
+                <a
+                    href="{{ url_for('user.reports', plagiarism_id=item.ai_report_id) }}"
+                    class="report-action-button action-plagiarism"
+                >
+                    <i
+                        class="fas fa-search"
+                        aria-hidden="true"
+                    ></i>
+                    View AI Plagiarism Report
+                </a>
+                {% endif %}
+
+                {% if item.human_report_id is not none %}
+                <a
+                    href="{{ url_for('user.reports', plagiarism_id=item.human_report_id) }}"
+                    class="report-action-button action-plagiarism"
+                >
+                    <i
+                        class="fas fa-file-alt"
+                        aria-hidden="true"
+                    ></i>
+                    View Humanized Plagiarism Report
+                </a>
+                {% endif %}
+
+            </div>
+            {% endif %}
+
+            <!-- SAVED CONTENT -->
 
             <details class="report-content">
                 <summary>
-                    <span class="report-view-label">View Content</span>
-                    <span class="report-hide-label">Hide Content</span>
-                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                    <span class="report-view-label">
+                        View Content
+                    </span>
+
+                    <span class="report-hide-label">
+                        Hide Content
+                    </span>
+
+                    <i
+                        class="fas fa-chevron-down"
+                        aria-hidden="true"
+                    ></i>
                 </summary>
 
                 <div class="report-content-body">
+
                     {% if item.versions %}
+
                         {% for version in item.versions %}
                         <section class="report-text-section">
-                            <h3>{{ version.label|default('Content', true) }}</h3>
+                            <h3>
+                                {{ version.label|default('Content', true) }}
+                            </h3>
+
                             <div class="report-text">{{ version.content|default('Saved text unavailable.', true) }}</div>
                         </section>
                         {% endfor %}
+
                     {% elif item.content %}
+
                         <div class="report-text">{{ item.content }}</div>
+
                     {% else %}
+
                         <p class="report-unavailable">
                             Saved text is unavailable for this report.
                         </p>
+
                     {% endif %}
+
                 </div>
             </details>
+
         </article>
+
         {% else %}
+
         <div class="reports-empty">
             <i class="fas fa-chart-line" aria-hidden="true"></i>
+
             <h2>No Reports Yet</h2>
             <p>Analyze your content to see results here.</p>
-            <a href="{{ url_for('user.generator') }}">Generate Content</a>
+
+            <a href="{{ url_for('user.generator') }}">
+                Generate Content
+            </a>
         </div>
+
         {% endfor %}
+
     </div>
 
-    <nav id="reportsPagination"
-         class="reports-pagination"
-         aria-label="Reports pagination"
-         hidden></nav>
+    <nav
+        id="reportsPagination"
+        class="reports-pagination"
+        aria-label="Reports pagination"
+        hidden
+    ></nav>
+
 </div>
 {% endblock %}
+
 
 {% block js %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+    "use strict";
+
     const page = document.getElementById("reportsWorkspace");
+
     if (!page) return;
 
-    const cards = [...page.querySelectorAll(".report-card")];
+    const cards = Array.from(
+        page.querySelectorAll(".reports-container .report-card")
+    );
+
     const search = page.querySelector("#searchReports");
     const select = page.querySelector("#reportsPerPage");
     const count = page.querySelector("#reportsResultCount");
     const noMatch = page.querySelector("#reportsNoMatch");
     const clear = page.querySelector("#clearReportsSearch");
     const pagination = page.querySelector("#reportsPagination");
+
+    if (!cards.length) {
+        if (count) count.textContent = "0 reports";
+        return;
+    }
+
+    if (
+        !search || !select || !count ||
+        !noMatch || !clear || !pagination
+    ) {
+        return;
+    }
+
     let currentPage = 1;
 
-    if (!cards.length) return;
+    function addButton(label, target, disabled = false, active = false) {
+        const button = document.createElement("button");
 
-    function button(label, target, disabled = false, active = false) {
-        const element = document.createElement("button");
-        element.type = "button";
-        element.textContent = label;
-        element.disabled = disabled;
+        button.type = "button";
+        button.textContent = String(label);
+        button.disabled = disabled;
 
-        if (active) element.setAttribute("aria-current", "page");
+        if (active) {
+            button.setAttribute("aria-current", "page");
+        }
 
-        element.addEventListener("click", () => {
+        button.addEventListener("click", () => {
             currentPage = target;
             render();
+
+            page.querySelector(".reports-tools")?.scrollIntoView({
+                behavior: "auto",
+                block: "start"
+            });
+
+            pagination.querySelector(
+                '[aria-current="page"]'
+            )?.focus({ preventScroll: true });
         });
 
-        pagination.appendChild(element);
+        pagination.appendChild(button);
+    }
+
+    function addEllipsis() {
+        const span = document.createElement("span");
+
+        span.textContent = "…";
+        span.setAttribute("aria-hidden", "true");
+
+        pagination.appendChild(span);
     }
 
     function render() {
         const query = search.value.trim().toLowerCase();
         const size = Number(select.value) || 5;
-        const filtered = cards.filter(card =>
-            (card.dataset.topic || "").toLowerCase().includes(query)
-        );
-        const pages = Math.max(1, Math.ceil(filtered.length / size));
-        currentPage = Math.min(currentPage, pages);
-        const start = (currentPage - 1) * size;
 
-        cards.forEach(card => { card.hidden = true; });
-        filtered.slice(start, start + size).forEach(card => {
+        const filtered = cards.filter(card => {
+            const text = [
+                card.dataset.topic || "",
+                card.dataset.type || ""
+            ].join(" ").toLowerCase();
+
+            return text.includes(query);
+        });
+
+        const pages = Math.max(
+            1,
+            Math.ceil(filtered.length / size)
+        );
+
+        currentPage = Math.max(
+            1,
+            Math.min(currentPage, pages)
+        );
+
+        const start = (currentPage - 1) * size;
+        const end = Math.min(start + size, filtered.length);
+
+        cards.forEach(card => {
+            card.hidden = true;
+        });
+
+        filtered.slice(start, end).forEach(card => {
             card.hidden = false;
         });
 
         noMatch.hidden = filtered.length !== 0;
+
         count.textContent = filtered.length
-            ? `Showing ${start + 1}–${Math.min(start + size, filtered.length)} of ${filtered.length} reports`
+            ? (
+                `Showing ${start + 1}–${end} of `
+                + `${filtered.length} reports`
+                + ` · Page ${currentPage} of ${pages}`
+            )
             : "0 matching reports";
 
         pagination.replaceChildren();
         pagination.hidden = pages <= 1;
 
-        if (pages > 1) {
-            button("Previous", currentPage - 1, currentPage === 1);
-            const first = Math.max(1, Math.min(currentPage - 2, pages - 4));
-            const last = Math.min(pages, first + 4);
+        if (pages <= 1) return;
 
-            for (let number = first; number <= last; number++) {
-                button(String(number), number, false, number === currentPage);
-            }
+        addButton(
+            "Previous",
+            currentPage - 1,
+            currentPage === 1
+        );
 
-            button("Next", currentPage + 1, currentPage === pages);
+        const first = Math.max(
+            1,
+            Math.min(currentPage - 2, pages - 4)
+        );
+
+        const last = Math.min(pages, first + 4);
+
+        if (first > 1) {
+            addButton(1, 1);
+
+            if (first > 2) addEllipsis();
         }
+
+        for (let number = first; number <= last; number++) {
+            addButton(
+                number,
+                number,
+                false,
+                number === currentPage
+            );
+        }
+
+        if (last < pages) {
+            if (last < pages - 1) addEllipsis();
+
+            addButton(pages, pages);
+        }
+
+        addButton(
+            "Next",
+            currentPage + 1,
+            currentPage === pages
+        );
     }
 
     search.addEventListener("input", () => {

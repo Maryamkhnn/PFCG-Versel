@@ -886,3 +886,929 @@
         font-size: 13px;
     }
 }
+/* =========================================================
+   ACTIVITY LOGS
+========================================================= */
+
+
+/* HEADER */
+
+.logs-top-header {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.logs-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logs-title-row h1 {
+    margin: 0;
+    font-size: 27px;
+    font-weight: 700;
+    color: #202431;
+}
+
+.logs-title-row i {
+    font-size: 20px;
+    color: #6d4aff;
+}
+
+.logs-top-header p {
+    margin: 0;
+    font-size: 14px;
+    color: #7a7f8c;
+}
+
+
+/* PAGE */
+
+.logs-page {
+    width: 100%;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+
+/* SUMMARY */
+
+.logs-summary {
+    margin-bottom: 22px;
+}
+
+.summary-card {
+    width: 100%;
+    max-width: 350px;
+
+    padding: 20px 22px;
+
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    background: #ffffff;
+
+    border: 1px solid #ececf2;
+    border-radius: 14px;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+}
+
+.summary-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 13px;
+
+    background: #eeeaff;
+    color: #6847e8;
+
+    font-size: 19px;
+}
+
+.summary-card span {
+    font-size: 13px;
+    color: #747986;
+}
+
+.summary-card h2 {
+    margin: 4px 0 0;
+
+    font-size: 26px;
+    font-weight: 700;
+
+    color: #242936;
+}
+
+
+/* MAIN CARD */
+
+.logs-card {
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #ececf2;
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.04);
+}
+
+
+/* CARD HEADER */
+
+.logs-card-header {
+    padding: 19px 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid #ededf2;
+}
+
+.logs-card-header h2 {
+    margin: 0 0 4px;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    color: #252a36;
+}
+
+.logs-card-header p {
+    margin: 0;
+
+    font-size: 13px;
+    color: #818691;
+}
+
+.card-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #eeeaff;
+    color: #6847e8;
+
+    font-size: 17px;
+}
+
+
+/* TABLE */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.logs-table {
+    width: 100%;
+    min-width: 950px;
+
+    border-collapse: collapse;
+
+    font-size: 13px;
+}
+
+.logs-table thead {
+    background: #f8f8fb;
+}
+
+.logs-table th {
+    padding: 14px 16px;
+
+    text-align: left;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    color: #606572;
+
+    text-transform: uppercase;
+    letter-spacing: 0.35px;
+
+    border-bottom: 1px solid #e8e8ed;
+
+    white-space: nowrap;
+}
+
+.logs-table td {
+    padding: 15px 16px;
+
+    vertical-align: middle;
+
+    color: #4e5460;
+
+    border-bottom: 1px solid #f0f0f3;
+}
+
+.logs-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.logs-table tbody tr:hover {
+    background: #faf9ff;
+}
+
+.logs-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* NUMBER */
+
+.row-number {
+    font-weight: 600;
+    color: #9297a1 !important;
+}
+
+
+/* ADMIN */
+
+.admin-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    white-space: nowrap;
+}
+
+.admin-avatar {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #eeeaff;
+    color: #6847e8;
+
+    font-size: 12px;
+}
+
+.admin-cell span {
+    font-weight: 500;
+    color: #383e49;
+}
+
+
+/* ACTION */
+
+.action-badge {
+    display: inline-flex;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    background: #eaf7ef;
+    color: #198754;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* TARGET */
+
+.target-badge {
+    display: inline-flex;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    background: #eeeaff;
+    color: #6447d7;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* DETAILS */
+
+.details-cell {
+    max-width: 230px;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: #626873;
+}
+
+
+/* DATE */
+
+.log-date {
+    font-size: 12px;
+    color: #7d828d;
+
+    white-space: nowrap;
+}
+
+
+/* EMPTY */
+
+.empty-state {
+    padding: 65px 20px;
+
+    text-align: center;
+}
+
+.empty-icon {
+    width: 65px;
+    height: 65px;
+
+    margin: 0 auto 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #eeeaff;
+    color: #6847e8;
+
+    font-size: 23px;
+}
+
+.empty-state h3 {
+    margin: 0 0 7px;
+
+    font-size: 18px;
+    color: #343944;
+}
+
+.empty-state p {
+    margin: 0;
+
+    font-size: 13px;
+    color: #858a94;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+
+    .logs-page {
+        padding: 16px;
+    }
+
+    .summary-card {
+        max-width: none;
+        box-sizing: border-box;
+    }
+
+    .logs-title-row h1 {
+        font-size: 24px;
+    }
+
+}
+    .logs-table tbody tr[hidden],
+    #logsPagination[hidden] {
+        display: none !important;
+    }
+
+    .logs-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 18px;
+    }
+
+    .logs-pagination button {
+        padding: 8px 14px;
+        border: 1px solid #ddd6fe;
+        border-radius: 8px;
+        background: white;
+        color: #6d28d9;
+        cursor: pointer;
+    }
+
+    .logs-pagination button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+/* Pagination */
+
+.logs-table tbody tr[hidden],
+#logsPagination[hidden] {
+    display: none !important;
+}
+
+.logs-page .logs-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 18px;
+    border-top: 1px solid #ececf2;
+}
+
+.logs-page .logs-pagination button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 15px;
+    border: 1px solid #e4dcf2;
+    border-radius: 10px;
+    background: #f5f1fc;
+    color: #6347d8;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.logs-page .logs-pagination button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.logs-page .logs-pagination span {
+    color: #777184;
+    font-size: 12px;
+    text-align: center;
+}
+
+
+/* Mobile layout */
+
+@media (max-width: 768px) {
+
+    .logs-page {
+        width: 100%;
+        min-width: 0;
+        padding: 0;
+    }
+
+    .logs-title-row {
+        gap: 10px;
+    }
+
+    .logs-title-row h1 {
+        font-size: 22px;
+        line-height: 1.4;
+    }
+
+    .logs-title-row i {
+        flex-shrink: 0;
+        font-size: 19px;
+    }
+
+    .logs-top-header p {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    /* Total activities */
+
+    .logs-summary {
+        margin-bottom: 18px;
+    }
+
+    .logs-page .summary-card {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        padding: 17px;
+        gap: 13px;
+        box-sizing: border-box;
+    }
+
+    .logs-page .summary-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        font-size: 18px;
+    }
+
+    .logs-page .summary-card > div:last-child {
+        min-width: 0;
+    }
+
+    .logs-page .summary-card span {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .logs-page .summary-card h2 {
+        font-size: 25px;
+        line-height: 1.3;
+        font-variant-numeric: tabular-nums;
+        overflow-wrap: anywhere;
+    }
+
+    /* Main card heading */
+
+    .logs-card {
+        min-width: 0;
+        border-radius: 15px;
+    }
+
+    .logs-card-header {
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .logs-card-header > div:first-child {
+        min-width: 0;
+    }
+
+    .logs-card-header h2 {
+        font-size: 17px;
+        line-height: 1.4;
+    }
+
+    .logs-card-header p {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .logs-page .card-icon {
+        flex-shrink: 0;
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+    }
+
+    /* Table becomes activity cards */
+
+    .logs-page .table-container {
+        min-width: 0;
+        padding: 12px;
+        overflow: visible;
+        box-sizing: border-box;
+    }
+
+    .logs-table {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .logs-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .logs-table tbody {
+        display: grid;
+        gap: 14px;
+        width: 100%;
+    }
+
+    .logs-table .activity-log-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 12px;
+        min-width: 0;
+        padding: 15px;
+        border: 1px solid #e9e3f1;
+        border-radius: 13px;
+        background: #fff;
+    }
+
+    .logs-table .activity-log-row > td {
+        display: block;
+        min-width: 0;
+        width: auto;
+        padding: 0;
+        border: 0;
+        font-size: 12px;
+        line-height: 1.6;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    /* Activity number */
+
+    .logs-table .activity-log-row > td:nth-child(1) {
+        grid-column: 1 / -1;
+        font-size: 11px;
+    }
+
+    .logs-table .activity-log-row > td:nth-child(1)::before {
+        content: "Activity #";
+        margin-right: 4px;
+        color: #8a8097;
+    }
+
+    /* Administrator */
+
+    .logs-table .activity-log-row > td:nth-child(2) {
+        grid-column: 1 / -1;
+        padding-bottom: 13px;
+        border-bottom: 1px solid #eee9f5;
+    }
+
+    .logs-page .admin-cell {
+        min-width: 0;
+        gap: 9px;
+        white-space: normal;
+    }
+
+    .logs-page .admin-cell span {
+        flex: 1;
+        min-width: 0;
+        font-size: 12px;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+
+    /* Field labels */
+
+    .logs-table .activity-log-row > td:nth-child(n+3)::before {
+        display: block;
+        margin-bottom: 6px;
+        color: #8a8097;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .logs-table .activity-log-row > td:nth-child(3)::before {
+        content: "Action";
+    }
+
+    .logs-table .activity-log-row > td:nth-child(4)::before {
+        content: "Target";
+    }
+
+    .logs-page .action-badge,
+    .logs-page .target-badge {
+        max-width: 100%;
+        padding: 6px 10px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        font-size: 11px;
+        line-height: 1.5;
+        box-sizing: border-box;
+    }
+
+    /* Complete details */
+
+    .logs-table .activity-log-row > td:nth-child(5) {
+        grid-column: 1 / -1;
+    }
+
+    .logs-table .activity-log-row > td:nth-child(5)::before {
+        content: "Details";
+    }
+
+    .logs-page .details-cell {
+        max-width: none;
+        white-space: normal;
+        overflow: visible;
+        overflow-wrap: anywhere;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    /* Date and time */
+
+    .logs-table .activity-log-row > td:nth-child(6) {
+        grid-column: 1 / -1;
+        padding-top: 12px;
+        border-top: 1px solid #eee9f5;
+    }
+
+    .logs-table .activity-log-row > td:nth-child(6)::before {
+        content: "Date & Time";
+    }
+
+    .logs-page .log-date {
+        font-size: 12px;
+        white-space: normal;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Pagination */
+
+    .logs-page .logs-pagination {
+        gap: 10px;
+        padding: 15px 12px;
+    }
+
+    #logsPageInfo {
+        order: -1;
+        width: 100%;
+    }
+
+    .logs-page .logs-pagination button {
+        flex: 1;
+        max-width: 160px;
+    }
+
+    /* Empty state */
+
+    .logs-page .empty-state {
+        padding: 35px 16px;
+    }
+
+    .logs-page .empty-state h3 {
+        font-size: 17px;
+    }
+
+    .logs-page .empty-state p {
+        font-size: 12px;
+        line-height: 1.7;
+    }
+}
+
+@media (hover: none) {
+    .logs-page .logs-pagination button:hover {
+        transform: none;
+    }
+}
+/* Improve mobile readability and spacing */
+
+@media (max-width: 768px) {
+
+    .logs-top-header p {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .logs-page .summary-card {
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .logs-page .summary-card span {
+        font-size: 13px;
+    }
+
+    .logs-page .summary-card h2 {
+        font-size: 27px;
+    }
+
+    .logs-card-header {
+        padding: 16px;
+    }
+
+    .logs-card-header h2 {
+        font-size: 18px;
+    }
+
+    .logs-card-header p {
+        font-size: 13px;
+    }
+
+    .logs-page .table-container {
+        padding: 10px;
+        background: #faf9fd;
+    }
+
+    .logs-table tbody {
+        gap: 12px;
+    }
+
+    .logs-table .activity-log-row {
+        padding: 15px;
+        gap: 11px 12px;
+        border: 1px solid #e5ddf0;
+        border-radius: 12px;
+        box-shadow: 0 2px 7px rgba(40, 22, 70, .03);
+    }
+
+    .logs-table .activity-log-row > td {
+        font-size: 14px;
+    }
+
+    /* Small reference number */
+
+    .logs-table .activity-log-row > td:nth-child(1) {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    /* Email and avatar */
+
+    .logs-table .activity-log-row > td:nth-child(2) {
+        padding-bottom: 11px;
+    }
+
+    .logs-page .admin-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .logs-page .admin-cell span {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    /* Action and target */
+
+    .logs-table .activity-log-row > td:nth-child(n+3)::before {
+        margin-bottom: 5px;
+        font-size: 12px;
+        color: #81758f;
+    }
+
+    .logs-page .action-badge,
+    .logs-page .target-badge {
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* Details */
+
+    .logs-table .activity-log-row > td:nth-child(5) {
+        padding: 10px 12px;
+        background: #f7f4fc;
+        border-radius: 9px;
+    }
+
+    .logs-page .details-cell {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #51445f;
+    }
+
+    /* Compact date row */
+
+    .logs-table .activity-log-row > td:nth-child(6) {
+        padding-top: 10px;
+        line-height: 1.6;
+    }
+
+    .logs-table .activity-log-row > td:nth-child(6)::before {
+        content: "Date:";
+        display: inline;
+        margin-right: 5px;
+        font-size: 12px;
+    }
+
+    .logs-page .log-date {
+        font-size: 12px;
+        color: #756981;
+    }
+
+    .logs-page .logs-pagination button,
+    .logs-page .logs-pagination span {
+        font-size: 13px;
+    }
+}
+
+/* ==========================================
+   ACTIVITY LOGS - TOP SPACING FIX
+========================================== */
+
+.logs-page {
+    width: 100%;
+    padding: 0 24px 24px !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+}
+
+.logs-page .logs-summary {
+    margin-top: 0 !important;
+    margin-bottom: 20px !important;
+}
+
+.logs-page .summary-card {
+    margin-top: 0 !important;
+}
+
+/* TABLET */
+@media (max-width: 900px) {
+    .logs-page {
+        padding: 0 18px 20px !important;
+    }
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+    .logs-page {
+        padding: 0 12px 16px !important;
+    }
+
+    .logs-page .logs-summary {
+        margin-bottom: 14px !important;
+    }
+}

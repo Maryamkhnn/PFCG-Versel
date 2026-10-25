@@ -606,56 +606,94 @@ def update_humanized_content(content_id):
     from app.database import db
 
     user_id = session.get("user_id")
+
     if not user_id:
         return jsonify({
             "success": False,
             "message": "Please sign in again."
         }), 401
 
-    data = request.get_json(silent=True) or {}
-    content = str(data.get("content") or "").strip()
+    data = request.get_json(silent=True)
 
-    if not content:
+    if not isinstance(data, dict):
+        return jsonify({
+            "success": False,
+            "message": "Valid content is required."
+        }), 400
+
+    content = data.get("content")
+
+    if not isinstance(content, str) or not content.strip():
         return jsonify({
             "success": False,
             "message": "Content cannot be empty."
         }), 400
 
+    content = content.strip()
+
     try:
-        result = db.session.execute(
+        existing = db.session.execute(
+            text("""
+                SELECT id, humanized_content, is_edited
+                FROM humanized_history
+                WHERE id = :content_id
+                  AND user_id = :user_id
+                FOR UPDATE
+            """),
+            {
+                "content_id": content_id,
+                "user_id": user_id
+            }
+        ).mappings().first()
+
+        if existing is None:
+            db.session.rollback()
+
+            return jsonify({
+                "success": False,
+                "message": "Humanized content not found."
+            }), 404
+
+        changed = (
+            content != (existing["humanized_content"] or "").strip()
+        )
+
+        is_edited = bool(existing["is_edited"]) or changed
+
+        db.session.execute(
             text("""
                 UPDATE humanized_history
                 SET humanized_content = :content,
-                    word_count = :word_count
+                    word_count = :word_count,
+                    is_edited = :is_edited
                 WHERE id = :content_id
                   AND user_id = :user_id
             """),
             {
                 "content": content,
                 "word_count": len(content.split()),
+                "is_edited": int(is_edited),
                 "content_id": content_id,
                 "user_id": user_id
             }
         )
 
-        if result.rowcount == 0:
-            db.session.rollback()
-            return jsonify({
-                "success": False,
-                "message": "Humanized content not found."
-            }), 404
-
         db.session.commit()
-        return jsonify({"success": True, "message": "Changes saved."})
+
+        return jsonify({
+            "success": True,
+            "message": "Changes saved.",
+            "is_edited": is_edited
+        })
 
     except Exception:
         db.session.rollback()
         current_app.logger.exception("HUMANIZED EDIT ERROR")
+
         return jsonify({
             "success": False,
             "message": "Unable to save humanized content."
-        }), 500
-        
+        }), 500       
 @user.route("/api/account/photo", methods=["GET"])
 @login_required
 def account_photo():

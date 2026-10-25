@@ -1190,3 +1190,348 @@ body.user-layout .main > .user-page-header {
 #seoHistoryPageInfo {
     font-size: 14px;
 }
+
+/* =========================================
+   TITLE AND META DESCRIPTION
+========================================= */
+
+.seo-page #seoTitle,
+.seo-page #metaDescription {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid #ddd7eb;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #292239;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.seo-page #metaDescription {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.seo-page #seoTitle::placeholder,
+.seo-page #metaDescription::placeholder {
+    color: #82798f;
+}
+
+.seo-page #seoTitle:focus,
+.seo-page #metaDescription:focus {
+    outline: 2px solid transparent;
+    border-color: #7950ce;
+    box-shadow: 0 0 0 3px rgba(106, 61, 190, 0.12);
+}
+
+.seo-page #seoTitle:disabled,
+.seo-page #metaDescription:disabled {
+    background: #f4f1f8;
+    color: #72697e;
+    cursor: not-allowed;
+}
+
+/* =========================================
+   SUGGEST METADATA BUTTON
+========================================= */
+
+.seo-page #suggestMetadataBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 46px;
+    margin: 18px 0 0;
+    padding: 12px 14px;
+    border: 1px solid #d9cbed;
+    border-radius: 10px;
+    background: #f1eafb;
+    color: #59319a;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: normal;
+    text-align: center;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.seo-page #suggestMetadataBtn:hover:not(:disabled) {
+    background: #e8dcf8;
+    border-color: #b99bdc;
+}
+
+.seo-page #suggestMetadataBtn:focus-visible {
+    outline: 3px solid #7950ce;
+    outline-offset: 3px;
+}
+
+.seo-page #suggestMetadataBtn:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+.seo-page #metadataSuggestionStatus {
+    margin: 10px 0 20px;
+    color: #696173;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================
+   DETAILED CHECKS
+========================================= */
+
+.seo-page #seoDetailedChecks {
+    margin-top: 16px;
+}
+
+.seo-page #seoDetailedChecks .seo-check-row {
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid #e5dfed;
+    border-left: 4px solid #7950ce;
+    border-radius: 10px;
+    background: #faf8fd;
+    overflow-wrap: anywhere;
+}
+
+.seo-page #seoDetailedChecks .seo-check-row strong {
+    display: block;
+    margin: 0 0 7px;
+    color: #402765;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+.seo-page #seoDetailedChecks .seo-check-row p {
+    margin: 0;
+    color: #635b6e;
+    font-size: 14px;
+    line-height: 1.75;
+}
+
+.seo-page #seoDetailedChecks > p {
+    margin: 16px 0 0;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: #f0ebf7;
+    color: #514361;
+    font-size: 13px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================
+   CHANGED CONTENT / SAVED REPORT NOTICE
+========================================= */
+
+.seo-page #seoStaleNotice:empty {
+    display: none;
+}
+
+.seo-page #seoStaleNotice:not(:empty) {
+    margin: 16px 0 0;
+    padding: 12px 14px;
+    border: 1px solid #ecd6a6;
+    border-radius: 9px;
+    background: #fff8e9;
+    color: #76551a;
+    font-size: 13px;
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================
+   SAVED REPORT BUTTON
+========================================= */
+
+.seo-page .seo-history-table td > .seo-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: 1px solid #d9cbed;
+    border-radius: 8px;
+    background: #f1eafb;
+    color: #59319a;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: normal;
+    cursor: pointer;
+}
+
+.seo-page .seo-history-table td > .seo-btn:hover {
+    background: #e8dcf8;
+}
+
+.seo-page .seo-history-table td > .seo-btn:focus-visible {
+    outline: 3px solid #7950ce;
+    outline-offset: 2px;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+    .seo-page #seoTitle,
+    .seo-page #metaDescription {
+        font-size: 16px;
+    }
+
+    .seo-page #suggestMetadataBtn {
+        min-height: 48px;
+    }
+
+    .seo-page #seoDetailedChecks .seo-check-row {
+        padding: 13px;
+    }
+
+    .seo-page .seo-history-table td > .seo-btn {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 480px) {
+    .seo-page #suggestMetadataBtn {
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    .seo-page #seoDetailedChecks .seo-check-row {
+        padding: 12px;
+        border-left-width: 3px;
+    }
+
+    .seo-page #seoDetailedChecks .seo-check-row p {
+        font-size: 13px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .seo-page #seoTitle,
+    .seo-page #metaDescription,
+    .seo-page #suggestMetadataBtn {
+        transition: none;
+    }
+}
+/* Detailed Checks and AI Review */
+.seo-page .seo-suggestions > h3 {
+    margin: 0 0 8px;
+    color: var(--seo-text);
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.seo-page .seo-suggestions > p {
+    margin: 0 0 18px;
+    color: var(--seo-muted);
+    font-size: 13px;
+    line-height: 1.75;
+}
+
+.seo-page #seoDetailedChecks,
+.seo-page #seoAIReview {
+    display: grid;
+    gap: 12px;
+    margin-top: 18px;
+    color: var(--seo-muted);
+    font-size: 14px;
+    line-height: 1.75;
+}
+
+/* Same card styling for both sections */
+.seo-page #seoDetailedChecks .seo-check-row,
+.seo-page #seoAIReview .seo-check-row {
+    min-width: 0;
+    margin: 0;
+    padding: 18px 20px;
+    border: 1px solid #e6dff0;
+    border-left: 4px solid #8455ce;
+    border-radius: 12px;
+    background: #fcfaff;
+    overflow-wrap: anywhere;
+}
+
+.seo-page #seoDetailedChecks .seo-check-row > strong,
+.seo-page #seoAIReview .seo-check-row > strong {
+    display: block;
+    margin: 0 0 8px;
+    color: #402765;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.6;
+}
+
+.seo-page #seoDetailedChecks .seo-check-row p,
+.seo-page #seoAIReview .seo-check-row p {
+    margin: 0;
+    color: #655b72;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+/* AI suggestion inside each card */
+.seo-page #seoAIReview .seo-check-row p + p {
+    margin-top: 12px;
+    padding: 11px 14px;
+    border-radius: 8px;
+    background: #f0eafa;
+    color: #594174;
+    font-size: 13px;
+}
+
+/* Review note and measured summary */
+.seo-page #seoAIReview > p,
+.seo-page #seoDetailedChecks > p {
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px solid #e6ddf2;
+    border-radius: 10px;
+    background: #f5f1fb;
+    color: #70627f;
+    font-size: 12px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+}
+
+.seo-page .seo-report-card {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+    .seo-page #seoDetailedChecks .seo-check-row,
+    .seo-page #seoAIReview .seo-check-row {
+        padding: 14px;
+        border-left-width: 3px;
+    }
+
+    .seo-page #seoDetailedChecks .seo-check-row p,
+    .seo-page #seoAIReview .seo-check-row p {
+        font-size: 13px;
+    }
+
+    .seo-page .seo-suggestions > h3 {
+        font-size: 17px;
+    }
+}

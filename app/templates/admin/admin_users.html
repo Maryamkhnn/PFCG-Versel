@@ -356,7 +356,29 @@
                 <label for="editUsername">Username</label>
                 <input type="text" id="editUsername" maxlength="100">
             </div>
+            <div class="form-group">
+                <label for="editStatus">Current account status</label>
+                <input
+                    type="text"
+                    id="editStatus"
+                    readonly
+                >
+                <small class="privacy-note">
+                    Review automatic restrictions through Content Moderation.
+                </small>
+            </div>
 
+            <div class="form-group">
+                <label for="editReason">Edit reason</label>
+                <textarea
+                    id="editReason"
+                    minlength="10"
+                    maxlength="1000"
+                    rows="3"
+                    placeholder="Explain why these details need updating..."
+                    required
+                ></textarea>
+            </div>
             <button type="submit" class="save-btn" id="saveUserDetails">
                 Save Changes
             </button>
