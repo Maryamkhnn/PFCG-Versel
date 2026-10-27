@@ -328,22 +328,28 @@ def record_blocked_attempt(user_id, category):
                     "flagged": now,
                 },
             )
+             
         else:
-            db.session.execute(
-                text("""
-                    UPDATE moderation_review_cases
-                    SET pending = 1,
-                        restriction_count = :count,
-                        flagged_at = :flagged,
-                        reviewed_at = NULL
-                    WHERE id = :case_id
-                """),
-                {
-                    "count": restriction_count,
-                    "flagged": now,
-                    "case_id": case["id"],
-                },
-            )
+         db.session.execute(
+        text("""
+            UPDATE moderation_review_cases
+            SET pending = 1,
+                restriction_count = :count,
+                flagged_at = :flagged,
+                reviewed_at = NULL,
+                reviewed_by = NULL,
+                review_action = NULL,
+                review_reason = NULL,
+                last_reviewed_event_id = NULL
+            WHERE id = :case_id
+        """),
+        {
+            "count": restriction_count,
+            "flagged": now,
+            "case_id": case["id"],
+        },
+    )
+
 
         if restriction_count >= SUSPENSION_THRESHOLD:
             suspension_until = now + timedelta(hours=SUSPENSION_HOURS)

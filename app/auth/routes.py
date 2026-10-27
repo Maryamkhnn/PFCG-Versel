@@ -481,12 +481,12 @@ def forgot_password():
 
     db.session.commit()
 
+
     # Send reset email
     try:
-
         msg = Message(
             subject="PFCG - Password Reset Code",
-            sender=("PFCG AI", current_app.config["MAIL_USERNAME"]),
+            sender=current_app.config["MAIL_DEFAULT_SENDER"],
             recipients=[email]
         )
 
@@ -508,8 +508,10 @@ PFCG Team
         mail.send(msg)
 
     except Exception as e:
+        import traceback
 
-        print("PASSWORD RESET EMAIL ERROR:", str(e))
+        print("PASSWORD RESET EMAIL ERROR:", repr(e))
+        traceback.print_exc()
 
         return render_template(
             "auth/forgot_password.html",
@@ -521,6 +523,7 @@ PFCG Team
     return redirect(
         url_for("auth.reset_password")
     )
+
 # RESET PASSWORD
 
 @auth.route("/reset-password", methods=["GET", "POST"])

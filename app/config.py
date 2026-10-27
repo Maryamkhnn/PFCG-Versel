@@ -1,20 +1,20 @@
-
 import os
 from pathlib import Path
 from datetime import timedelta
 
 from dotenv import load_dotenv
+from sqlalchemy.engine import make_url
 
 
 # =====================================================
 # LOAD ENVIRONMENT VARIABLES
 # =====================================================
 
-env_path = Path(__file__).resolve().parent.parent / ".env"
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(
-    dotenv_path=env_path,
-    override=True
+    dotenv_path=BASE_DIR / ".env",
+    override=True,
 )
 
 
@@ -24,35 +24,38 @@ load_dotenv(
 
 class Config:
 
+    # =================================================
+    # SECURITY AND SESSION
+    # =================================================
+
     SECRET_KEY = os.getenv(
         "SECRET_KEY",
-        "PFCG_SECRET_KEY"
+        "PFCG_SECRET_KEY",
     )
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        "pool_pre_ping": True,
-        "pool_recycle": 300,
-    }
+
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=2)
+
     # =================================================
     # DATABASE CONFIGURATION
     # =================================================
 
-       # DATABASE CONFIGURATION
-    from sqlalchemy.engine import URL
+    railway_url = os.getenv("MYSQL_PUBLIC_URL", "").strip()
 
-        # DATABASE CONFIGURATION
-    from sqlalchemy.engine import make_url
-
-    railway_url = os.getenv("MYSQL_PUBLIC_URL")
     if not railway_url:
-        raise ValueError("MYSQL_PUBLIC_URL is missing from .env")
+        raise ValueError(
+            "MYSQL_PUBLIC_URL is missing from .env"
+        )
 
     SQLALCHEMY_DATABASE_URI = make_url(railway_url).set(
         drivername="mysql+pymysql",
-        database="pfcg_db",
     )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    PERMANENT_SESSION_LIFETIME = timedelta(hours=2)
+
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+    }
 
     # =================================================
     # EMAIL CONFIGURATION
@@ -67,6 +70,6 @@ class Config:
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
 
     MAIL_DEFAULT_SENDER = (
-        os.getenv("MAIL_DEFAULT_SENDER")
-        or MAIL_USERNAME
+        "PFCG AI",
+        os.getenv("MAIL_DEFAULT_SENDER") or MAIL_USERNAME,
     )

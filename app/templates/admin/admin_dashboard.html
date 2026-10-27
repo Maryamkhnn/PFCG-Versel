@@ -19,62 +19,11 @@
 
 <div class="dashboard-page">
 
-    {% if blocked_alerts %}
-    <section class="topic-alert-card">
-        <div class="topic-alert-heading">
-            <span class="topic-alert-icon">
-                <i class="fas fa-triangle-exclamation"></i>
-            </span>
-
-            <div>
-                <h2>Topics needing review</h2>
-                <p>Users with at least 3 blocked topic attempts in the last 24 hours.</p>
-            </div>
-
-            <span class="topic-alert-total">
-                {{ blocked_alerts | length }}
-            </span>
-        </div>
-
-        <div class="topic-alert-list">
-            {% for alert in blocked_alerts %}
-            <div class="topic-alert-row">
-                <div class="topic-alert-user">
-                    <span class="topic-alert-avatar">
-                        {{ alert.email[:1] | upper }}
-                    </span>
-
-                    <div>
-                        <strong>{{ alert.email }}</strong>
-                        <span>Restricted topic activity</span>
-                    </div>
-                </div>
-
-                <div class="topic-alert-actions">
-                    <span class="topic-attempt-count">
-                        {{ alert.attempts }} attempts
-                    </span>
-
-                    <a href="{{ url_for('admin.blocked_attempts', email=alert.email) }}"
-   class="topic-review-btn">
-    Review attempts
-    <i class="fas fa-arrow-right"></i>
-</a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
-
 <link rel="stylesheet"
       href="{{ url_for(
           'static',
           filename='css/admin/admin_dashboard.css'
       ) }}">
-
-
-
 
 
     <!-- =====================================================
